@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+* {
+  font-family:'Inter', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  margin-bottom: 0;
+}
+
+a, a:hover{
+  text-decoration: none;
+  color: unset;
+}
+
+.navbar-container {
+  margin-bottom: 20px;
+}
+
+.base-button-container{
+  text-align: center;
+  min-width: 100px;
+  width: 100px;
+}
+
+.base-button {
+  border-radius: 10px;
+  background-color: #3D9AD5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 17px;
+  min-height: 100px;
+}
+
+.base-button:hover {
+  background-color: #3D9AD5;
+  border: 1px solid white;
+}
+
+.base-button .icon-container svg{
+  width: 100%;
+  height: 100%;
+}
