@@ -1,9 +1,13 @@
 import IconButton from "..";
 import {ReactComponent as PersonIcon} from "assets/images/person-icon.svg";
 
-const PersonIconButton = () => {
+type Props = {
+    text : string;
+}
+
+const PersonIconButton = ({ text } : Props) => {
     return(
-        <IconButton icon={<PersonIcon/>}/>
+        <IconButton icon={<PersonIcon/>} text={text}/>
     );
 }
 

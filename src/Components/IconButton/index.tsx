@@ -3,9 +3,10 @@ import { ReactComponent as PlusIcon } from "assets/images/plus-icon.svg";
 
 type Props  = {
     icon : JSX.Element;
+    text : string;
 }
 
-const IconButton = ({ icon } : Props) => {
+const IconButton = ({ icon, text } : Props) => {
     return(
         <div className="base-button-container">
       <div className="content-container">
@@ -14,7 +15,7 @@ const IconButton = ({ icon } : Props) => {
             {icon}
           </div>
         </button>
-        <p>Conteúdo</p>
+        <p>{text}</p>
       </div>
     </div>
     );
