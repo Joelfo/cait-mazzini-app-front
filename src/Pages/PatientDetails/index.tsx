@@ -3,21 +3,25 @@ import PersonIconButton from "Components/IconButton/PersonIconButton";
 import "./index.css";
 import { useEffect, useState } from "react";
 import { API_URL } from "util/requests";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { LaravelPage } from "types/vendor/LaravelPage/LaravelPage";
 import { TrackingAppointmentChart } from "types/TrackingAppointmentChart";
 import { TrackingAppointmentChartType } from "types/enums/TrackingAppointmentChartType";
 import AddButton from "Components/IconButton/AddButton";
+import { Patient } from "types/Patient";
 
 export const PatientDetails = () => {
     const { patientId } = useParams(); 
     const [nurseryTrackingAppointmentChartsPage, setNurseryTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
     const [medicalTrackingAppointmentChartsPage, setMedicalTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
     const [farmacyTrackingAppointmentChartsPage, setFarmacyTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
-
-
+    const [patient, setPatient] = useState<Patient | null>(null);
     useEffect(() => {
+        axios.get(
+            `${API_URL}/patients/${patientId}`,
+        ).then((response) => setPatient(response.data));
+
         axios.get(
             `${API_URL}/patients/${patientId}/trackingAppointmentCharts/${TrackingAppointmentChartType.Nursery}`,
             {
@@ -65,7 +69,21 @@ export const PatientDetails = () => {
     }, [])
     return (
         <>
-            <div className="container">
+            {
+                patient
+                &&
+                <div className="container">
+                <div className="row main-info-container mb-4 mt-5">
+                    <div className="col-1 chart-container">
+                        <PersonIconButton text={patient.name}/>
+                    </div>
+                    <div className="col-1 chart-container">
+                        <Link to={"/patientForm/" + patient.id}>
+                            <ChartIconButton text="FichaCadastral" date=""/>
+                        </Link>
+                        
+                    </div>
+                </div>
                 <h5>Enfermeiro</h5>
                 <div className="row charts-container nursery-charts-container">
                     <div className="chart-container col-1">
@@ -119,6 +137,8 @@ export const PatientDetails = () => {
                     </div>
                 </div>
             </div>
+            }
+            
         </>
     );
 }

@@ -12,6 +12,10 @@ import { City } from "types/City";
 import { Nationality } from "types/Nationality";
 import { HealthUnity } from "types/HealthUnity";
 import { validate } from "gerador-validador-cpf";
+import { redirect, useNavigate } from "react-router";
+import { Modal, Spinner } from "react-bootstrap";
+import { useParams } from "react-router-dom";
+
 
 export const PatientForm = () => {
     const [cities, setCities] = useState<City[]>([]);
@@ -19,6 +23,9 @@ export const PatientForm = () => {
     const [nationalities, setNationalities] = useState<Nationality[]>([]);
     const [healthUnities, setHealthUnities] = useState<HealthUnity[]>([]);
     const [searchHealthUnities, setSearchHealthUnities] = useState<boolean>(false);
+    const [patient, setPatient] = useState<Patient | null>();
+
+    let { patientId } = useParams();
 
     const {
         register,
@@ -26,34 +33,71 @@ export const PatientForm = () => {
         handleSubmit,
         watch,
         formState : { errors },
-    } = useForm<Patient>();
+    } = useForm<Patient>({
+        defaultValues: async () => {
+            if (patientId) {
+                const response = await axios.get(`${API_URL}/patients/${patientId}`);
+                setPatient(response.data);
+                const district = (await axios.get<District>(`${API_URL}/districts/${response.data.district.id}`)).data;
+                setSelectedCityId(district.city.id);
+                setShowLoadingModal(false);
+                return {...response.data}
+            } else {
+                setShowLoadingModal(false);
+                return { isPregnant: false }
+            }
+            
+        }
+    });
     useEffect(() => console.log(errors), [errors]);
-
+    const navigate = useNavigate();
     const [errorMessages, setErrorMessages] = useState<string[]>([]);
 
+    const modalRef = useRef<HTMLDivElement | null>(null);
+    const [showLoadingModal, setShowLoadingModal] = useState<boolean>(true);
     
 
     const districtInputRef = useRef<HTMLSelectElement | null>(null);
     const {ref: districtReactHookRef, ...districtRegister } = register("district.id");
     const otherSpecialPopulationInputContainerRef = useRef<HTMLDivElement | null>(null);
     const healthUnityInputContainerRef = useRef<HTMLDivElement | null>(null);
+    const [selectedCityId, setSelectedCityId] = useState<number>();
 
     const onSubmit: SubmitHandler<Patient> = data => {
+        setShowLoadingModal(true);
+        
         axios.post(
             `${API_URL}/patients`,
             {
                 ...data
             }
-        )
+        ).then((response) => {
+            setShowLoadingModal(false);
+           navigate('/Home');
+        }).catch(() => {
+            window.alert("Ocorreu um erro, verifique os campos digitados");
+            setShowLoadingModal(false);
+        })
     };
 
     const onChangeCity : React.ChangeEventHandler<HTMLSelectElement> = (event) => {
-        axios.get(
+        axios.get<District[]>(
             `${API_URL}/cities/${event.target.value}/districts`
         ).then((response) => {
             setDistricts(response.data);
         })
     };
+
+    useEffect(() => {
+        if (selectedCityId) {
+            axios.get<District[]>(
+                `${API_URL}/cities/${selectedCityId}/districts`
+            ).then((response) => {
+                setDistricts(response.data);
+            })
+        }
+       
+    }, [selectedCityId])
 
     const watchSpecialPopulation = watch("specialPopulation");
     const watchArrival = watch("arrival");
@@ -81,7 +125,7 @@ export const PatientForm = () => {
     useEffect(() => {
         if (otherSpecialPopulationInputContainerRef.current) {
             if (watchSpecialPopulation === SpecialPopulationType.Other) {
-                otherSpecialPopulationInputContainerRef.current.classList.remove("d-none")
+                otherSpecialPopulationInputContainerRef.current.classList.remove("d-none");
             }
             else {
                 otherSpecialPopulationInputContainerRef.current.classList.add("d-none");
@@ -111,7 +155,14 @@ export const PatientForm = () => {
     }, [searchHealthUnities])
     return (
         <>
+        
+        <Modal show={showLoadingModal}>
+            <Modal.Body>
+                <Spinner animation="border" variant="primary" />
+            </Modal.Body>
+        </Modal>
         <div className="container">
+        
             <div className="col">
                 {
                     Object.keys(errors).map((key, index) => {
@@ -186,7 +237,7 @@ export const PatientForm = () => {
                                 <select id="healthUnity" className="form-select" {...register("healthUnity.id")}>
                                     {
                                         healthUnities.map(healthUnity => (
-                                            <option value={healthUnity.id} key={healthUnity.id}>
+                                            <option value={healthUnity.id} key={healthUnity.id} selected={healthUnity.id === patient?.healthUnity?.id}>
                                                 {healthUnity.name}
                                             </option>
                                         ))
@@ -272,7 +323,7 @@ export const PatientForm = () => {
 
                     <div className="row form-section justify-content-evenly">
                         <div className="form-group col-md-3 pregnant-input-group">
-                            <input id="isPregnant" className="form-check-input pregnant-checkbox" type="checkbox" {...register("isPregnant", {required: true})}/>
+                            <input id="isPregnant" className="form-check-input pregnant-checkbox" type="checkbox" {...register("isPregnant")}/>
                             <label className="form-check-label" htmlFor="isPregnant">Paciente gestante</label>
                         </div>
                         <div className="form-group col-md-3">
@@ -311,7 +362,7 @@ export const PatientForm = () => {
                             <label className="form-label" htmlFor="city">
                                 Cidade
                             </label>
-                            <select className="form-select" id="city" onChange={onChangeCity}>
+                            <select className="form-select" id="city" value={selectedCityId} onChange={event => setSelectedCityId(parseInt(event.target.value))}>
                                 {
                                     cities
                                     &&
@@ -335,7 +386,7 @@ export const PatientForm = () => {
                                     districts
                                     &&
                                     districts.map((district) => (
-                                        <option key={district.id} value={district.id}>
+                                        <option key={district.id} value={district.id} selected={district.id === patient?.district.id}>
                                             {district.name}
                                         </option>
                                     ))
@@ -362,7 +413,7 @@ export const PatientForm = () => {
                                 <label className="form-label" htmlFor="birthplace">
                                     Naturalidade
                                 </label>
-                                <input className="form-control" id="birthplace" {...register("birthPlace", {required: true})}/>
+                                <input className="form-control" id="birthplace" {...register("birthplace", {required: true})}/>
                         </div>
                     </div>
                     <div className="row form-section justify-content-center">
@@ -373,7 +424,6 @@ export const PatientForm = () => {
                     </div>
                     <div className="row form-section justify-content-center">
                         <div className="form-group col-md-3">
-                            <input type="submit"/>
                             <button type="submit" className="btn btn-primary w-100">Enviar</button>
                         </div>
                     </div>

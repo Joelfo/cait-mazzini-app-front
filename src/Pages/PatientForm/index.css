@@ -12,3 +12,8 @@
     display: flex;
     align-items: center;
 }
+
+.loading-modal {
+    height: 300px;
+    width: 300px;
+}

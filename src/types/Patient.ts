@@ -26,8 +26,8 @@ export type Patient = {
     specialPopulation: SpecialPopulationType,
     otherSpecialPopulation: string | null,
     biologicalGender: string,
-    district: IdModelDTO | undefined,
-    birthPlace: string,
+    district: IdModelDTO,
+    birthplace: string,
     nationality: IdModelDTO | undefined,
     healthUnity: IdModelDTO | undefined,
     _links: LaravelLink[];

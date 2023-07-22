@@ -12,7 +12,7 @@ const Navbar = () => {
           <img src={CaitMazziniLogo} alt="logo do CAIT Mazzini Bueno" />
           <h4>CAIT Mazzini Bueno e CASIC</h4>
         </a>
-        <Link to="/">
+        
           <button
             className="navbar-toggler"
             type="button"
@@ -24,7 +24,7 @@ const Navbar = () => {
           >
             <span className="navbar-toggler-icon"></span>
           </button>
-        </Link>
+        
         
 
         <div className="collapse navbar-collapse d-md-flex flex-md-row-reverse" id="navbarNav">

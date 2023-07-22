@@ -27,6 +27,10 @@ function App() {
         {
           path:"patientForm",
           element: <PatientForm/>
+        },
+        {
+          path: "patientForm/:patientId",
+          element: <PatientForm/>
         }
       ]
     }
