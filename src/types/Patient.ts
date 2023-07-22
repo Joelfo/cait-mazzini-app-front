@@ -1,3 +1,7 @@
+import { ArrivalType } from "./enums/ArrivalType";
+import { PatientType } from "./enums/PatientType";
+import { SpecialPopulationType } from "./enums/SpecialPopulationType";
+import { IdModelDTO } from "./vendor/IdModelDTO";
 import { LaravelLink } from "./vendor/LaravelLink";
 
 export type Patient = {
@@ -7,15 +11,24 @@ export type Patient = {
     rg: string;
     cpf: string;
     admissionDate: string;
-    type: string;
-    arrival: string;
+    type: PatientType;
+    arrival: ArrivalType;
     telephone1: string;
     telephone2: string;
     cep: string;
-    pregnant: boolean;
+    isPregnant: boolean;
     birthDate: string;
     recordCode: string;
     motherName: string;
-    address: string;
-    _links: LaravelLink;
+    street: string,
+    number: number,
+    complement: string | null,
+    specialPopulation: SpecialPopulationType,
+    otherSpecialPopulation: string | null,
+    biologicalGender: string,
+    district: IdModelDTO | undefined,
+    birthPlace: string,
+    nationality: IdModelDTO | undefined,
+    healthUnity: IdModelDTO | undefined,
+    _links: LaravelLink[];
 }

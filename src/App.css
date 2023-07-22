@@ -23,3 +23,7 @@ a, a:hover{
   min-width: 100px;
   width: 100px;
 }
+
+input, select {
+  background-color: white !important;
+}

@@ -9,6 +9,7 @@ import { AxiosParams } from 'types/vendor/AxiosParams';
 import { API_URL } from 'util/requests';
 import axios from 'axios';
 import AddButton from 'Components/IconButton/AddButton';
+import { Link } from 'react-router-dom';
 
 const ReceptionistHome = () => {
 
@@ -30,11 +31,13 @@ const ReceptionistHome = () => {
             .catch((error) => {
                 console.log(error)
             });
-    })
+    }, [])
     return(
         <div className="receptionist-home-container container">
             <div className="top-container d-flex justify-content-evenly align-items-center">
-            <AddButton/>
+            <Link to="/patientForm">
+                <AddButton/>
+            </Link>
             <SearchBar/>
             <PersonIconButton text="Usuário"/>
             </div>
@@ -42,7 +45,9 @@ const ReceptionistHome = () => {
              
                 {page && page.data.map((patient) => (
                     <div className="item-container col-2" key={patient.id.toString()}>
-                        <PersonIconButton text={patient.name}/>
+                        <a href={'/patient/' + patient.id}>
+                            <PersonIconButton text={patient.name}/>
+                        </a>
                     </div>
                     ) )}
             

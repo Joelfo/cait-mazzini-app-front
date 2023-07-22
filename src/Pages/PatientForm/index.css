@@ -1,0 +1,14 @@
+.form-section {
+    margin-bottom: 40px;
+}
+
+.pregnant-checkbox {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+}
+
+.pregnant-input-group {
+    display: flex;
+    align-items: center;
+}
