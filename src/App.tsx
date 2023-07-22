@@ -17,6 +17,10 @@ function App() {
           element: <ReceptionistHome/>
         },
         {
+          path: "/Home",
+          element: <ReceptionistHome/>
+        },
+        {
           path:"patient/:patientId",
           element: <PatientDetails/>
         },
