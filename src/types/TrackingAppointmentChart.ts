@@ -5,6 +5,7 @@ import { LaravelLink } from "./vendor/LaravelLink";
 export type TrackingAppointmentChart = {
     id : number;
     date: string;
+    schema: string;
     evolution: string;
     econduct: string;
     type: TrackingAppointmentChartType;
