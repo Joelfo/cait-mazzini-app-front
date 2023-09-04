@@ -24,6 +24,14 @@ a, a:hover{
   width: 100px;
 }
 
-input, select {
-  background-color: white !important;
+.form-mazzini-row {
+  margin-top: 20px;
 }
+
+.mazzini-form-section {
+  margin-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  padding: 20px 0px;
+}
+

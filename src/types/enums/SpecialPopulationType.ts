@@ -1,8 +1,8 @@
 export enum SpecialPopulationType {
-    None = "Nenhum",
-    Prisoner = "Presidiário",
-    Immigrant = "Imigrante",
-    Homeless = "Morador de rua",
-    HealthProfessional = "Profissional de saúde",
-    Other = "Outro",
+    None = 0,
+    Prisoner = 1,
+    Immigrant = 2,
+    Homeless = 3,
+    HealthProfessional = 4,
+    Other = 5,
 }

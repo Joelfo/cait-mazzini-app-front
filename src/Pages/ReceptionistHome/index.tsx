@@ -10,10 +10,11 @@ import { API_URL } from 'util/requests';
 import axios from 'axios';
 import AddButton from 'Components/IconButton/AddButton';
 import { Link } from 'react-router-dom';
+import { usePatientsStore } from 'Stores/UsePatientsStore';
 
 const ReceptionistHome = () => {
-
     const [page, setPage] = useState<LaravelPage<Patient>>();
+    const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
 
     useEffect(() => {
         const param: AxiosParams = {
@@ -45,14 +46,16 @@ const ReceptionistHome = () => {
              
                 {page && page.data.map((patient) => (
                     <div className="item-container col-2" key={patient.id.toString()}>
-                        <a href={'/patient/' + patient.id}>
+                        <Link to="/patient" onClick={() => setSelectedPatientId(patient.id)}>
                             <PersonIconButton text={patient.name}/>
-                        </a>
+                        </Link>
                     </div>
                     ) )}
             
                 <div className="item-container col-2">
-                    <AddButton/>
+                    <Link to="/patientForm">
+                        <AddButton/>
+                    </Link>
                 </div>
             </div>
         </div>

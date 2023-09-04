@@ -1,3 +1,4 @@
+import { IdModelDTO } from "./vendor/IdModelDTO";
 import { LaravelLink } from "./vendor/LaravelLink"
 
 export type VitalSignsMeasurement = {
@@ -5,9 +6,11 @@ export type VitalSignsMeasurement = {
     paMmhg: string,
     fcBpm: string,
     frIrpm: string,
+    taxCelsius: string,
     oxygenSaturationPercentage: string,
     weightKg: string,
-    weightM: string,
+    heightM: string,
     measurementDateTime: string,
+    patient: IdModelDTO
     _links: LaravelLink[];
 }

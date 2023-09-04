@@ -1,18 +1,23 @@
 import { ChartIconButton } from "Components/IconButton/ChartIconButton";
 import PersonIconButton from "Components/IconButton/PersonIconButton";
 import "./index.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_URL } from "util/requests";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { LaravelPage } from "types/vendor/LaravelPage/LaravelPage";
 import { TrackingAppointmentChart } from "types/TrackingAppointmentChart";
 import { TrackingAppointmentChartType } from "types/enums/TrackingAppointmentChartType";
 import AddButton from "Components/IconButton/AddButton";
 import { Patient } from "types/Patient";
+import { usePatientsStore } from "Stores/UsePatientsStore";
+import { StatsIconButton } from "Components/IconButton/StatsIconButton";
+import { VitalSignsMeasurementPopup } from "Components/VitalSignsMeasurementPopup";
 
 export const PatientDetails = () => {
-    const { patientId } = useParams(); 
+    const [searchParams, setSearchParams] = useSearchParams();
+    const patientId = usePatientsStore(state => state.selectedPatientId) ?? 1;
+    const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
     const [nurseryTrackingAppointmentChartsPage, setNurseryTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
     const [medicalTrackingAppointmentChartsPage, setMedicalTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
     const [farmacyTrackingAppointmentChartsPage, setFarmacyTrackingAppointmentChartsPage] = useState<LaravelPage<TrackingAppointmentChart>>();
@@ -66,7 +71,12 @@ export const PatientDetails = () => {
         ).then((response) => {
             setFarmacyTrackingAppointmentChartsPage(response.data);
         }).catch(error => console.log(error));
-    }, [])
+    }, []);
+
+    
+    const [ vitalSignsMeasurementPopupOpen, setVitalSignsMeasurementPopupOpen ] = useState<boolean>(false);
+
+    useEffect(() => console.log(vitalSignsMeasurementPopupOpen), [vitalSignsMeasurementPopupOpen]);
     return (
         <>
             {
@@ -78,10 +88,12 @@ export const PatientDetails = () => {
                         <PersonIconButton text={patient.name}/>
                     </div>
                     <div className="col-1 chart-container">
-                        <Link to={"/patientForm/" + patient.id}>
-                            <ChartIconButton text="FichaCadastral" date=""/>
+                        <Link to={"/patientForm"} onClick={() => setSelectedPatientId(patient.id)}>
+                            <ChartIconButton text="Ficha Cadastral" date=""/>
                         </Link>
-                        
+                    </div>
+                    <div className="col-1 chart-container">
+                        <StatsIconButton onClick={() => setVitalSignsMeasurementPopupOpen(true)} text="Medições de sinais vitais"/>
                     </div>
                 </div>
                 <h5>Enfermeiro</h5>
@@ -99,7 +111,10 @@ export const PatientDetails = () => {
                         ))
                     }
                     <div className="chart-container col-1">
+                        <Link to={'/TrackingAppointmentChart?patientId=' + patientId}>
                         <AddButton></AddButton>
+                        </Link>
+                        
                     </div>
                 </div>
                 
@@ -138,7 +153,7 @@ export const PatientDetails = () => {
                 </div>
             </div>
             }
-            
+            <VitalSignsMeasurementPopup show={vitalSignsMeasurementPopupOpen} onClose={() => setVitalSignsMeasurementPopupOpen(false)}/>
         </>
     );
 }

@@ -1,5 +1,5 @@
 export enum PatientType {
-    TB = "TB",
-    PNT = "PNT",
-    Chemoprofilaxys = "QUIMIOPROFILAXIA",
+    TB = 0,
+    PNT = 1,
+    Chemoprofilaxys = 2,
 }

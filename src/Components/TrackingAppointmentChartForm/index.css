@@ -1,0 +1,32 @@
+.ql-toolbar {
+    background-color: #3D9AD5;
+    border-radius: 5px 5px 0 0;
+}
+
+button:hover {
+    border: 1px solid #fff;
+}
+
+.ql-container {
+    background-color: #fff;
+    border-radius: 0 0 5px 5px;
+}
+
+.ql-editor {
+    font-size: 1rem;
+    min-height: 200px;
+}
+
+.ql-toolbar .ql-stroke {
+    fill: none;
+    stroke: #222423;
+}
+
+.ql-toolbar .ql-fill {
+    fill: #222423;
+    stroke: none;
+}
+
+.ql-toolbar .ql-picker {
+    color: #222423;
+}

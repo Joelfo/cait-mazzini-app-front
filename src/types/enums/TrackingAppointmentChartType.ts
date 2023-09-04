@@ -1,5 +1,5 @@
 export enum TrackingAppointmentChartType {
-    Medical = "Médica",
-    Nursery = "De enfermagem",
-    Farmacy = "Farmacêutica"
+    Medical = 0,
+    FromNursery = 1,
+    Farmaceuthical = 2
 }

@@ -8,10 +8,12 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-md bg-primary main-nav">
       <div className="container">
-        <a href="home" className="d-flex align-items-center">
-          <img src={CaitMazziniLogo} alt="logo do CAIT Mazzini Bueno" />
-          <h4>CAIT Mazzini Bueno e CASIC</h4>
-        </a>
+        <Link to="/home">
+          <div className="d-flex align-items-center">
+            <img src={CaitMazziniLogo} alt="logo do CAIT Mazzini Bueno" />
+            <h4>CAIT Mazzini Bueno e CASIC</h4>
+          </div>
+        </Link>
         
           <button
             className="navbar-toggler"
@@ -30,9 +32,9 @@ const Navbar = () => {
         <div className="collapse navbar-collapse d-md-flex flex-md-row-reverse" id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-                <a href="Home">
+                <Link to="/home">
                     Inicio
-                </a>
+                </Link>
             </li>
           </ul>
         </div>

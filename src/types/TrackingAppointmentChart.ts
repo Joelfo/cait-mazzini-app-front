@@ -1,5 +1,6 @@
 import { VitalSignsMeasurement } from "./VitalSignsMeasurement";
 import { TrackingAppointmentChartType } from "./enums/TrackingAppointmentChartType";
+import { IdModelDTO } from "./vendor/IdModelDTO";
 import { LaravelLink } from "./vendor/LaravelLink";
 
 export type TrackingAppointmentChart = {
@@ -7,9 +8,9 @@ export type TrackingAppointmentChart = {
     date: string;
     schema: string;
     evolution: string;
-    econduct: string;
+    conduct: string;
     type: TrackingAppointmentChartType;
-    vitalSignsMeasurement: VitalSignsMeasurement;
+    patient: IdModelDTO;
     _links: LaravelLink[];
 
 }

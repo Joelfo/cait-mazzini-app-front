@@ -1,5 +1,5 @@
 export enum ArrivalType {
-    Fowarded = 'ENCAMINHADO',
-    Referenced = 'REFERENCIADO',
-    SpontaneousDemand = 'DEMANDA ESPONTÂNEA',
+    Fowarded = 0,
+    Referenced = 1,
+    SpontaneousDemand = 2,
 }

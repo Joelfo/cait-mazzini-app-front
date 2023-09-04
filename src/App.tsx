@@ -5,6 +5,9 @@ import ReceptionistHome from "Pages/ReceptionistHome";
 import { Outlet, Router, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { PatientDetails } from "Pages/PatientDetails";
 import { PatientForm } from "Pages/PatientForm";
+import { TrackingAppointmentChart } from "Pages/TrackingAppointmentChart";
+import 'react-quill/dist/quill.snow.css';
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 function App() {
   const router = createBrowserRouter([
@@ -21,23 +24,27 @@ function App() {
           element: <ReceptionistHome/>
         },
         {
-          path:"patient/:patientId",
+          path:"/patient",
           element: <PatientDetails/>
         },
         {
-          path:"patientForm",
+          path:"/patientForm",
           element: <PatientForm/>
         },
         {
-          path: "patientForm/:patientId",
-          element: <PatientForm/>
+          path:"/trackingAppointmentChart",
+          element: <TrackingAppointmentChart/>
         }
       ]
     }
-  ])
+  ]);
+  
+  const queryClient = new QueryClient();
   return (
     <>
-    <RouterProvider router={router}/>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router}/>
+      </QueryClientProvider>
     </>
     
   );
@@ -45,12 +52,12 @@ function App() {
 
 function Root() {
   return (
-    <>
+    <div className="bg-secondary" style={{minHeight: '100vh'}}>
       <div className="navbar-container">
        <Navbar/>
       </div>
       <Outlet/>
-    </>
+    </div>
   )
 }
 
