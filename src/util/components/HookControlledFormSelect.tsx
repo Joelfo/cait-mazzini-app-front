@@ -27,7 +27,7 @@ export const HookControlledFormSelect = <FormEntityType extends HookForm.FieldVa
                     onChange={onChange}
                     onBlur={onBlur}
                     value={value}
-                    isInvalid={invalid} 
+                    isInvalid={invalid}
                 >
                     {children}
                 </ReactBootstrap.FormSelect>

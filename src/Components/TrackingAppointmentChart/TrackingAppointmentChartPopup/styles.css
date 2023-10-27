@@ -1,0 +1,13 @@
+.tracking-chart-title {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.tracking-chart-row {
+    padding-top: 0px;
+    padding-bottom: 10px;
+}
+
+.modal-50w {
+    min-width: 50vw;
+}

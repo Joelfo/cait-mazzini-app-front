@@ -3,11 +3,15 @@ import './App.css';
 import Navbar from './Components/Navbar';
 import ReceptionistHome from "Pages/ReceptionistHome";
 import { Outlet, Router, RouterProvider, createBrowserRouter } from "react-router-dom";
-import { PatientDetails } from "Pages/PatientDetails";
-import { PatientForm } from "Pages/PatientForm";
+import { PatientDetails } from "Pages/Patient/PatientDetails";
+import { PatientForm } from "Pages/Patient/PatientForm";
 import { TrackingAppointmentChart } from "Pages/TrackingAppointmentChart";
 import 'react-quill/dist/quill.snow.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { PatientInfo } from "Pages/Patient/PatientInfo";
+import { LifeHabitsForm } from "Components/LifeHabitsForm";
+import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm";
+import { FirstNurseryChartPage } from "Pages/FirstNurseryChart";
 
 function App() {
   const router = createBrowserRouter([
@@ -34,6 +38,26 @@ function App() {
         {
           path:"/trackingAppointmentChart",
           element: <TrackingAppointmentChart/>
+        },
+        {
+          path:"/patientInfo",
+          element: <PatientInfo/>
+        },
+        {
+          path:'/lifeHabits',
+          element: <></>
+        },
+        {
+          path: '/clinicalHistory',
+          element: <></>
+        },
+        {
+          path: '/physicalExam',
+          element: <></>
+        },
+        {
+          path: '/firstNurseryChart',
+          element: <FirstNurseryChartPage/>
         }
       ]
     }

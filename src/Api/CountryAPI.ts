@@ -1,8 +1,8 @@
-import { Country } from "types/Country";
-import { ResourceAPI } from "./ResourceAPI";
+import { Country } from "types/Api/Country";
+import { ResourceAPI } from "./Base/ResourceAPI";
 
 export class CountryAPI extends ResourceAPI<Country> {
     public constructor() {
-        super('Country');
+        super('Countries');
     }
 }

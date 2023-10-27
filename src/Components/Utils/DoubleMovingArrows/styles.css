@@ -1,0 +1,21 @@
+.arrow-container {
+    position: absolute;
+    top: calc(50vh - 80px);
+    z-index: 999999;
+    color:#d9d9d9;
+}
+
+.arrow-container:hover {
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.left-arrow-container {
+    left: 10vw;
+}
+
+.right-arrow-container {
+    left: calc(90vw - 80px);
+    
+}
+

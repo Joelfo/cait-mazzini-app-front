@@ -7,7 +7,7 @@ export type HookControlledFormControlProps<FormEntityType extends HookForm.Field
         control: HookForm.Control<FormEntityType, any>, 
         name: HookForm.FieldPath<FormEntityType>, 
         formControlType: string,
-        rules: Omit<HookForm.RegisterOptions<FormEntityType, HookForm.Path<FormEntityType>>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>;
+        rules: Omit<HookForm.RegisterOptions<FormEntityType, HookForm.Path<FormEntityType>>, 'valueAsNumber' | 'valueAsDate' | 'setValueAs' | 'disabled'>
     }
 
 export const HookControlledFormControl = <FormEntityType extends HookForm.FieldValues = HookForm.FieldValues, 
