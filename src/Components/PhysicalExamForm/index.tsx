@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { PhysicalExam } from "types/Api/PhysicalExam";
+import { PhysicalExam } from "types/Api/DTOs/PhysicalExam";
 import { QUILL_DEFAULT_MODULES } from "util/QuillDefaultModules";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
@@ -16,7 +16,7 @@ import { justRequiredRule } from "util/validation";
 
 export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData } : PhysicalExamFormProps) => {
 
-    const patient = useSelectedPatient();
+    const { patient } = useSelectedPatient();
 
     const {
         handleSubmit,

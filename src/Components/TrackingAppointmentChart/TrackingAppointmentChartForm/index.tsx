@@ -5,8 +5,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { Alert, Button, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
-import { Patient } from 'types/Api/Patient';
-import { TrackingAppointmentChart } from 'types/Api/TrackingAppointmentChart';
+import { Patient } from 'types/Api/DTOs/Patient';
+import { TrackingAppointmentChart } from 'types/Api/DTOs/TrackingAppointmentChart';
 import { justRequiredRule, requiredTextMessage } from 'util/validation';
 import './index.css';
 import { registerForBootstrap } from 'util/HookFormBootstrapUtils';
@@ -15,6 +15,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TrackingAppointmentChartType } from 'types/enums/TrackingAppointmentChartType';
 import { getActualDate } from 'util/DateUtils';
 import { TrackingAppointmentChartAPI } from 'Api/TrackingAppointmentChartAPI';
+import { ConnectionErrorAlert } from 'Components/Utils/Alert/ConnectionErrorAlert';
 
 export const TrackingAppointmentChartForm = () => {
     const {
@@ -29,7 +30,7 @@ export const TrackingAppointmentChartForm = () => {
 
     const [isFormValidated, setIsFormValidated] = useState<boolean>(false);
 
-    const patient = useSelectedPatient();
+    const { patient, isError: isPatientError } = useSelectedPatient();
 
     const urlParams = useSearchParams()[0]
 
@@ -168,7 +169,7 @@ export const TrackingAppointmentChartForm = () => {
                     </Row>
                     <Row className='mt-4'>
                         <Col md={12} style={{display:'flex', justifyContent:'center'}}>
-                            <Button type='submit' variant='primary' size='lg'> 
+                            <Button type='submit' variant='primary' size='lg' disabled={isPatientError}> 
                                 {
                                     !isLoading ?
                                         <Fragment> Salvar ficha </Fragment>
@@ -200,6 +201,7 @@ export const TrackingAppointmentChartForm = () => {
                 <Alert.Heading> Erro ao salvar os dados. </Alert.Heading>
                 <p>Por favor, verifique sua conexão à internet e tente novamente em alguns instantes. Se o erro persistir, por favor contacte-nos para resolver o problema.</p>
             </Alert>
+            <ConnectionErrorAlert show={isPatientError} />
             
         </>
     );

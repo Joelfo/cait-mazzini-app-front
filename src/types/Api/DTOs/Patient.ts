@@ -1,10 +1,10 @@
-import { ArrivalType } from "./enums/ArrivalType";
-import { EAddressZone } from "./enums/EAddressZone";
-import { EBiologicalGender } from "./enums/EBiologicalGender";
-import { PatientType } from "./enums/PatientType";
-import { SpecialPopulationType } from "./enums/SpecialPopulationType";
-import { IdModelDTO } from "./vendor/IdModelDTO";
-import { LaravelLink } from "./vendor/LaravelLink";
+import { ArrivalType } from "types/enums/ArrivalType";
+import { EAddressZone } from "types/enums/EAddressZone";
+import { EBiologicalGender } from "types/enums/EBiologicalGender";
+import { PatientType } from "types/enums/PatientType";
+import { SpecialPopulationType } from "types/enums/SpecialPopulationType";
+import { IdModelDTO } from "types/vendor/IdModelDTO";
+import { LaravelLink } from "types/vendor/LaravelLink";
 
 export type Patient = {
     id: number;

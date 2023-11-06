@@ -10,16 +10,17 @@ import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { produce } from "immer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Col, Container, Form, ProgressBar, Row } from "react-bootstrap"
-import { ClinicalHistory } from "types/Api/ClinicalHistory";
-import { LifeHabitsInfo } from "types/Api/LifeHabitsInfo";
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
-import { PhysicalExam } from "types/Api/PhysicalExam";
-import { FirstAppointment } from "types/Api/FirstAppointment";
+import { ClinicalHistory } from "types/Api/DTOs/ClinicalHistory";
+import { LifeHabitsInfo } from "types/Api/DTOs/LifeHabitsInfoDTO";
+import { PhysicalActivity } from "types/Api/DTOs/PhysicalActivity";
+import { PhysicalExam } from "types/Api/DTOs/PhysicalExam";
+import { FirstAppointment } from "types/Api/DTOs/FirstAppointment";
 import { FirsNurseryAppointmentEndingForm } from "Components/FirstAppointmentForm/FirstNurseryAppointmentEndingForm";
-import { FirstNurseryAppointment } from "types/Api/FirstNurseryAppointment";
+import { FirstNurseryAppointment } from "types/Api/DTOs/FirstNurseryAppointment";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
 import { useNavigate } from "react-router-dom";
+import { PatientInfoFields } from "Components/PatientInfoFields";
 
 export const FirstNurseryChartPage = () => {
     
@@ -33,7 +34,7 @@ export const FirstNurseryChartPage = () => {
 
     const [ firstAppointmentBegining, setFirstAppointmentBegining ] = useState<FirstAppointment>()
 
-    const patient = useSelectedPatient();
+    const { patient } = useSelectedPatient();
 
     const navigate = useNavigate();
 
@@ -137,15 +138,8 @@ export const FirstNurseryChartPage = () => {
                     <ProgressBar now={progressBarLevel} variant='primary' animated/>
                 </Col>
             </Row>
-            <Row className='mt-5'>
-                    <Form.Group as={Col} md='3'>
-                        <Form.Label>Paciente</Form.Label>
-                        <Form.Control disabled value={patient?.name ?? ''}/>
-                    </Form.Group>
-                    <Form.Group as={Col} md='2'>
-                        <Form.Label>Nº do Prontuário</Form.Label>
-                        <Form.Control disabled value={patient?.recordCode ?? ''}/>
-                    </Form.Group>  
+            <Row>
+                <PatientInfoFields patient={patient}/>
             </Row>
             <Row className='form-mazzini-row'>
                 <Col>

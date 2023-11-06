@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Button, Col, Form, Modal, ModalBody, OverlayTrigger, Row } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "types/Api/DTOs/VitalSignsMeasurement";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { justRequiredRule, requiredTextMessage } from "util/validation";
 import * as Api from 'Api/VitalSignsMeasurementAPI';
@@ -14,6 +14,7 @@ import { getActualDate, getActualTime } from "util/DateUtils";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { yupResolver } from "@hookform/resolvers/yup"
+import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 
 export interface IVitalSignsMeasurementPopupProps {
     show: boolean,
@@ -55,9 +56,9 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
 
     
 
-    const patient = useSelectedPatient();
+    const { patient } = useSelectedPatient();
 
-    const onSubmit = (data: VitalSignsMeasurement) => { mutate(data); onSave(); }
+    const onSubmit = (data: VitalSignsMeasurement) => mutate(data);
 
     const vitalSignsMeasurementApi = new Api.VitalSignsMeasurementAPI();
     const { mutate, isLoading, isError, isSuccess } = vitalSignsMeasurementApi.useCreate();
@@ -82,7 +83,7 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
     }, [isError])
 
     useEffect(() => {
-        setShowSuccessAlert(isSuccess);
+        onSave();
     }, [isSuccess]);
 
 
@@ -128,7 +129,7 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
                                     <Form.Label>FC (bpm)</Form.Label>
                                     <Form.Control
                                         {...register('bpmFc')}
-                                        isInvalid={!!errors.celsiusTax}
+                                        isInvalid={!!errors.bpmFc}
                                         type='number'
                                     />
                                     <Form.Control.Feedback
@@ -212,6 +213,7 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
             </Modal>
             <SaveErrorAlert show={showErrorAlert} />
             <SaveSuccessAlert show={showSuccessAlert} onClose={() => setShowSuccessAlert(false)} />
+            <SaveLoadingAlert show={isLoading}/>
         </Fragment>
     );
 }

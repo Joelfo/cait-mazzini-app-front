@@ -4,36 +4,40 @@ import { ClinicalHistoryAPi } from "Api/ClinicalHistoryAPI";
 import { DatedImmunizationAPI } from "Api/DatedImmunizationAPI";
 import { DeseaseAPI } from "Api/DeseaseAPI";
 import { ImmunizationAPI } from "Api/ImmunizationAPI";
+import { ConnectionErrorAlert } from "Components/Utils/Alert/ConnectionErrorAlert";
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
-import { useEffect } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap"
+import { produce } from "immer";
+import { useEffect, useMemo } from "react";
+import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ClinicalHistory } from "types/Api/ClinicalHistory";
-import { ClinicalHistoryHasDatedImmunization } from "types/Api/ClinicalHistoryHasDatedImmunization";
-import { Desease } from "types/Api/Desease";
+import { ClinicalHistory } from "types/Api/DTOs/ClinicalHistory";
+import { ClinicalHistoryHasDatedImmunization } from "types/Api/DTOs/ClinicalHistoryHasDatedImmunization";
+import { Desease } from "types/Api/DTOs/Desease";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { MazziniFormSection } from "util/components/MazziniFormSection";
 import * as yup from 'yup';
 
 export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defaultData } : ClinicalHistoryFormProps) => {
-    const patient = useSelectedPatient();
+    const { patient, isError: isPatientError } = useSelectedPatient();
 
     const deseaseAPI = new DeseaseAPI(); 
     const immunizationAPI = new ImmunizationAPI();
     const datedImmunizationAPI = new DatedImmunizationAPI();
     const clinicalHistoryAPI = new ClinicalHistoryAPi();
 
-    const { data: deseases } = deseaseAPI.useAll();
-    const { data: immunizations } = immunizationAPI.useAll();
-    const { data: datedImmunizations } = datedImmunizationAPI.useAll();
+    const { data: deseases, isLoading: isDeseasesLoading, isError: isDeseasesError } = deseaseAPI.useAll();
+    const { data: immunizations, isLoading: isImmunizationsLoading, isError: isImmunizationsError } = immunizationAPI.useAll();
+    const { data: datedImmunizations, isLoading: isDatedImmunizationsLoading, isError: isDatedImmunizationsError } = datedImmunizationAPI.useAll();
     const { mutate: saveClinicalHistory, isLoading: isSavingLoading, isError: isSavingError, isSuccess: isSaveSuccessed } = clinicalHistoryAPI.useCreate();
     
     const navigate = useNavigate();
 
     const searchParams = useSearchParams()[0];
+
+    const isConnectionError = useMemo(() => isPatientError || isDeseasesError || isImmunizationsError || isDatedImmunizationsError, [isPatientError, isDeseasesError, isImmunizationsError, isDatedImmunizationsError]);
 
     const schema = yup.object({
         previousDeseaseIds: yup.array().default(defaultData?.previousDeseaseIds ?? []), 
@@ -45,7 +49,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                 }
                 return true;
             },
-            message: 'A data da imunização é obrigatória'
+            message: 'A data da imunizaçãod é obrigatória'
         }),
         otherPreviousDeseases: yup.string().default(defaultData?.otherPreviousDeseases),
         otherImmunizations: yup.string().default(defaultData?.otherImmunizations),
@@ -119,6 +123,16 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
         }
     }
 
+    const addDatedImmunizationDate = (datedImmunizationId: number, date: string) => {
+        const clinicalHistoryHasDatedImmunizations = getValues('datedImmunizationIds')
+        const index = clinicalHistoryHasDatedImmunizations.findIndex(datedImmunization => { return (datedImmunization.immunizationId == datedImmunizationId) });
+        if (index >= 0) {
+            setValue('datedImmunizationIds', produce(clinicalHistoryHasDatedImmunizations, clinicalHistoryHasDatedImmunizations => {
+                clinicalHistoryHasDatedImmunizations[index].lastDoseDate = date;
+            }))
+        }
+    }
+
     const checkIfDatedImmunizationHasValidDate = (datedImmunizationId: number) => {
         const datedImmunization = getValues('datedImmunizationIds').find(x => x.immunizationId === datedImmunizationId);
         if (!datedImmunization || !!datedImmunization.lastDoseDate) {
@@ -138,7 +152,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
         if (patient) {
             setValue('patientId', patient.id);
         }  
-    }, [patient])
+    }, [patient]);
 
     return (
         <>
@@ -147,8 +161,22 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                     <MazziniFormSection title='Doenças Prévias'>
                         <Row>
                             {
+                                isDeseasesLoading
+                                &&
+                                <Col>
+                                <Row>
+                                    <Col md='auto'>
+                                    <Spinner/>
+                                    </Col>
+                                    <Col>
+                                        <p>Carregando doenças prévias...</p>
+                                    </Col>
+                                </Row>
+                                </Col>
+                            }
+                            {
                                 deseases?.map(desease => (
-                                    <Form.Group as={Col} md='2'>
+                                    <Form.Group as={Col} md='2' key={desease.id}>
                                         <Form.Check
                                             label={desease.name}
                                             value={desease.id}
@@ -160,7 +188,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                                 ))
                             }
                         </Row>
-                        <Row class='form-mazzini-row'>
+                        <Row className='form-mazzini-row'>
                             <Form.Group as={Col} md='4'>
                                 <Form.Label>Outras</Form.Label>
                                 <Form.Control
@@ -263,8 +291,22 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                     <MazziniFormSection title='Imunização'>
                         <Row>
                             {
+                                isImmunizationsLoading
+                                &&
+                                <Col>
+                                <Row>
+                                    <Col md='auto'>
+                                    <Spinner/>
+                                    </Col>
+                                    <Col>
+                                        <p>Carregando imunizações...</p>
+                                    </Col>
+                                </Row>
+                                </Col>
+                            }
+                            {
                                 immunizations?.map(immunization => (
-                                    <Form.Group as={Col} md='2'>
+                                    <Form.Group as={Col} md='2' key={immunization.id}>
                                         <Form.Check
                                             label={immunization.name}
                                             key={immunization.id}
@@ -278,8 +320,22 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                         </Row>
                         <Row className=" form-mazzini-row gx-5">
                             {
+                                isDatedImmunizationsLoading
+                                &&
+                                <Col>
+                                <Row>
+                                    <Col md='auto'>
+                                    <Spinner/>
+                                    </Col>
+                                    <Col>
+                                        <p>Carregando imunizações...</p>
+                                    </Col>
+                                </Row>
+                                </Col>
+                            }
+                            {
                                 datedImmunizations?.map(datedImmunization => (
-                                    <Form.Group as={Col} md='2'>
+                                    <Form.Group as={Col} md='2' key={datedImmunization.id}>
                                         <Form.Group>
                                             <Form.Check
                                                 label={datedImmunization.name}
@@ -296,6 +352,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                                                 isInvalid={!!errors.datedImmunizationIds && !checkIfDatedImmunizationHasValidDate(datedImmunization.id)} 
                                                 type='date'
                                                 defaultValue={defaultData?.datedImmunizationIds.find(x => x.immunizationId === datedImmunization.id)?.lastDoseDate}
+                                                onChange={(event) => addDatedImmunizationDate(datedImmunization.id, event.currentTarget.value)}
                                             />
                                             <Form.Control.Feedback type='invalid'>
                                                 {errors.datedImmunizationIds?.message}
@@ -328,14 +385,14 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                         }
 
                         <Col md='1'>
-                            <Button disabled={isSavingLoading} type='submit' variant='primary' size='lg'> Salvar </Button>
+                            <Button disabled={isSavingLoading || isConnectionError} type='submit' variant='primary' size='lg'> Salvar </Button>
                         </Col>
                     </Row>
                 </Form>
             </Container>
             <SaveLoadingAlert show={isSavingLoading}/>
             <SaveErrorAlert show={isSavingError}/>
-
+            <ConnectionErrorAlert show={isConnectionError}/>
         </>
     )
 }

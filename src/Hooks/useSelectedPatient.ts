@@ -1,6 +1,6 @@
 import { usePatientsStore } from "Stores/UsePatientsStore"
 import { useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PatientAPI } from 'Api/PatientAPI';
 
 export const useSelectedPatient = () => {
@@ -12,7 +12,11 @@ export const useSelectedPatient = () => {
 
     const [ patientIdToSearch, setPatientIdToSearch ] = useState<number>();
 
-    const { data: fetchedPatient } = patientAPI.useShow(patientIdToSearch);
+    const { data: fetchedPatient, isError, isLoading: isPatientLoading, fetchStatus } = patientAPI.useShow(patientIdToSearch);
+    
+    const isLoading = useMemo(() => isPatientLoading && fetchStatus !== 'idle', [isPatientLoading, fetchStatus])
+
+    useEffect(() => console.log(isLoading), [isLoading])
 
     useEffect(() => {
         const patientQueryStringId = Number(queryStringParams.get('patientId'));
@@ -28,5 +32,5 @@ export const useSelectedPatient = () => {
     }, [fetchedPatient]);
 
 
-    return selectedPatient;
+    return { patient: selectedPatient, isError, isLoading };
 }

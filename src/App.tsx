@@ -12,6 +12,9 @@ import { PatientInfo } from "Pages/Patient/PatientInfo";
 import { LifeHabitsForm } from "Components/LifeHabitsForm";
 import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm";
 import { FirstNurseryChartPage } from "Pages/FirstNurseryChart";
+import * as yup from 'yup';
+import { LifeHabitsViewPage } from "Pages/LifeHabits/LifeHabitsViewPage";
+import { ClinicalHistoryViewPage } from "Pages/ClinicalHistory/ClinicalHistoryViewPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -28,7 +31,7 @@ function App() {
           element: <ReceptionistHome/>
         },
         {
-          path:"/patient",
+          path:"patient",
           element: <PatientDetails/>
         },
         {
@@ -44,12 +47,12 @@ function App() {
           element: <PatientInfo/>
         },
         {
-          path:'/lifeHabits',
-          element: <></>
+          path:'/lifeHabits/view',
+          element: <LifeHabitsViewPage/>
         },
         {
-          path: '/clinicalHistory',
-          element: <></>
+          path: '/clinicalHistory/view',
+          element: <ClinicalHistoryViewPage/>
         },
         {
           path: '/physicalExam',
@@ -64,6 +67,24 @@ function App() {
   ]);
   
   const queryClient = new QueryClient();
+
+  const requiredInputMessage = 'O campo ${label} é obrigatório.';
+  const positiveInputMessage = 'O campo ${label} deve conter um valor positivo.';
+  const numericInputMessage = 'O campo ${label} deve conter um número.';
+
+  yup.setLocale({
+    mixed: {
+      default: 'O valor informado para o campo ${label} não é válido',
+      required: requiredInputMessage,
+      defined: requiredInputMessage
+    },
+    number: {
+      positive: positiveInputMessage,
+      
+    }
+
+  });
+
   return (
     <>
       <QueryClientProvider client={queryClient}>

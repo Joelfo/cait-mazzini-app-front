@@ -1,4 +1,4 @@
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
+import { PhysicalActivity } from "types/Api/DTOs/PhysicalActivity";
 import { ResourceAPI } from "./Base/ResourceAPI";
 
 export class PhysicalActivityAPI extends ResourceAPI<PhysicalActivity> {

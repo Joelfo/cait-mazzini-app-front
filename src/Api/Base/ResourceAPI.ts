@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { API_URL } from "util/requests";
 
-export class ResourceAPI<TResource> {
+export class ResourceAPI<TResource, TDto = TResource> {
     protected resourceName: string;
     protected resourceRoute: string;
 
@@ -12,7 +12,7 @@ export class ResourceAPI<TResource> {
     }
 
     public useAll = () => useQuery<TResource[]>(
-        [this.resourceName + 'all'],
+        [this.resourceName, '.All'],
         async () => {
             const response = await axios.get(
                 this.resourceRoute
@@ -22,7 +22,7 @@ export class ResourceAPI<TResource> {
     )
 
     public useAllPaginated = (skip: number, take: number) => useQuery<TResource[]>(
-        [this.resourceName + 'allPaginated' + skip],
+        [this.resourceName + '.AllPaginated' + skip],
         async () => {
             const response = await axios.get(
                 this.resourceRoute,
@@ -37,21 +37,24 @@ export class ResourceAPI<TResource> {
         }
     )
 
-    public useShow = (resourceId: number | undefined) => useQuery<TResource>(
-        [this.resourceName + 'all', resourceId],
-        async () => {
-            const response = await axios.get(
-                this.resourceRoute + "/" + resourceId
-            );
-            return response.data;
-        },
-        {
-            enabled: !!resourceId
-        }
-    )
-
+    public useShow = (resourceId: number | undefined) => {
+        console.log([this.resourceName + '.Show', resourceId]);
+        return useQuery<TResource>(
+            [this.resourceName + '.Show', resourceId],
+            async () => {
+                const response = await axios.get(
+                    this.resourceRoute + "/" + resourceId
+                );
+                return response.data;
+            },
+            {
+                enabled: !!resourceId,
+                
+            }
+        );
+    }
     public useCreate = () => useMutation({
-        mutationFn: async (resource: TResource) => {
+        mutationFn: async (resource: TDto) => {
             const response = await axios.post<number>(
                 this.resourceRoute,
                 resource

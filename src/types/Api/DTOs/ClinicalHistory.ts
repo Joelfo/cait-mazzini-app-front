@@ -1,6 +1,7 @@
 import { ClinicalHistoryHasDatedImmunization } from "./ClinicalHistoryHasDatedImmunization"
 
 export type ClinicalHistory = {
+    id: number,
     previousDeseaseIds: number[],
     otherPreviousDeseases?: string,
     isAlergic: boolean,

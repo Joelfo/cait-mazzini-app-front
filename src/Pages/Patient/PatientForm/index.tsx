@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { Controller, FieldError, SubmitHandler, useForm } from 'react-hook-form'
-import { Patient } from 'types/Api/Patient'
+import { Patient } from 'types/Api/DTOs/Patient'
 import { ArrivalType } from 'types/enums/ArrivalType';
 import { PatientType } from 'types/enums/PatientType';
 import { SpecialPopulationType } from 'types/enums/SpecialPopulationType';
 import { API_URL } from 'util/requests';
 import './index.css';
-import { useEffect, useRef, useState } from 'react';
-import { District } from 'types/Api/District';
-import { City } from 'types/Api/City';
-import { Country } from 'types/Api/Country';
-import { HealthUnity } from 'types/Api/HealthUnity';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { District } from 'types/Api/DTOs/District';
+import { City } from 'types/Api/DTOs/City';
+import { Country } from 'types/Api/DTOs/Country';
+import { HealthUnity } from 'types/Api/DTOs/HealthUnity';
 import { validate } from 'gerador-validador-cpf';
 import { redirect, useNavigate } from 'react-router';
 import { Alert, Button, Col, Container, Dropdown, Form, FormCheck, FormGroup, Modal, Row, Spinner, Stack } from 'react-bootstrap';
@@ -29,11 +29,12 @@ import { ViaCepAPI } from 'Api/Vendor/ViaCepAPI';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { CountryAPI } from 'Api/CountryAPI';
-import { FederativeUnity } from 'types/Api/FederativeUnity';
+import { FederativeUnity } from 'types/Api/DTOs/FederativeUnity';
 import { FederativeUnityAPI } from 'Api/FederativeUnityAPI';
 import { PatientAPI } from 'Api/PatientAPI';
 import { validateCns, validateCpf } from 'util/Validations';
 import { Option } from 'react-bootstrap-typeahead/types/types';
+import { HealthUnityAPI } from 'Api/HealthUnityAPI';
 
 export const PatientForm = () => {
     const selectedPatient = useSelectedPatient();
@@ -63,17 +64,21 @@ export const PatientForm = () => {
     const countryAPI = new CountryAPI();
     const federativeUnityAPI = new FederativeUnityAPI();
     const patientAPI = new PatientAPI();
+    const healthUnityAPI = new HealthUnityAPI();
 
-    const { data: cities } = cityAPI.useAll();
+    const { data: cities, isLoading: isCitiesLoading } = cityAPI.useAll();
 
     const [ selectedCityId, setSelectedCityId ] = useState<number>();
 
     const { data: districts, isLoading: isDistrictsLoading, isStale } = districtAPI.useAllByCity(selectedCityId);
 
+    const { data: healthUnities, isLoading: isHealthUnitiesLoading } = healthUnityAPI.useAll();
+
     const newCityRef = useRef<City>();
     const [ newDistrict, setNewDistrict ] = useState<District>();
     const [ newCountry, setNewCountry ] = useState<Country>();
     const [ newFederativeUnity, setNewFederativeUnity ] = useState<FederativeUnity>();
+    const [ newHealthUnity, setNewHealthUnity ] = useState<HealthUnity>();
     
     const watchCep = watch('cep', undefined);
 
@@ -100,6 +105,8 @@ export const PatientForm = () => {
 
     const { mutate: saveFederativeUnity, status: federativeUnityCreationStatus, data: createdFederativeUnityId } = federativeUnityAPI.useCreate();
 
+    const { mutate: saveHealthUnity, status: healthUnityCreationStatus, data: createdHealthUnityId } = healthUnityAPI.useCreate();
+
     const [ isSavingLoading, setIsSavingLoading ] = useState<boolean>(false);
 
     const [ isSavingError, setIsSavingError ] = useState<boolean>(false);
@@ -110,6 +117,8 @@ export const PatientForm = () => {
     const watchFederativeUnityId = watch('birthplaceId');
 
     const patientToSaveRef = useRef<Patient>();
+
+    const navigate = useNavigate();
 
     const handleSubmit : SubmitHandler<Patient> = (value) => {
         value.biologicalGender = parseInt(value.biologicalGender.toString());
@@ -134,6 +143,9 @@ export const PatientForm = () => {
         if (!!newFederativeUnity && !newCountry) {
             saveFederativeUnity(newFederativeUnity);
         }
+        if (!!newHealthUnity) {
+            saveHealthUnity(newHealthUnity);
+        }
     }
 
     const trySavingPatient = () => {
@@ -141,7 +153,8 @@ export const PatientForm = () => {
             (cityCreationStatus === 'success' || !newCityRef.current) &&
             (districtCreationStatus === 'success' || !newDistrict) &&
             (countryCreationStatus === 'success' || !newCountry) &&
-            (federativeUnityCreationStatus === 'success' || !newFederativeUnity)
+            (federativeUnityCreationStatus === 'success' || !newFederativeUnity) &&
+            (healthUnityCreationStatus === 'success' || !newHealthUnity)
         ) {
             if (patientToSaveRef.current) {
                 savePatient(patientToSaveRef.current);
@@ -149,20 +162,56 @@ export const PatientForm = () => {
         }
     };
 
+    const handleSelectedNationalityChange = useCallback((selected: Option[]) => {
+        if (selected.length === 0) {
+            return;
+        }
+        const selectedCountry = selected[0] as Country;
+        setFormValue('birthCountryId', selectedCountry.id);
+    }, []);
+
+    const handleSelectedFederativeUnityChange = useCallback((selected: Option[]) => {
+        if (selected.length === 0) {
+            return;
+        }
+        const selectedFederativeUnity = selected[0] as FederativeUnity;
+        if (selectedFederativeUnity.id === 0 || isNaN(selectedFederativeUnity.id)) {
+            selectedFederativeUnity.countryId = getFormValues('birthCountryId');
+            setNewFederativeUnity(selectedFederativeUnity);
+        } else {
+            setFormValue('birthplaceId', selectedFederativeUnity.id);
+        }
+    }, [setNewFederativeUnity]);
+
+    const handleSelectedHealthUnityChange = useCallback((selected: Option[]) => {
+        if (selected.length === 0) {
+            return;
+        }
+
+        const selectedHealthUnity = selected[0] as HealthUnity;
+        if (selectedHealthUnity.id === 0 || isNaN(selectedHealthUnity.id)) {
+            setNewHealthUnity(selectedHealthUnity);
+        } else {
+            setFormValue('healthUnityId', selectedHealthUnity.id)
+        }
+    }, []);
+
+    const validateHealthUnityId = useCallback((value: number | undefined, formValues: Patient) => (!!value || formValues.arrivalType !== ArrivalType.Fowarded || !!newHealthUnity), [newHealthUnity]) ;
+
     useEffect(() => {
-        if (cityCreationStatus === 'error' || districtCreationStatus === 'error' || countryCreationStatus === 'error' || federativeUnityCreationStatus === 'error') {
+        if (cityCreationStatus === 'error' || districtCreationStatus === 'error' || countryCreationStatus === 'error' || federativeUnityCreationStatus === 'error' || healthUnityCreationStatus === 'error') {
             setIsSavingError(true)
         } else {
             setIsSavingError(false);
         }
 
-        if (cityCreationStatus === 'loading' || districtCreationStatus === 'loading' || countryCreationStatus === 'loading' || federativeUnityCreationStatus === 'error') {
+        if (cityCreationStatus === 'loading' || districtCreationStatus === 'loading' || countryCreationStatus === 'loading' || federativeUnityCreationStatus === 'loading' || healthUnityCreationStatus === 'loading') {
             setIsSavingLoading(true);
         } else {
             setIsSavingLoading(false);
         }
 
-        if (cityCreationStatus === 'success' || districtCreationStatus === 'success' || countryCreationStatus === 'success' || federativeUnityCreationStatus === 'success') {
+        if (cityCreationStatus === 'success' || districtCreationStatus === 'success' || countryCreationStatus === 'success' || federativeUnityCreationStatus === 'success' || healthUnityCreationStatus === 'success') {
             trySavingPatient();
         }
     }, [cityCreationStatus, districtCreationStatus, countryCreationStatus, federativeUnityCreationStatus]);
@@ -194,6 +243,12 @@ export const PatientForm = () => {
     useEffect(() => {
         if (createdDistrictId && patientToSaveRef.current) {
             patientToSaveRef.current.districtId = createdDistrictId;
+        }
+    })
+
+    useEffect(() => {
+        if (createdHealthUnityId && patientToSaveRef.current) {
+            patientToSaveRef.current.healthUnityId = createdHealthUnityId;
         }
     })
 
@@ -282,9 +337,6 @@ export const PatientForm = () => {
 
     useEffect(() => {
         switch (patientCreationStatus) {
-            case 'success':
-                redirect('/Home?savedData=true');
-                break;
             case 'error':
                 setIsSavingError(true);
                 break;
@@ -293,7 +345,13 @@ export const PatientForm = () => {
                 break;
         }
         
-    }, [patientCreationStatus])
+    }, [patientCreationStatus]);
+
+    useEffect(() => {
+        if (!!createdPatientId) {
+            navigate('/patientInfo?patientId' + createdPatientId);
+        }
+    }, [createdPatientId])
 
     return (
         <>
@@ -427,7 +485,7 @@ export const PatientForm = () => {
                                         )}
                                     />
                                 </Form.Group>
-                                <FormGroup className='mt-2'>
+                                <Form.Group className='mt-2'>
                                     <Controller 
                                         control={control}
                                         name='isPregnant'
@@ -442,11 +500,62 @@ export const PatientForm = () => {
                                             />
                                         )}
                                     />
-                            </FormGroup>
+                            </Form.Group>
                             </Col>
 
                            
                         </Row>
+                        {
+                            watchArrivalType === ArrivalType.Fowarded
+                            &&
+                            <Row className='form-mazzini-row'>
+                                <Form.Group as={Col} md='3'> 
+                                    <Form.Label>Unidade de saúde</Form.Label>
+                                    <Controller 
+                                        name='healthUnityId'
+                                        control={control}
+                                        rules={{
+                                            validate: {
+                                                requiredWhenForwarded: validateHealthUnityId
+                                            }
+                                        }}
+                                        render={({
+                                            fieldState: { invalid }
+                                        }) => (
+                                            <Typeahead
+                                                options={healthUnities ?? []}
+                                                allowNew
+                                                labelKey='name'
+                                                onChange={handleSelectedHealthUnityChange}
+                                                renderInput={
+                                                    ({
+                                                        inputRef,
+                                                        referenceElementRef,
+                                                        value,
+                                                        ...inputProps
+                                                    }) => (
+                                                        <>
+                                                            <Form.Control
+                                                                ref={(input: HTMLInputElement) => {
+                                                                    inputRef(input);
+                                                                    referenceElementRef(input);
+                                                                }}
+                                                                value={typeof value === 'object' ? [...value] : value}
+                                                                isInvalid={invalid}
+                                                                {...inputProps}
+                                                            />
+                                                            <Form.Control.Feedback type='invalid'>{requiredTextMessage('Unidade de saúde')}</Form.Control.Feedback>
+                                                        </>
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                    />
+
+                                    
+                                </Form.Group>
+                            </Row>
+                        }
                     </MazziniFormSection>
                     <MazziniFormSection title='Social'>
                         <Row>
@@ -576,16 +685,10 @@ export const PatientForm = () => {
                                         fieldState: {invalid}
                                     }) => (
                                         <Typeahead
-                                            options={countries?.map(country => country.name) ?? new Array() as string[]}
-                                            onChange={selected => {
-                                                const value = !!selected[0] ? (selected[0] as Record<string, any>)['label'] ?? selected[0] as string : '';
-                                                if (!!value || value === '') {
-                                                    setSelectedCountryName(value as string);
-                                                }
-                                            }
-                                            }
+                                            options={countries ?? []}
+                                            onChange={handleSelectedNationalityChange}
                                             allowNew
-                                            selected={!!selectedCountryName ? [{ label: selectedCountryName } ] : []}
+                                            labelKey='name'
                                             renderInput={({
                                                 inputRef,
                                                 referenceElementRef,
@@ -622,16 +725,10 @@ export const PatientForm = () => {
                                         fieldState: {invalid}
                                     }) => (
                                         <Typeahead
-                                            options={federativeUnities?.map(federativeUnity => federativeUnity.name) ?? new Array() as FederativeUnity[]}
-                                            onChange={selected => {
-                                                    const value = !!selected[0] ? (selected[0] as Record<string, any>)['label'] ?? selected[0] as string : '';
-                                                    if (!!value || value === '') {
-                                                        setSelectedFederativeUnityName(value as string);
-                                                    }
-                                                }
-                                            }
+                                            options={federativeUnities ?? []}
+                                            onChange={handleSelectedFederativeUnityChange}
                                             allowNew
-                                            selected = {!!selectedFederativeUnityName ? [selectedFederativeUnityName] : []}
+                                            labelKey='name'
                                             renderInput={({
                                                 inputRef,
                                                 referenceElementRef,
@@ -678,9 +775,16 @@ export const PatientForm = () => {
                         <Row>
                             <Form.Group as={Col} md='3'>
                                 <Form.Label>Cep</Form.Label>
-                                <HookControlledFormControl control={control} name='cep' rules={justRequiredRule('Cep')} formControlType='text' />
+                                <Form.Control {...register('cep')} isInvalid={!!errors?.cep} type='text' disabled={isCitiesLoading}/>
                                 <Form.Control.Feedback type='invalid'>{errors.cep?.message}</Form.Control.Feedback>
                             </Form.Group>
+                            {
+                                isCitiesLoading
+                                &&
+                                <Col md='1' className='d-flex align-items-end justify-content-start'>
+                                    <Spinner style={{marginBottom: '4px'}} animation='border'/>
+                                </Col>
+                            }
                         </Row>
                         <Row className='form-mazzini-row justify-content-between'>
                             <Form.Group as={Col} md='6'>

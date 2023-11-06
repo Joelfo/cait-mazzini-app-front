@@ -1,7 +1,10 @@
+import { ConnectionErrorAlert } from "Components/Utils/Alert/ConnectionErrorAlert";
+import { useSelectedPatient } from "Hooks/useSelectedPatient";
+import { useEffect } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { FirstAppointment } from "types/Api/FirstAppointment";
-import { FirstNurseryAppointment } from "types/Api/FirstNurseryAppointment";
+import { FirstAppointment } from "types/Api/DTOs/FirstAppointment";
+import { FirstNurseryAppointment } from "types/Api/DTOs/FirstNurseryAppointment";
 import { QUILL_DEFAULT_MODULES } from "util/QuillDefaultModules";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledReactQuill } from "util/components/HookControlledReactQuill";
@@ -18,6 +21,15 @@ export const FirsNurseryAppointmentEndingForm = ({ firstAppointmentData, default
     } = useForm<FirstNurseryAppointment>({
         defaultValues: defaultData ?? {...firstAppointmentData}
     });
+
+    const { patient, isError: isPatientError } = useSelectedPatient();
+
+    const isConnectionError = isPatientError;
+
+    useEffect(() => {
+        if (!!patient)
+            setValue('patientId', patient.id)
+    }, [patient]);
     
     return (
         <>
@@ -63,19 +75,20 @@ export const FirsNurseryAppointmentEndingForm = ({ firstAppointmentData, default
                 </Row>
                 <ResponsabilityCheckbox/>
                 <Row className='form-mazzini-row justify-content-center gx-5'>
-                        {
-                            !!onReturn
-                            &&
-                            <Col md='1'>
-                                <Button variant='danger' size='lg' onClick={onReturn}> Voltar </Button>
-                            </Col>
-                        }
+                    {
+                        !!onReturn
+                        &&
                         <Col md='1'>
-                            <Button type='submit' variant='primary' size='lg'> Próximo </Button>
+                            <Button variant='danger' size='lg' onClick={onReturn}> Voltar </Button>
                         </Col>
+                    }
+                    <Col md='1'>
+                        <Button type='submit' variant='primary' size='lg'> Próximo </Button>
+                    </Col>
                         
-                    </Row>
+                </Row>
             </Form>
+            <ConnectionErrorAlert show={isConnectionError}/>
         </>
     );
 }

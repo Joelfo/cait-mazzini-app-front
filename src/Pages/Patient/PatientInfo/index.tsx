@@ -2,10 +2,11 @@ import { CityAPI } from "Api/CityAPI";
 import { CountryAPI } from "Api/CountryAPI";
 import { DistrictAPI } from "Api/DistrictAPI";
 import { FederativeUnityAPI } from "Api/FederativeUnityAPI";
+import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
 import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
-import { Patient } from "types/Api/Patient";
+import { Patient } from "types/Api/DTOs/Patient";
 import { ArrivalType } from "types/enums/ArrivalType";
 import { EAddressZone } from "types/enums/EAddressZone";
 import { EBiologicalGender } from "types/enums/EBiologicalGender";
@@ -13,12 +14,13 @@ import { PatientType } from "types/enums/PatientType";
 import { MazziniFormSection } from "util/components/MazziniFormSection";
 
 export const PatientInfo = () => {
-    const patient = useSelectedPatient();
+    const { patient } = useSelectedPatient();
 
     const countryAPI = new CountryAPI();
     const federativeUnityAPI = new FederativeUnityAPI();
     const districtAPI = new DistrictAPI();
     const cityAPI = new CityAPI();
+    const firstNurseryAppointmentAPI = new FirstNurseryAppointmentAPI();
 
     const { data: country } = countryAPI.useShow(patient?.birthCountryId);
     const { data: federativeUnity } = federativeUnityAPI.useShow(patient?.birthplaceId);

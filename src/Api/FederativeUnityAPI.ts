@@ -1,4 +1,4 @@
-import { FederativeUnity } from "types/Api/FederativeUnity";
+import { FederativeUnity } from "types/Api/DTOs/FederativeUnity";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "util/requests";

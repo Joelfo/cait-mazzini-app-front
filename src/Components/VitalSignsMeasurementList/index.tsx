@@ -3,11 +3,10 @@ import AddButton from "Components/IconButton/AddButton";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { Button, Modal, Stack, Table } from "react-bootstrap"
-import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "types/Api/DTOs/VitalSignsMeasurement";
 import { VitalSignsMeasurementFormPopup } from "./VitalSignsMeasurementFormPopup";
 import { useState } from "react";
 import date from 'date-and-time';
-import './index.css';
 
 export type VitalSignsMeasurementsListProps = {
     show: boolean;
@@ -16,7 +15,7 @@ export type VitalSignsMeasurementsListProps = {
 
 export const VitalSignsMeasurementsList = ({ show, onClose } : VitalSignsMeasurementsListProps) => {
     const vitalSignsMeasurementsAPI = new VitalSignsMeasurementAPI();
-    const patient = useSelectedPatient();
+    const { patient } = useSelectedPatient();
     const { data: vitalSignsMeasurements, refetch: refetchVitalSignsMeasurements } = vitalSignsMeasurementsAPI.useAllByPatient(patient?.id)
     const [ isAddPopupOpened, setIsAddPopupOpened ] = useState<boolean>(false);
     
@@ -26,10 +25,9 @@ export const VitalSignsMeasurementsList = ({ show, onClose } : VitalSignsMeasure
                 <Modal.Header className='bg-primary border-dark'>
                     <Modal.Title>Lista de medições</Modal.Title>
                     <Stack direction="horizontal" gap={3}>
-                    <Button variant='success' className='border-dark' onClick={() => setIsAddPopupOpened(true)}>Novo</Button>
-                    <Button variant='danger' className='border-dark' onClick={onClose}><i className='bi bi-x-lg'/></Button>
+                        <Button variant='success' className='border-dark' onClick={() => setIsAddPopupOpened(true)}>Novo</Button>
+                        <Button variant='danger' className='border-dark' onClick={onClose}><i className='bi bi-x-lg'/></Button>
                     </Stack>
-                    
                 </Modal.Header>
                 <Modal.Body className='bg-secondary'>
                     <Table striped responsive bordered hover className='table-light border-dark table-bordered'>

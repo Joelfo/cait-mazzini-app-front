@@ -1,4 +1,4 @@
-import { TrackingAppointmentChart } from "types/Api//TrackingAppointmentChart";
+import { TrackingAppointmentChart } from "types/Api/DTOs/TrackingAppointmentChart";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
