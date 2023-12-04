@@ -1,6 +1,6 @@
 import { Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { HealthUnity } from "types/Api/DTOs/HealthUnity";
+import { HealthUnity } from "types/Api/HealthUnity";
 import { justRequiredRule } from "util/validation";
 
 export const HealthUnityForm = () => {

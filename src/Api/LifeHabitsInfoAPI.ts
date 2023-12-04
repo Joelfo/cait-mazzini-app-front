@@ -1,9 +1,9 @@
-import { LifeHabitsInfoDTO } from "types/Api/DTOs/LifeHabitsInfoDTO";
+import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { LifeHabitsInfo } from "types/Api/LifeHabitsInfo";
-import { PhysicalActivity } from "types/Api/DTOs/PhysicalActivity";
+import { PhysicalActivity } from "types/Api/PhysicalActivity";
 
 export class LifeHabitsInfoAPI extends ResourceAPI<LifeHabitsInfo, LifeHabitsInfoDTO> {
     constructor(){

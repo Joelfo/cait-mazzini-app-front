@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { PhysicalExam } from "types/Api/DTOs/PhysicalExam";
+import { PhysicalExam } from "types/Api/PhysicalExam";
 import { QUILL_DEFAULT_MODULES } from "util/QuillDefaultModules";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";

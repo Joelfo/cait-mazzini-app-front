@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Button, Col, Form, Modal, ModalBody, OverlayTrigger, Row } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import { VitalSignsMeasurement } from "types/Api/DTOs/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { justRequiredRule, requiredTextMessage } from "util/validation";
 import * as Api from 'Api/VitalSignsMeasurementAPI';

@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { Controller, FieldError, SubmitHandler, useForm } from 'react-hook-form'
-import { Patient } from 'types/Api/DTOs/Patient'
+import { Patient } from 'types/Api/Patient'
 import { ArrivalType } from 'types/enums/ArrivalType';
 import { PatientType } from 'types/enums/PatientType';
 import { SpecialPopulationType } from 'types/enums/SpecialPopulationType';
 import { API_URL } from 'util/requests';
 import './index.css';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { District } from 'types/Api/DTOs/District';
-import { City } from 'types/Api/DTOs/City';
-import { Country } from 'types/Api/DTOs/Country';
-import { HealthUnity } from 'types/Api/DTOs/HealthUnity';
+import { District } from 'types/Api/District';
+import { City } from 'types/Api/City';
+import { Country } from 'types/Api/Country';
+import { HealthUnity } from 'types/Api/HealthUnity';
 import { validate } from 'gerador-validador-cpf';
 import { redirect, useNavigate } from 'react-router';
 import { Alert, Button, Col, Container, Dropdown, Form, FormCheck, FormGroup, Modal, Row, Spinner, Stack } from 'react-bootstrap';
@@ -29,7 +29,7 @@ import { ViaCepAPI } from 'Api/Vendor/ViaCepAPI';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { CountryAPI } from 'Api/CountryAPI';
-import { FederativeUnity } from 'types/Api/DTOs/FederativeUnity';
+import { FederativeUnity } from 'types/Api/FederativeUnity';
 import { FederativeUnityAPI } from 'Api/FederativeUnityAPI';
 import { PatientAPI } from 'Api/PatientAPI';
 import { validateCns, validateCpf } from 'util/Validations';

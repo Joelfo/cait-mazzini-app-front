@@ -15,4 +15,8 @@ export type ClinicalHistory = {
     datedImmunizationIds: ClinicalHistoryHasDatedImmunization[],
     otherImmunizations?: string,
     patientId: number
+    previousPulmonarTuberculosis: boolean;
+    previousPulmonarTuberculosisDateObs: string;
+    previousExtrapulmonarTuberculosis: boolean;
+    previousExtrapulmonarTuberculosisDateObs: string;
 }

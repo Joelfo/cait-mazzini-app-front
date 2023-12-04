@@ -6,7 +6,7 @@ import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
 import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
-import { Patient } from "types/Api/DTOs/Patient";
+import { Patient } from "types/Api/Patient";
 import { ArrivalType } from "types/enums/ArrivalType";
 import { EAddressZone } from "types/enums/EAddressZone";
 import { EBiologicalGender } from "types/enums/EBiologicalGender";

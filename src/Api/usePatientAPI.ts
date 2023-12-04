@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Patient } from "types/Api/DTOs/Patient";
+import { Patient } from "types/Api/Patient";
 import { API_URL } from "util/requests";
 
 export const useShowPatient = (resourceId: number | undefined) => {

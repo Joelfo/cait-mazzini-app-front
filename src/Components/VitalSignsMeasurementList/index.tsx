@@ -3,7 +3,7 @@ import AddButton from "Components/IconButton/AddButton";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { Button, Modal, Stack, Table } from "react-bootstrap"
-import { VitalSignsMeasurement } from "types/Api/DTOs/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
 import { VitalSignsMeasurementFormPopup } from "./VitalSignsMeasurementFormPopup";
 import { useState } from "react";
 import date from 'date-and-time';

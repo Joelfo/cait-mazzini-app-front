@@ -1,6 +1,4 @@
-import { DatedImmunization } from "./DTOs/DatedImmunization"
-
 export type ClinicalHistoryHasDatedImmunization = {
-    datedImmunization: DatedImmunization,
+    immunizationId: number,
     lastDoseDate: string
 }

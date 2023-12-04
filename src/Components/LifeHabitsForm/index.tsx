@@ -13,9 +13,9 @@ import { Typeahead } from "react-bootstrap-typeahead";
 import { Option } from "react-bootstrap-typeahead/types/types";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ContraceptiveMethod } from "types/Api/DTOs/ContraceptiveMethod";
-import { LifeHabitsInfoDTO } from "types/Api/DTOs/LifeHabitsInfoDTO";
-import { PhysicalActivity } from "types/Api/DTOs/PhysicalActivity";
+import { ContraceptiveMethod } from "types/Api/ContraceptiveMethod";
+import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
+import { PhysicalActivity } from "types/Api/PhysicalActivity";
 import { ESexualActivityLevel } from "types/enums/ESexualActivityLevel";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { MazziniFormSection } from "util/components/MazziniFormSection"

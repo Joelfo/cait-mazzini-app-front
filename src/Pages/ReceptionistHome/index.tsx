@@ -4,7 +4,7 @@ import SearchBar from "Components/SearchBar";
 import PersonIconButton from 'Components/IconButton/PersonIconButton';
 import { useEffect, useState } from 'react';
 import { LaravelPage } from 'types/vendor/LaravelPage/LaravelPage';
-import { Patient } from 'types/Api/DTOs/Patient';
+import { Patient } from 'types/Api/Patient';
 import { AxiosParams } from 'types/vendor/AxiosParams';
 import { API_URL } from 'util/requests';
 import axios from 'axios';

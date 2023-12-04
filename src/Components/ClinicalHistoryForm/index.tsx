@@ -13,9 +13,9 @@ import { useEffect, useMemo } from "react";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ClinicalHistory } from "types/Api/DTOs/ClinicalHistory";
-import { ClinicalHistoryHasDatedImmunization } from "types/Api/DTOs/ClinicalHistoryHasDatedImmunization";
-import { Desease } from "types/Api/DTOs/Desease";
+import { ClinicalHistory } from "types/Api/ClinicalHistory";
+import { ClinicalHistoryHasDatedImmunization } from "types/Api/ClinicalHistoryHasDatedImmunization";
+import { Desease } from "types/Api/Desease";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { MazziniFormSection } from "util/components/MazziniFormSection";
 import * as yup from 'yup';

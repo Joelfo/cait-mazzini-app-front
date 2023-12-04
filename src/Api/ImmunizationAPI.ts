@@ -1,4 +1,4 @@
-import { Immunization } from "types/Api/DTOs/Immunization";
+import { Immunization } from "types/Api/Immunization";
 import { ResourceAPI } from "./Base/ResourceAPI";
 
 

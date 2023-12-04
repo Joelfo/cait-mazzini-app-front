@@ -6,10 +6,10 @@ import { API_URL } from "util/requests";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { LaravelPage } from "types/vendor/LaravelPage/LaravelPage";
-import { TrackingAppointmentChart } from "types/Api/DTOs/TrackingAppointmentChart";
+import { TrackingAppointmentChart } from "types/Api/TrackingAppointmentChart";
 import { TrackingAppointmentChartType } from "types/enums/TrackingAppointmentChartType";
 import AddButton from "Components/IconButton/AddButton";
-import { Patient } from "types/Api/DTOs/Patient";
+import { Patient } from "types/Api/Patient";
 import { usePatientsStore } from "Stores/UsePatientsStore";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
@@ -24,6 +24,7 @@ import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
 import { LifeHabitsIconButton } from "Components/IconButton/LifeHabitsIcon";
 import { ClinicalHistoryIconButton } from "Components/IconButton/ClinicalHistoryIconButton";
 import { LoadingAlert } from "Components/Utils/Alert/LoadingAlert";
+import { IconButton2 } from "Components/IconButton/IconButton2";
 
 
 export const PatientDetails = () => {
@@ -51,6 +52,7 @@ export const PatientDetails = () => {
 
     const handleClinicalHistoryButton = useCallback(() => navigate('/clinicalHistory/view?patientId=' + patient?.id), [patient, navigate]);
 
+    const handleExamsButton = useCallback(() => navigate('/exams?patientId' + patient?.id), [navigate, patient]);
     return (
         <>
             <LoadingAlert show={isPatientLoading}/>
@@ -75,6 +77,9 @@ export const PatientDetails = () => {
                     </div>
                     <div className="col-1 chart-container">
                         <ClinicalHistoryIconButton onClick={handleClinicalHistoryButton}/>
+                    </div>
+                    <div className="col-1 chart-container">
+                        <IconButton2 text='Exames' iconClass='bi-graph-up-arrow' onClick={handleExamsButton}/>
                     </div>
                 </div>
                 <h5>Enfermeiro</h5>

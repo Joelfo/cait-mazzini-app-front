@@ -15,6 +15,7 @@ import { FirstNurseryChartPage } from "Pages/FirstNurseryChart";
 import * as yup from 'yup';
 import { LifeHabitsViewPage } from "Pages/LifeHabits/LifeHabitsViewPage";
 import { ClinicalHistoryViewPage } from "Pages/ClinicalHistory/ClinicalHistoryViewPage";
+import { ExamsPage } from "Pages/Exams/ExamsPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -61,6 +62,10 @@ function App() {
         {
           path: '/firstNurseryChart',
           element: <FirstNurseryChartPage/>
+        },
+        {
+          path: '/exams',
+          element: <ExamsPage/>
         }
       ]
     }

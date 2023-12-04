@@ -1,4 +1,4 @@
-import { Patient } from "types/Api/DTOs/Patient";
+import { Patient } from "types/Api/Patient";
 import { create } from "zustand";
 
 interface usePatientsStoreStates {

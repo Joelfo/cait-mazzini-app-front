@@ -1,10 +1,10 @@
-import { ClinicalHistory } from "types/Api/DTOs/ClinicalHistory";
+import { ClinicalHistory } from "types/Api/ClinicalHistory";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Immunization } from "types/Api/DTOs/Immunization";
+import { Immunization } from "types/Api/Immunization";
 import { ClinicalHistoryHasDatedImmunization } from "types/Api/ClinicalHistoryHasDatedImmunization";
-import { Desease } from "types/Api/DTOs/Desease";
+import { Desease } from "types/Api/Desease";
 
 export class ClinicalHistoryAPi extends ResourceAPI<ClinicalHistory>{
     constructor(){

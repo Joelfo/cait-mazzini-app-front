@@ -1,7 +1,7 @@
 import { ClinicalHistoryAPi } from "Api/ClinicalHistoryAPI";
 import { formToJSON } from "axios";
 import { Col, Container, Form, Row, Stack } from "react-bootstrap";
-import { ClinicalHistory } from "types/Api/DTOs/ClinicalHistory";
+import { ClinicalHistory } from "types/Api/ClinicalHistory";
 import { MazziniFormSection } from "util/components/MazziniFormSection";
 
 export const ClinicalHistoryView = ({ data } : ClinicalHistoryViewProps) => {
