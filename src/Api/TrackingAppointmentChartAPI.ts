@@ -2,7 +2,7 @@ import { TrackingAppointmentChart } from "types/Api/TrackingAppointmentChart";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { TrackingAppointmentChartType } from "types/enums/TrackingAppointmentChartType";
+import { TrackingAppointmentChartType } from "types/enums/ETrackingAppointmentChartType";
 import { TrackingAppointmentChartBasicInfo } from "types/Api/BasicInfo/TrackingAppointmentChartBasicInfo";
 import { API_URL } from "util/requests";
 

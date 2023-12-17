@@ -4,7 +4,9 @@ import { CulturesExamAPI } from "Api/CulturesExamAPI";
 import { PCRExamAPI } from "Api/PCRExamAPI";
 import { PPDExamAPI } from "Api/PPDExamAPI";
 import { ToraxXRayExamAPI } from "Api/ToraxXRayExamAPI";
-import { ExamTableSubPage } from "Components/ExamTableSubPage";
+import { ExamsTable } from "Components/ExamsTable";
+import { BiopsyForm } from "Components/Forms/Exams/BiopsyForm";
+import { CulturesForm } from "Components/Forms/Exams/CulturesForm";
 import { PcrForm } from "Components/Forms/Exams/PcrForm";
 import { PpdForm } from "Components/Forms/Exams/PpdForm";
 import { ToraxXRayForm } from "Components/Forms/Exams/ToraxXRayForm";
@@ -15,22 +17,13 @@ import { SaveSuccessAlert } from "Components/Utils/Alert/SaveSuccessAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import React, { useEffect, useMemo } from "react";
 import { useCallback, useState } from "react";
-import { Button, Col, Container, Nav, Row, Stack, Table } from "react-bootstrap"
+import { Button, Col, Container, Nav, Row, Stack, Tab, Table } from "react-bootstrap"
+import { BiopsyExam } from "types/Api/Exams/BiopsyExam";
+import { CulturesExam } from "types/Api/Exams/CulturesExam";
+import { PPDExam } from "types/Api/Exams/PPDExam";
 import { ToraxXRayExam } from "types/Api/Exams/ToraxXRayExam";
+import { PCRExam } from "types/Api/PCRExam";
 import { EToraxXRayResult } from "types/enums/EToraxXRayResult";
-
-type DownloadButtonProps = {
-    onClick: () => void
-}
-
-
-const DownloadButton = ({ onClick } : DownloadButtonProps) => {
-    return (
-        <Button variant='primary' size='sm' onClick={onClick} style={{padding: '2px 6px'}}>
-            <i className="bi bi-download" style={{color: 'white', fontSize: 20}}></i>
-        </Button>
-    );
-}
 
 export const ExamsPage = () => {
     const examTypes = ["Raio X", "PPD", "PCR", "Biópsia", "Culturas"]
@@ -57,6 +50,18 @@ export const ExamsPage = () => {
     const [ showSuccessMessage, setShowSuccessMessage ] = useState<boolean>(false);
     const showLoadingMessage = useMemo(() => isToraxXRayExamCreationLoading, [isToraxXRayExamCreationLoading]);
 
+    const getXRayResultLabel = (xRayResult: EToraxXRayResult) => {
+        switch (xRayResult) {
+            case EToraxXRayResult.Common:
+                return 'Normal';
+            case EToraxXRayResult.HasOthers:
+                return 'Outros';
+            case EToraxXRayResult.HasSequelae:
+                return "Sequela";
+            case EToraxXRayResult.HasSug:
+                return "SUG"
+        }
+    }
 
     const getPpdResultLabel = (ppdResult: boolean) => {
         return ppdResult ? "SIM" : "NÃO";
@@ -64,24 +69,6 @@ export const ExamsPage = () => {
 
     const getPcrResultLabel = (pcrResult: boolean) => {
         return pcrResult ? "Positivo" : "Negativo";
-    }
-
-    const onClickNew = () => {
-        console.log('q');
-        switch(selectedExamType) {
-            case "Raio X":
-                setShowToraxXRayForm(true);
-                break;
-            case "PPD":
-                setShowPpdForm(true);
-                break;
-            case "PPD":
-                
-        }
-    }
-
-    const onSubmitXRayExam = () => {
-        
     }
 
     useEffect(() => {
@@ -100,20 +87,25 @@ export const ExamsPage = () => {
                         {
                             examTypes.map(examType => (
                                 <Nav.Item>
-                                    <Nav.Link eventKey={examType}>
+                                    <Nav.Link eventKey={examType} style={{color: 'black'}}>
                                         {examType}
                                     </Nav.Link>
                                 </Nav.Item>
                             ))
                         }
                     </Nav>
-                    <Table striped bordered hover>
-                        {
+                </Col>
+                </Row>
+                <Row>
+                    <Col>
+                    {
                             selectedExamType === "Raio X"
                             &&
-                            <React.Fragment>
-                                <thead>
-                                    <tr>
+                            <ExamsTable
+                                api={toraxXRayExamAPI}
+                                patient={patient}
+                                tableHeaders={
+                                    <> 
                                         <th>
                                             Data
                                         </th>
@@ -123,33 +115,35 @@ export const ExamsPage = () => {
                                         <th>
                                             Observações
                                         </th>
-                                        <th>
-                                            Arquivos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        toraxXRayExams?.map(exam => (
-                                            <tr>
-                                                <td>{exam.date}</td>
-                                                <td>{getXRayResultLabel(exam.xRayResult)}</td>
-                                                <td>{exam.observations}</td>
-                                                <td> <DownloadButton onClick={() => {}}/> </td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </React.Fragment>
+                                    </>
+                                }
+                                renderRowFields={(exam: ToraxXRayExam) => (
+                                    <>
+                                    
+                                        <td>{exam.date}</td>
+                                        <td>{getXRayResultLabel(exam.xRayResult)}</td>
+                                        <td>{exam.observations}</td>
+                                    </>
+                                )}
+                                renderPopup={
+                                    (show, onClose, onSubmit, patient, data) => (
+                                        <MazziniPopup show={show} onClose={onClose}>
+                                            <ToraxXRayForm patient={patient} onSubmit={onSubmit} data={data}/>
+                                        </MazziniPopup>
+                                    )
+                                }
+                            />
                         }
                         {
                             selectedExamType === 'PPD'
                             &&
-                            <React.Fragment>
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            Data
+                            <ExamsTable
+                                api={ppdExamAPI}
+                                patient={patient}
+                                tableHeaders={
+                                    <>
+                                      <th>
+                                        Data
                                         </th>
                                         <th>
                                             Reativo?
@@ -157,83 +151,68 @@ export const ExamsPage = () => {
                                         <th>
                                             Observações
                                         </th>
-                                        <th>
-                                            Arquivos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        ppdExams?.map(ppdExam => (
-                                            <tr>
-                                                <td>
-                                                    {ppdExam.date}
-                                                </td>
-                                                <td>
-                                                    {getPpdResultLabel(ppdExam.isReactiveResult)}
-                                                </td>
-                                                <td>
-                                                    {ppdExam.observations}
-                                                </td>
-                                                <td>
-                                                <DownloadButton onClick={() => {}}/>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </React.Fragment>
+                                    </>
+                                }
+                                renderRowFields={
+                                    (exam: PPDExam) => (
+                                        <>
+                                            <td>
+                                                {exam.date}
+                                            </td>
+                                            <td>
+                                                {getPpdResultLabel(exam.isReactiveResult)}
+                                            </td>
+                                            <td>
+                                                {exam.observations}
+                                            </td>
+                                        </>
+                                    )
+                                }
+                                renderPopup={
+                                    (show, onClose, onSubmit, patient, data) => (
+                                        <MazziniPopup show={show} onClose={onClose}>
+                                            <PpdForm patient={patient} onSubmit={onSubmit} data={data}/>
+                                        </MazziniPopup>
+                                    )
+                                }
+                            />
                         }
                         {
                             selectedExamType === 'PCR'
                             &&
-                            <ExamTableSubPage 
-                                renderTable={
-                                    (data) => (
-                                        <Table>
-                                            <thead>
-                                                <tr>
-                                                    <th>
-                                                        Data
-                                                    </th>
-                                                    <th>
-                                                        Resultado
-                                                    </th>
-                                                    <th>
-                                                        Observações
-                                                    </th>
-                                                    <th>
-                                                        Arquivos
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {
-                                                    data?.map(exam => (
-                                                        <tr>
-                                                            <td>
-                                                                {exam.date}
-                                                            </td>
-                                                            <td>
-                                                                {getPcrResultLabel(exam.isPositiveResult)}
-                                                            </td>
-                                                            <td>
-                                                                {exam.observations}
-                                                            </td>
-                                                            <td>
-                                                                <DownloadButton onClick={() => {}}/>
-                                                            </td>
-                                                        </tr>
-                                                    ))
-                                                }
-                                            </tbody>
-                                        </Table>
+                            <ExamsTable
+                                tableHeaders={
+                                    <>
+                                        <th>
+                                            Data
+                                        </th>
+                                        <th>
+                                            Resultado
+                                        </th>
+                                        <th>
+                                            Observações
+                                        </th>
+                                    </>
+                                }
+                                renderRowFields={
+                                    (exam: PCRExam) => (
+                                        <>
+                                            <td>
+                                                {exam.date}
+                                            </td>
+                                            <td>
+                                                {getPcrResultLabel(exam.isPositiveResult)}
+                                            </td>
+                                            <td>
+                                                {exam.observations}
+                                            </td>
+                                        </>
                                     )
                                 }
                                 renderPopup={
-                                    (show, onClose, onSubmit, patient) => (
+                                    (show, onClose, onSubmit, patient, data) => (
                                         <MazziniPopup show={show} onClose={onClose}>
-                                            <PcrForm patient={patient} onSubmit={onSubmit}/>
+                                            <PcrForm patient={patient} onSubmit={onSubmit} data={data}/>
                                         </MazziniPopup>
                                     )
                                 }
@@ -244,9 +223,11 @@ export const ExamsPage = () => {
                         {
                             selectedExamType === 'Culturas'
                             &&
-                            <React.Fragment>
-                                <thead>
-                                    <tr>
+                            <ExamsTable
+                                api={culturesExamAPI}
+                                patient={patient}
+                                tableHeaders={
+                                    <>
                                         <th>
                                             Data
                                         </th>
@@ -259,42 +240,41 @@ export const ExamsPage = () => {
                                         <th>
                                             Observações
                                         </th>
-                                        <th>
-                                            Arquivos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        culturesExams?.map(exam => (
-                                            <tr>
-                                                <td>
-                                                    {exam.date}
-                                                </td>
-                                                <td>
-                                                    {getPcrResultLabel(exam.isPositiveResult)}
-                                                </td>
-                                                <td>
-                                                    {exam.site}
-                                                </td>
-                                                <td>
-                                                    {exam.observations}
-                                                </td>
-                                                <td>
-                                                    <DownloadButton onClick={() => {}}/>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </React.Fragment>
+                                    </>
+                                }
+                                renderRowFields={(exam) => (
+                                    <>
+                                        <td>
+                                            {exam.date}
+                                        </td>
+                                        <td>
+                                            {getPcrResultLabel(exam.isPositiveResult)}
+                                        </td>
+                                        <td>
+                                            {exam.site}
+                                        </td>
+                                        <td>
+                                            {exam.observations}
+                                        </td>
+                                    </>
+                                )}  
+                                renderPopup={
+                                    (show, onClose, onSubmit, patient, data) => (
+                                        <MazziniPopup show={show} onClose={onClose}>
+                                            <CulturesForm patient={patient} onSubmit={onSubmit} data={data}/>
+                                        </MazziniPopup>
+                                    )
+                                }
+                            />
                         }
                         {
                             selectedExamType === 'Biópsia'
                             &&
-                            <React.Fragment>
-                                <thead>
-                                    <tr>
+                            <ExamsTable
+                                api={biopsyExamAPI}
+                                patient={patient}
+                                tableHeaders={
+                                    <>
                                         <th>
                                             Data
                                         </th>
@@ -307,39 +287,35 @@ export const ExamsPage = () => {
                                         <th>
                                             Observações
                                         </th>
-                                        <th>
-                                            Arquivos
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {
-                                        biopsyExams?.map(exam => (
-                                            <tr>
-                                                <td>
-                                                    {exam.date}
-                                                </td>
-                                                <td>
-                                                    {exam.analyzedTissue}
-                                                </td>
-                                                <td>
-                                                    {exam.result}
-                                                </td>
-                                                <td>
-                                                    {exam.observations}
-                                                </td>
-                                                <td>
-                                                    <DownloadButton onClick={() => {}}/>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    }
-                                </tbody>
-                            </React.Fragment>
+                                    </>
+                                }
+                                renderRowFields={(exam) => (
+                                    <>
+                                        <td>
+                                            {exam.date}
+                                        </td>
+                                        <td>
+                                            {exam.analyzedTissue}
+                                        </td>
+                                        <td>
+                                            {exam.result}
+                                        </td>
+                                        <td>
+                                            {exam.observations}
+                                        </td>
+                                    </>
+                                )}
+                                renderPopup={
+                                    (show, onClose, onSubmit, patient, data) => (
+                                        <MazziniPopup show={show} onClose={onClose}>
+                                            <BiopsyForm patient={patient} onSubmit={onSubmit} data={data}/>
+                                        </MazziniPopup>
+                                    )
+                                }
+                            />
                         }
-                    </Table>
-                </Col>
-            </Row>
+                    </Col>
+                </Row>
             
         </Container>
     )

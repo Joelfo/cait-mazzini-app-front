@@ -1,4 +1,4 @@
-import { Alert } from "react-bootstrap";
+import { Alert, Container } from "react-bootstrap";
 
 export interface ISaveSuccessAlertProps {
     show: boolean;
@@ -7,15 +7,16 @@ export interface ISaveSuccessAlertProps {
 
 export const SaveSuccessAlert = ({ show, onClose } : ISaveSuccessAlertProps) => {
     return (
-        <Alert
-            show={show}
-            onClose={onClose}
-            variant='success'
-            dismissible
-            className='fixed-top'
-        >
-            <Alert.Heading>Dados salvos com sucesso.</Alert.Heading>
-            <p>Os dados enviados foram cadastrados com sucesso.</p>
-        </Alert>
+        <Container className='fixed-top'>
+            <Alert
+                show={show}
+                onClose={onClose}
+                variant='success'
+                dismissible
+            >
+                <Alert.Heading>Dados salvos com sucesso.</Alert.Heading>
+                <p>Os dados enviados foram cadastrados com sucesso.</p>
+            </Alert>
+        </Container>
     )
 }

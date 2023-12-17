@@ -1,5 +1,5 @@
 import { VitalSignsMeasurement } from "./VitalSignsMeasurement";
-import { TrackingAppointmentChartType } from "../enums/TrackingAppointmentChartType";
+import { TrackingAppointmentChartType } from "../enums/ETrackingAppointmentChartType";
 
 export type TrackingAppointmentChart = {
     id: number;

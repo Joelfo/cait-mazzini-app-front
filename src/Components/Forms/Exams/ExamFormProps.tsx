@@ -8,5 +8,6 @@ import { justRequiredRule } from "util/validation";
 
 export type ExamFormProps<TExam extends ComplementaryExam> = {
     onSubmit: (data: TExam) => void,
-    patient: Patient
+    patient: Patient,
+    data?: TExam
 }

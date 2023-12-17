@@ -12,7 +12,7 @@ import './index.css';
 import { registerForBootstrap } from 'util/HookFormBootstrapUtils';
 import { HookControlledFormControl } from 'util/components/HookControlledFormControl';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { TrackingAppointmentChartType } from 'types/enums/TrackingAppointmentChartType';
+import { ETrackingAppointmentChartType } from 'types/enums/ETrackingAppointmentChartType';
 import { getActualDate } from 'util/DateUtils';
 import { TrackingAppointmentChartAPI } from 'Api/TrackingAppointmentChartAPI';
 import { ConnectionErrorAlert } from 'Components/Utils/Alert/ConnectionErrorAlert';

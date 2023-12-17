@@ -13,7 +13,7 @@ import { Country } from 'types/Api/Country';
 import { HealthUnity } from 'types/Api/HealthUnity';
 import { validate } from 'gerador-validador-cpf';
 import { redirect, useNavigate } from 'react-router';
-import { Alert, Button, Col, Container, Dropdown, Form, FormCheck, FormGroup, Modal, Row, Spinner, Stack } from 'react-bootstrap';
+import { Alert, Button, Col, Container, Dropdown, Form, FormCheck, FormControlProps, FormGroup, Modal, Row, Spinner, Stack } from 'react-bootstrap';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { usePatientsStore } from 'Stores/UsePatientsStore';
 import { HookControlledFormControl } from 'util/components/HookControlledFormControl';
@@ -35,6 +35,8 @@ import { PatientAPI } from 'Api/PatientAPI';
 import { validateCns, validateCpf } from 'util/Validations';
 import { Option } from 'react-bootstrap-typeahead/types/types';
 import { HealthUnityAPI } from 'Api/HealthUnityAPI';
+import InputMask, { Props } from 'react-input-mask';
+
 
 export const PatientForm = () => {
     const selectedPatient = useSelectedPatient();
@@ -615,10 +617,6 @@ export const PatientForm = () => {
                                             value: true,
                                             message: requiredTextMessage('CPF')
                                         },
-                                        maxLength: {
-                                            value: 11,
-                                            message: 'O campo CPF não deve ser maior do que 11 caracteres'
-                                        },
                                         validate: {
                                             validCpf: value => validateCpf(!!value ? value.toString() : '') || 'Valor de Cpf inválido informado.' 
                                         }
@@ -627,13 +625,12 @@ export const PatientForm = () => {
                                        field: { value, onChange, onBlur },
                                        fieldState: { invalid } 
                                     }) => (
-                                        <Form.Control 
-                                            value={value} 
-                                            onChange={onChange} 
-                                            onBlur={onBlur}
-                                            isInvalid={invalid}
-                                            type='number'
-                                        />
+                                        <><InputMask mask='999.999.999-99' onChange={onChange} value={value} onBlur={onBlur}>
+                                            {
+                                                ((inputProps: Props & FormControlProps) => 
+                                                    { return <Form.Control {...inputProps} isInvalid={invalid}/> }) as any
+                                            }
+                                        </InputMask></>
                                     )}
                                 />
                                 <Form.Control.Feedback type='invalid'>{errors.cpf?.message}</Form.Control.Feedback>
@@ -775,7 +772,12 @@ export const PatientForm = () => {
                         <Row>
                             <Form.Group as={Col} md='3'>
                                 <Form.Label>Cep</Form.Label>
-                                <Form.Control {...register('cep')} isInvalid={!!errors?.cep} type='text' disabled={isCitiesLoading}/>
+                                <InputMask mask='99999-999' {...register('cep')}>
+                                    {
+                                        ((inputProps: Props & FormControlProps) => 
+                                            { return <Form.Control {...inputProps} isInvalid={!!errors.cep}/> }) as any
+                                    }
+                                </InputMask>
                                 <Form.Control.Feedback type='invalid'>{errors.cep?.message}</Form.Control.Feedback>
                             </Form.Group>
                             {

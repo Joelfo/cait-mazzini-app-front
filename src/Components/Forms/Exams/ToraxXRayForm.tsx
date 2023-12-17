@@ -6,13 +6,11 @@ import { ToraxXRayExam } from "types/Api/Exams/ToraxXRayExam";
 import { Patient } from "types/Api/Patient";
 import { EToraxXRayResult } from "types/enums/EToraxXRayResult";
 import { justRequiredRule } from "util/validation";
+import { ExamFormProps } from "./ExamFormProps";
 
-export type ToraxXRayFormProps = {
-    onSubmit: (data: ToraxXRayExam) => void,
-    patient: Patient
-}
 
-export const ToraxXRayForm = ({ onSubmit, patient } : ToraxXRayFormProps) => {
+
+export const ToraxXRayForm = ({ onSubmit, patient, data } : ExamFormProps<ToraxXRayExam>) => {
 
     const {
         handleSubmit,
@@ -21,7 +19,7 @@ export const ToraxXRayForm = ({ onSubmit, patient } : ToraxXRayFormProps) => {
         setValue,
         register
     } = useForm<ToraxXRayExam>({
-        defaultValues: {
+        defaultValues: data ?? {
             patientId: patient.id
         }
     });
@@ -39,7 +37,8 @@ export const ToraxXRayForm = ({ onSubmit, patient } : ToraxXRayFormProps) => {
                         <Form.Label>
                             Data
                         </Form.Label>
-                        <Form.Control type='date' {...register('date', justRequiredRule('Data'))}/>
+                        <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
+                        <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                     </Form.Group>
                     <Form.Group as={Col} md='2'>
                         <Form.Label>

@@ -4,7 +4,7 @@ import { PPDExam } from "types/Api/Exams/PPDExam";
 import { justRequiredRule } from "util/validation";
 import { ExamFormProps } from "./ExamFormProps";
 
-export const PpdForm = ( { patient, onSubmit } : ExamFormProps<PPDExam>) => {
+export const PpdForm = ( { patient, onSubmit, data } : ExamFormProps<PPDExam>) => {
 
     const {
         handleSubmit,
@@ -13,19 +13,20 @@ export const PpdForm = ( { patient, onSubmit } : ExamFormProps<PPDExam>) => {
         setValue,
         register
     } = useForm<PPDExam>({
-        defaultValues: {
+        defaultValues: data ?? {
             patientId: patient.id
         }
     });
 
     return (
-        <Form>
+        <Form noValidate onSubmit={handleSubmit(onSubmit)}>
             <Row>
                 <Form.Group as={Col} md='3'>
                     <Form.Label>
                         Data
                     </Form.Label>
-                    <Form.Control type='date' {...register('date', justRequiredRule('Data'))}/>
+                    <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
+                    <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} md='2' className='d-flex align-items-center'>
                     <Controller 
@@ -39,7 +40,7 @@ export const PpdForm = ( { patient, onSubmit } : ExamFormProps<PPDExam>) => {
                             <Form.Check
                                 label='Reativo'
                                 checked={value}
-                                onSelect={onChange}
+                                onChange={onChange}
                                 onBlur={onBlur}
                             />
                         )}

@@ -19,7 +19,7 @@ export class ResourceAPI<TResource, TDto = TResource> {
             )
             return response.data
         }
-    )
+    );
 
     public useAllPaginated = (skip: number, take: number) => useQuery<TResource[]>(
         [this.resourceName + '.AllPaginated' + skip],
@@ -35,7 +35,7 @@ export class ResourceAPI<TResource, TDto = TResource> {
             );
             return response.data;
         }
-    )
+    );
 
     public useShow = (resourceId: number | undefined) => {
         console.log([this.resourceName + '.Show', resourceId]);
@@ -52,7 +52,8 @@ export class ResourceAPI<TResource, TDto = TResource> {
                 
             }
         );
-    }
+    };
+
     public useCreate = () => useMutation({
         mutationFn: async (resource: TDto) => {
             const response = await axios.post<number>(
@@ -62,5 +63,26 @@ export class ResourceAPI<TResource, TDto = TResource> {
             return response.data;
         },
         retry: 999999,
+    });
+
+    public useUpdate = () => useMutation({
+        mutationFn: async ({id, resource} : { id:number, resource: TDto }) => {
+            const response = await axios.put(
+                `${this.resourceRoute}/${id}`,
+                {
+                    ...resource
+                }
+            )
+            return response.data;
+        },
+        retry: 99999,
+    });
+
+    public useDelete = () => useMutation({
+        mutationFn: async ({ id } : { id: number }) => {
+            console.log(id);
+            const response = await axios.delete(`${this.resourceRoute}/${id}`);
+            return response.data;
+        }
     })
 }

@@ -1,10 +1,10 @@
 import { CulturesExam } from "types/Api/Exams/CulturesExam";
 import { ExamFormProps } from "./ExamFormProps";
 import { Controller, useForm } from "react-hook-form";
-import { Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row } from "react-bootstrap";
 import { justRequiredRule } from "util/validation";
 
-export const CulturesForm = ({patient, onSubmit} : ExamFormProps<CulturesExam>) => {
+export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesExam>) => {
 
     const {
         handleSubmit,
@@ -13,7 +13,7 @@ export const CulturesForm = ({patient, onSubmit} : ExamFormProps<CulturesExam>) 
         setValue,
         register
     } = useForm<CulturesExam>({
-        defaultValues: {
+        defaultValues: data ?? {
             patientId: patient.id
         }
     });
@@ -25,7 +25,8 @@ export const CulturesForm = ({patient, onSubmit} : ExamFormProps<CulturesExam>) 
                     <Form.Label>
                         Data
                     </Form.Label>
-                    <Form.Control type='date' {...register('date', justRequiredRule('Data'))}/>
+                    <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
+                    <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group as={Col} md='2' className='d-flex align-items-center'>
                     <Controller 
@@ -39,7 +40,7 @@ export const CulturesForm = ({patient, onSubmit} : ExamFormProps<CulturesExam>) 
                             <Form.Check
                                 label='Positivo'
                                 checked={value}
-                                onSelect={onChange}
+                                onChange={onChange}
                                 onBlur={onBlur}
                             />
                         )}
@@ -52,10 +53,19 @@ export const CulturesForm = ({patient, onSubmit} : ExamFormProps<CulturesExam>) 
                     <Form.Control {...register('site', justRequiredRule('Sítio'))} isInvalid={!!errors.site}/>
                     <Form.Control.Feedback type='invalid'>{errors.site?.message}</Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group as={Col} md='5'>
+            </Row>
+            <Row className='form-mazzini-row'>
+                <Form.Group as={Col} md='6'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
                 </Form.Group>
+            </Row>
+            <Row className="form-mazzini-row">
+                <Col md='2'>
+                    <Button variant='success' type='submit'>
+                        Salvar
+                    </Button>
+                </Col>
             </Row>
         </Form>
     )
