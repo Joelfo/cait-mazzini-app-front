@@ -17,7 +17,7 @@ const IconButton = ({ icon, text, onClick = () => {} } : Props) => {
           </div>
         </button>
         <div style={{width: 'auto', textAlign: 'justify', display: 'inline-block'}}>
-          <p>{text}</p>
+          <p style={{textAlign: 'center'}}>{text}</p>
         </div>
       </div>
     </div>

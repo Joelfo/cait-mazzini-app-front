@@ -26,6 +26,9 @@ import { ClinicalHistoryIconButton } from "Components/IconButton/ClinicalHistory
 import { LoadingAlert } from "Components/Utils/Alert/LoadingAlert";
 import { IconButton2 } from "Components/IconButton/IconButton2";
 import { ChartsBar } from "./ChartsBar";
+import { ScannedChartPopupContent } from "Components/ScannedChartPopupContent";
+import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
+import { useScannedChartAPI } from "Api/ScannedChartAPI";
 
 
 export const PatientDetails = () => {
@@ -56,7 +59,6 @@ export const PatientDetails = () => {
     const handleExamsButton = useCallback(() => navigate('/exams?patientId' + patient?.id), [navigate, patient]);
 
     const handleNewTrackingChart = useCallback((chartType: ETrackingAppointmentChartType) => navigate(`/trackingAppointmentChart?patientId=${patient?.id}&type=${chartType}`), [patient, navigate])
-
     
     const handleNewNurseryChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.FromNursery), [handleNewTrackingChart]);
     const handleNewMedicalChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.Medical), [handleNewTrackingChart]);
@@ -67,42 +69,96 @@ export const PatientDetails = () => {
     const nurseryTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.FromNursery) ?? [], [trackingAppointmentCharts]);
     const medicalTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.Medical) ?? [], [trackingAppointmentCharts]);
     const farmaceuticalTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.Farmaceuthical) ?? [], [trackingAppointmentCharts]);
-    
+
+    const [ showScannedChartPopup, setShowScannedChartPopup ] = useState<boolean>(false);
+
+    const { useCheck: useCheckScannedChart, useShow: useShowScannedChart, useCreate: useCreateScannedChart } = useScannedChartAPI();
+
+    const { data: hasScannedChart } = useCheckScannedChart(patient?.id);
+
+    const { mutate: getScannedChartFile } = useShowScannedChart();
+
+    const { mutate: saveScannedChart, isLoading: isScannedChartSaveLoading, isSuccess: isScannedChartSaveSuccess } = useCreateScannedChart(); 
+
+    const scannedChartInputRef = useRef<HTMLInputElement | null>(null);
+
+    const handleAddScannedChartButton = () => scannedChartInputRef.current?.click(); 
+
+    const handleSelectedScannedChartFileChange = useCallback<React.ChangeEventHandler<HTMLInputElement>>((event) => {
+        if (event.target.files) {
+            saveScannedChart({ 
+                patientId: patient!.id,
+                file: event.target.files[0]
+            });
+        }
+    }, [saveScannedChart]);
+
+    const handleOpenScannedChartClick = () => {
+        getScannedChartFile({ patientId: patient!.id }, {
+            onSuccess: (scannedChartFile) => {
+                const url = window.URL.createObjectURL(scannedChartFile);
+                const fileLink = document.createElement('a');
+                fileLink.href = url;
+                fileLink.download = "ficha-escaneada";
+                document.body.appendChild(fileLink);
+                fileLink.click();
+                fileLink.remove();
+            }
+        });
+    }
+
     return (
         <>
             <LoadingAlert show={isPatientLoading}/>
             {
                 patient
                 &&
-                <div className="container">
-                <div className="row main-info-container mb-4 mt-5">
-                    <div className="col-1 chart-container">
-                        <PersonIconButton text={patient.name}/>
+                <>
+                    <div className="container">
+                        <div className="row   mb-4 mt-5">
+                            <div className="col-1 chart-container">
+                                <PersonIconButton text={patient.name}/>
+                            </div>
+                            <div className="col-1 chart-container">
+                                <Link to={"/patientInfo?patientId=" + patient.id} onClick={() => {}}>
+                                    <DatabaseIconButton text="Dados cadastrais"/>
+                                </Link>
+                            </div>
+                            <div className="col-1 chart-container">
+                                <StatsIconButton onClick={() => setVitalSignsMeasurementPopupOpen(true)} text="Medições de sinais vitais"/>
+                            </div>
+                            <div className="col-1 chart-container">
+                                <LifeHabitsIconButton onClick={handleLifeHabitsButton}/>
+                            </div>
+                            <div className="col-1 chart-container">
+                                <ClinicalHistoryIconButton onClick={handleClinicalHistoryButton}/>
+                            </div>
+                            <div className="col-1 chart-container">
+                                <IconButton2 text='Exames' iconClass='bi-graph-up' onClick={handleExamsButton}/>
+                            </div>
+                            <div className="col-1 chart-container">
+                                {
+                                    hasScannedChart ? 
+                                        <IconButton2 text='Ficha escaneada' iconClass='bi-clipboard-check' onClick={handleOpenScannedChartClick}/>
+                                        :
+                                        <>
+                                            <input style={{visibility: 'hidden'}} ref={scannedChartInputRef} type='file' onChange={handleSelectedScannedChartFileChange}/>
+                                            <IconButton2 text='Adicionar ficha escaneada' iconClass="bi-clipboard-plus" onClick={handleAddScannedChartButton}/>
+                                        </>
+                                }
+                            </div>
+                        </div>
+                        <Stack gap={2}>
+                            <ChartsBar isLoading={isFirstNurseryAppointmentLoading} title='Enfermagem' charts={nurseryTrackingCharts} onClickNew={handleNewNurseryChart} /> 
+                            <ChartsBar title='Médico' charts={medicalTrackingCharts} onClickNew={handleNewMedicalChart}/>
+                            <ChartsBar title='Farmacêutico' charts={farmaceuticalTrackingCharts} onClickNew={handleNewFarmaceuthicalChart}/>
+                        </Stack>
                     </div>
-                    <div className="col-1 chart-container">
-                        <Link to={"/patientInfo?patientId=" + patient.id} onClick={() => {}}>
-                            <DatabaseIconButton text="Dados cadastrais"/>
-                        </Link>
-                    </div>
-                    <div className="col-1 chart-container">
-                        <StatsIconButton onClick={() => setVitalSignsMeasurementPopupOpen(true)} text="Medições de sinais vitais"/>
-                    </div>
-                    <div className="col-1 chart-container">
-                        <LifeHabitsIconButton onClick={handleLifeHabitsButton}/>
-                    </div>
-                    <div className="col-1 chart-container">
-                        <ClinicalHistoryIconButton onClick={handleClinicalHistoryButton}/>
-                    </div>
-                    <div className="col-1 chart-container">
-                        <IconButton2 text='Exames' iconClass='bi-graph-up' onClick={handleExamsButton}/>
-                    </div>
-                </div>
-                <Stack gap={2}>
-                    <ChartsBar isLoading={isFirstNurseryAppointmentLoading} title='Enfermagem' charts={nurseryTrackingCharts} onClickNew={handleNewNurseryChart} /> 
-                    <ChartsBar title='Médico' charts={medicalTrackingCharts} onClickNew={handleNewMedicalChart}/>
-                    <ChartsBar title='Farmacêutico' charts={farmaceuticalTrackingCharts} onClickNew={handleNewFarmaceuthicalChart}/>
-                </Stack>
-            </div>
+                    <MazziniPopup show={showScannedChartPopup} onClose={() => setShowScannedChartPopup(false)}>
+                        <ScannedChartPopupContent patientId={patient.id}/>
+                    </MazziniPopup>
+                    
+                </>
             }
             
             <VitalSignsMeasurementsList show={vitalSignsMeasurementPopupOpen} onClose={() => setVitalSignsMeasurementPopupOpen(false)}/>
