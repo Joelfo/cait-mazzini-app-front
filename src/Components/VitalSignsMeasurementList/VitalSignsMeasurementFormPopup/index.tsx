@@ -4,7 +4,7 @@ import { Controller, useForm } from "react-hook-form";
 import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { justRequiredRule, requiredTextMessage } from "util/validation";
-import * as Api from 'Api/VitalSignsMeasurementAPI';
+import * as Api from 'Api/useVitalSignsMeasurementApi';
 import './styles.css';
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
@@ -60,7 +60,7 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
 
     const onSubmit = (data: VitalSignsMeasurement) => mutate(data);
 
-    const vitalSignsMeasurementApi = new Api.VitalSignsMeasurementAPI();
+    const vitalSignsMeasurementApi = Api.useVitalSignsMeasurementApi();
     const { mutate, isLoading, isError, isSuccess } = vitalSignsMeasurementApi.useCreate();
 
     const [ showErrorAlert, setShowErrorAlert ] = useState<boolean>(false);

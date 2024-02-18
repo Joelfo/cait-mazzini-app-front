@@ -1,7 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ContraceptiveMethodAPI } from "Api/ContraceptiveMethodAPI";
-import { LifeHabitsInfoAPI } from "Api/LifeHabitsInfoAPI";
-import { PhysicalActivityAPI } from "Api/PhysicalActivityAPI";
+import { ContraceptiveMethodAPI, useContraceptiveMethodApi } from "Api/useContraceptiveMethodApi";
+import { LifeHabitsInfoAPI, useLifeHabitsInfoApi } from "Api/useLifeHabitsInfoApi";
+import { PhysicalActivityAPI, usePhysicalActivityApi } from "Api/usePhysicalActivityApi";
+import IconButton from "Components/IconButton";
+import { IconButton2 } from "Components/IconButton/IconButton2";
 import { ConnectionErrorAlert } from "Components/Utils/Alert/ConnectionErrorAlert";
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
@@ -15,6 +17,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ContraceptiveMethod } from "types/Api/ContraceptiveMethod";
 import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
+import { Patient } from "types/Api/Patient";
 import { PhysicalActivity } from "types/Api/PhysicalActivity";
 import { ESexualActivityLevel } from "types/enums/ESexualActivityLevel";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
@@ -23,8 +26,9 @@ import { NUMBER_MESSAGE, POSITIVE_MESSAGE, REQUIRED_MESSAGE } from "util/message
 import { justRequiredRule, requiredTextMessage } from "util/validation";
 import * as yup from 'yup';
 
-export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData } : LifeHabitsFormProps) => {
+export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData, onClickNewContraceptiveMethod, onClickNewPhysicalActivity, physicalActivities, contraceptiveMethods, patient } : LifeHabitsFormProps) => {
 
+    // form
     const labels = {
         mealsPerDay: 'Refeições por dia',
         waterCupsPerDay: 'Copos d\'água por dia',
@@ -104,77 +108,47 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
         resolver: yupResolver(schema)
     });
 
+    // useState
     const [savedPhysicalActivitiesNumber, setSavedPhysicalActivitiesNumber] = useState<number>(0);
-
-    const [ contraceptiveMethodsCheckboxChecked, setContraceptiveMethodsCheckboxChecked ] = useState<boolean>(!!defaultData && defaultData.contraceptiveMethodIds.length > 0);
-
-    const physicalActivityAPI = new PhysicalActivityAPI();
-
-    const contraceptiveMethodAPI = new ContraceptiveMethodAPI();
-
-    const lifeHabitsInfoAPI = new LifeHabitsInfoAPI();
-    
-    const { data: physicalActivities, isLoading: isPhysicalActivitiesLoading, isError: isPhysicalActivitiesError } = physicalActivityAPI.useAll();
-
-    const { data: contraceptiveMethods, isLoading: isContraceptiveMethodsLoading, isError: isContraceptiveMethodsError } = contraceptiveMethodAPI.useAll();
-
-    const { status: physicalActivitySavingStatus, mutate: savePhysicalActivity } = physicalActivityAPI.useCreate();
-
-    const { patient, isError: isPatientError } = useSelectedPatient();
-
-    const isConnectionError = useMemo(() => (isPatientError || isContraceptiveMethodsError || isPhysicalActivitiesError), [isPatientError, isContraceptiveMethodsError, isPhysicalActivitiesError])
 
     const [ isSavingLoading, setIsSavingLoading ] = useState<boolean>(false);
 
-    const newPhysicalActivitiesRef = useRef<PhysicalActivity[]>([]);
+    const [ contraceptiveMethodsCheckboxChecked, setContraceptiveMethodsCheckboxChecked ] = useState<boolean>(!!defaultData && defaultData.contraceptiveMethodIds.length > 0);
 
+    const selectedPhysicalActivityNames = useState<PhysicalActivity[]>([]);
+
+    // classes
+    const physicalActivityAPI = usePhysicalActivityApi();
+    const contraceptiveMethodAPI = useContraceptiveMethodApi();
+    const lifeHabitsInfoAPI = useLifeHabitsInfoApi();
+    
+    
+    // custom Hooks
+   
+
+    const { status: physicalActivitySavingStatus, mutate: savePhysicalActivity } = physicalActivityAPI.useCreate();
     const { status: lifeHabitsInfoSavingStatus, mutate: saveLifeHabitsInfo } = lifeHabitsInfoAPI.useCreate();
 
     const navigate = useNavigate();
 
-
-    const watchPhysicalActivityIds = watch('physicalActivityIds');
-
-    const selectedPhysicalActivityNames = useState<PhysicalActivity[]>([]);
-
-    const onclickSubmit : SubmitHandler<LifeHabitsInfoDTO> = (data) => {
-        onSubmit({...data, sexualActivityLevel: parseInt(data.sexualActivityLevel.toString())}, newPhysicalActivitiesRef.current);
-        /*
-        data.sexualActivityLevel = parseInt(data.sexualActivityLevel.toString());
-        if (newPhysicalActivitiesRef.current.length > 0) {
-            setIsSavingLoading(true);
-            newPhysicalActivitiesRef.current.forEach(physicalActivity => {
-                savePhysicalActivity(physicalActivity, {
-                    onSuccess: (id) => {
-                        setValue('physicalActivityIds', [...getValues('physicalActivityIds') ?? [], id]);
-                        setSavedPhysicalActivitiesNumber(current => current + 1);
-                    }
-                })
-            })
-        } else {
-            setIsSavingLoading(true);
-            saveLifeHabitsInfo(data);
-        }*/
-    };
-
+    
+    // callbacks
     const handlePhysicalActivitiesInputChange = useCallback((selecteds: Option[]) => {
-        const selectedEntities = selecteds.map(selected => selected as PhysicalActivity)
-        newPhysicalActivitiesRef.current = selectedEntities.filter(selected => !physicalActivities?.find(physicalActivity => physicalActivity.id === selected.id));
-        const filteredSelectedIds = Array.from(new Set(selectedEntities.map(entity => entity.id).filter(id => id > 0)));
-        setValue('physicalActivityIds', filteredSelectedIds);
+        const selectedIds = selecteds.map(selected => (selected as PhysicalActivity).id);
+        setValue('physicalActivityIds', selectedIds);
     }, [physicalActivities]);
 
+    const handleSelectContraceptiveMethod = useCallback((selecteds: Option[]) => {
+        const selectedIds = selecteds.map(selected => (selected as ContraceptiveMethod).id);
+        setValue('contraceptiveMethodIds', selectedIds);
+    }, [contraceptiveMethods])
+
+    // useEffect
     useEffect(() => {
         if (lifeHabitsInfoSavingStatus === 'success') {
             navigate(`/patient?patientId=${patient!.id}&savedData=true`)
         }
     }, [lifeHabitsInfoSavingStatus]);
-
-    useEffect(() => {
-        if (savedPhysicalActivitiesNumber > 0 && savedPhysicalActivitiesNumber === newPhysicalActivitiesRef.current.length) {
-            saveLifeHabitsInfo(getValues())
-        }
-    }, [savedPhysicalActivitiesNumber]);
     
     useEffect(() => {
         if (!!patient)
@@ -184,7 +158,7 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
     return (
         <>
             <Container>
-                <Form noValidate onSubmit={handleSubmit(onclickSubmit)}>
+                <Form noValidate onSubmit={handleSubmit(onSubmit)}>
                     <MazziniFormSection title='Alimentação e Hidratação'>
                         <Row className=''>
                             <Form.Group as={Col} md='1'>
@@ -503,28 +477,24 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
                     </MazziniFormSection>
                     <MazziniFormSection title='Atividade física'>
                         <Row>
-                            <Form.Group as={Col} md='4'>
+                            <Form.Group as={Col} md='5'>
                                 <Form.Label>Qual(is) pratica?</Form.Label>
                                 <Row gap={2}>
                                     <Col>
-                                        <Typeahead
-                                            multiple
-                                            allowNew
-                                            onChange={handlePhysicalActivitiesInputChange}
-                                            labelKey='name'
-                                            options={physicalActivities ?? []}
-                                            disabled={isPhysicalActivitiesLoading}
-                                            defaultSelected={physicalActivities?.filter(physicalActivity => defaultData?.physicalActivityIds.includes( physicalActivity.id)) ?? []}
-                                            placeholder="Deixar em branco caso nenhuma"
-                                        />
+                                        <Stack direction="horizontal">
+                                            <Typeahead
+                                                style={{width: '100%'}}
+                                                multiple
+                                                onChange={handlePhysicalActivitiesInputChange}
+                                                labelKey='name'
+                                                options={physicalActivities ?? []}
+                                                defaultSelected={physicalActivities?.filter(physicalActivity => defaultData?.physicalActivityIds.includes( physicalActivity.id)) ?? []}
+                                                placeholder="Deixar em branco caso nenhuma"
+                                            />
+                                            <IconButton2 iconClass='bi-plus' height="20px" width="20px" onClick={onClickNewPhysicalActivity}/>
+                                        </Stack>
+
                                     </Col>
-                                    {
-                                        isPhysicalActivitiesLoading 
-                                        &&
-                                        <Col>
-                                            <Spinner size='sm'/> 
-                                        </Col>
-                                    }
                                 </Row>
                                
                             </Form.Group>
@@ -639,31 +609,16 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
                                 style={{visibility: (contraceptiveMethodsCheckboxChecked) ? 'visible' : 'hidden'}}
                             >
                                 <Form.Label>Qual(is)</Form.Label>
-                                <Typeahead 
-                                    
-                                    multiple
-                                    allowNew
-                                    onChange={(selected) => {
-                                        selected.forEach(selected => {
-                                            const selectedLabel = (selected as ContraceptiveMethod).name;
-                                            if (selectedLabel === '') {
-                                                return;
-                                            }
-                                            const selectedContraceptiveMethodIndex = contraceptiveMethods?.findIndex(contraceptiveMethod => contraceptiveMethod.name === selectedLabel) ?? -1;
-                                            if (selectedContraceptiveMethodIndex >= 0) {
-                                                setValue('contraceptiveMethodIds', [...(getValues('contraceptiveMethodIds') ?? []), contraceptiveMethods![selectedContraceptiveMethodIndex].id ])
-                                            } else {
-                                                newPhysicalActivitiesRef.current.push({
-                                                    name: selectedLabel,
-                                                    id: 0
-                                                });
-                                            }
-                                        })
-                                    }}
-                                    labelKey='name'
-                                    options={contraceptiveMethods ?? []}
-                                    defaultSelected={contraceptiveMethods?.filter(contraceptiveMethod => defaultData?.contraceptiveMethodIds.includes( contraceptiveMethod.id)) ?? []}
-                                />
+                                <Stack direction="horizontal">
+                                    <Typeahead 
+                                        multiple
+                                        onChange={handleSelectContraceptiveMethod}
+                                        labelKey='name'
+                                        options={contraceptiveMethods ?? []}
+                                        defaultSelected={contraceptiveMethods?.filter(contraceptiveMethod => defaultData?.contraceptiveMethodIds.includes( contraceptiveMethod.id)) ?? []}
+                                    />
+                                    <IconButton2 iconClass="bi-plus" height='20px' width="20px" onClick={onClickNewContraceptiveMethod}/>
+                                </Stack>
                             </Form.Group>
                         </Row>
                         <Row className='form-mazzini-row'>
@@ -741,8 +696,6 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
                     </Row>
                    
                     <SaveLoadingAlert show={isSavingLoading}/>
-                    <ConnectionErrorAlert show={isConnectionError}/>
-                   
                 </Form>
             </Container>
         </>
@@ -750,8 +703,13 @@ export const LifeHabitsForm = ({ onSubmit, onReturn = () => {}, showReturnButton
 }
 
 export type LifeHabitsFormProps = {
-    onSubmit: (data: LifeHabitsInfoDTO, newPhysicalActivities: PhysicalActivity[]) => void,
+    onSubmit: (data: LifeHabitsInfoDTO) => void,
     onReturn?: () => void,
     showReturnButton? : boolean,
-    defaultData?: LifeHabitsInfoDTO
+    defaultData?: LifeHabitsInfoDTO,
+    onClickNewPhysicalActivity?: () => void,
+    onClickNewContraceptiveMethod?: () => void,
+    physicalActivities: PhysicalActivity[],
+    contraceptiveMethods: ContraceptiveMethod[],
+    patient: Patient
 };

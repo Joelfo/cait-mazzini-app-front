@@ -24,7 +24,7 @@ export const HookControlledFormSelect = <FormEntityType extends HookForm.FieldVa
                 fieldState: {invalid} 
             }) => (
                 <ReactBootstrap.FormSelect
-                    onChange={onChange}
+                    onChange={event => onChange({...event, target: {...event.target, value: parseInt(event.target.value)}})}
                     onBlur={onBlur}
                     value={value}
                     isInvalid={invalid}

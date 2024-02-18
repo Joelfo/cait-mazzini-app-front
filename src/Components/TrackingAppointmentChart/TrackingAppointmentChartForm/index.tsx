@@ -14,7 +14,7 @@ import { HookControlledFormControl } from 'util/components/HookControlledFormCon
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ETrackingAppointmentChartType } from 'types/enums/ETrackingAppointmentChartType';
 import { getActualDate } from 'util/DateUtils';
-import { TrackingAppointmentChartAPI } from 'Api/TrackingAppointmentChartAPI';
+import { TrackingAppointmentChartAPI, useTrackingAppointmentChartApi } from 'Api/useTrackingAppointmentChartApi';
 import { ConnectionErrorAlert } from 'Components/Utils/Alert/ConnectionErrorAlert';
 
 export const TrackingAppointmentChartForm = () => {
@@ -53,7 +53,7 @@ export const TrackingAppointmentChartForm = () => {
         ],
     };
 
-    const trackingAppointmentChartApi = new TrackingAppointmentChartAPI();
+    const trackingAppointmentChartApi = useTrackingAppointmentChartApi();
 
     const { mutate, isLoading, status: creationStatus } = trackingAppointmentChartApi.useCreate();
     
@@ -68,7 +68,7 @@ export const TrackingAppointmentChartForm = () => {
     useEffect(() => {
         const chartType = urlParams.get('type');
         if (!!chartType) {
-            setValue('type', parseInt(chartType) as TrackingAppointmentChartType);
+            setValue('type', parseInt(chartType) as ETrackingAppointmentChartType);
         }
     }, [urlParams]);
                

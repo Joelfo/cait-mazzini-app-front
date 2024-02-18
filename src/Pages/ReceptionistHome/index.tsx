@@ -1,6 +1,6 @@
 import './styles.css';
 
-import SearchBar from "Components/SearchBar";
+import { PatientSearchBar } from "Components/SearchBar";
 import PersonIconButton from 'Components/IconButton/PersonIconButton';
 import { useEffect, useState } from 'react';
 import { LaravelPage } from 'types/vendor/LaravelPage/LaravelPage';
@@ -12,17 +12,20 @@ import AddButton from 'Components/IconButton/AddButton';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { usePatientsStore } from 'Stores/UsePatientsStore';
 import { PatientAPI } from 'Api/PatientAPI';
-import { Alert, Container } from 'react-bootstrap';
+import { Alert, Container, Spinner } from 'react-bootstrap';
+import { TimedAlert } from 'Components/Utils/Alert/TimedAlert';
+import { usePatientApi } from 'Api/usePatientApi';
+import { useSelectedPatient } from 'Hooks/useSelectedPatient';
 
 const ReceptionistHome = () => {
     const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
 
-    const patientAPI = new PatientAPI();
+    const patientAPI = usePatientApi();
 
     const [patientPageSkip, setPatientPageSkip] = useState<number>(0);
     const patientPageTake = 10;
 
-    const { data: patients } = patientAPI.useAllPaginated(patientPageSkip, patientPageTake);
+    const { data: patients, isLoading: isPatientsLoading } = patientAPI.useAllPaginated(patientPageSkip, patientPageTake);
 
     const [ isSavedDataAlertVisible, setIsSavedDataAlertVisible ] = useState<boolean>(false);
     const searchParams = useSearchParams()[0];
@@ -34,6 +37,8 @@ const ReceptionistHome = () => {
         }
     }, []);
 
+
+
     return(
         <>
             <div className="receptionist-home-container container">
@@ -41,19 +46,23 @@ const ReceptionistHome = () => {
                 <Link to="/patientForm">
                     <AddButton/>
                 </Link>
-                <SearchBar/>
+                <PatientSearchBar/>
                 <PersonIconButton text="Usuário"/>
                 </div>
                 <div className="bottom-container row">
                 
                     {
-                        patients?.map((patient) => (
-                            <div className="item-container col-2" key={patient.id.toString()}>
-                                <Link to={`/patient?patientId=${patient.id}`} onClick={() => setSelectedPatientId(patient.id)}>
-                                    <PersonIconButton text={patient.name}/>
-                                </Link>
-                            </div>
-                            ) )
+                        
+                            patients?.map((patient) => {
+                                console.log(patient);
+                               return (
+                                <div className="item-container col-2" key={patient.id.toString()}>
+                                    <Link to={`/patient?patientId=${patient.id}`} onClick={() => setSelectedPatientId(patient.id)}>
+                                        <PersonIconButton text={patient.name}/>
+                                    </Link>
+                                </div>
+                                )})
+                                
                     }
                 
                     <div className="item-container col-2">

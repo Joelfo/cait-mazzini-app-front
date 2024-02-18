@@ -31,7 +31,6 @@ export type Patient = {
     biologicalGender: EBiologicalGender,
     districtId: number,
     birthplaceId: number,
-    birthCountryId: number,
     healthUnityId: number,
     _links: LaravelLink[];
 }

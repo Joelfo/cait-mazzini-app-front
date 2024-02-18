@@ -2,13 +2,20 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSubResourceAPI } from "./Base/useSubResourceAPI";
 import { API_URL } from "util/requests";
 import axios from "axios";
+import { useAuthStore } from "Stores/useAuthStore";
 
 export const useScannedChartAPI = () => {
+
+    const jwt = useAuthStore(state => state.bearerJwt);
+
     const useShow = () => {
         return useMutation({
             mutationFn: async ({ patientId } : { patientId: number }) => {
                 const response = await axios.get<Blob>(`${API_URL}/Patients/${patientId}/ScannedChart`, {
-                    responseType: 'blob'
+                    responseType: 'blob',
+                    headers: {
+                        Authorization: jwt
+                    }
                 });
                 return response.data
             }
@@ -25,7 +32,8 @@ export const useScannedChartAPI = () => {
                 formData,
                 {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: jwt
                     }
                 }
             );
@@ -38,7 +46,12 @@ export const useScannedChartAPI = () => {
         ['Patients', 'ScannedChart', 'Check'], 
         async () => {
             const response = await axios.get(
-                `${API_URL}/Patients/${patientId}/ScannedChart/Check`
+                `${API_URL}/Patients/${patientId}/ScannedChart/Check`,
+                {
+                    headers: {
+                        Authorization: jwt
+                    }
+                }
             );
 
             return response.data;

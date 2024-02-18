@@ -1,4 +1,5 @@
 import { PatientAPI } from "Api/PatientAPI";
+import { usePatientApi } from "Api/usePatientApi";
 import { LifeHabitsForm } from "Components/LifeHabitsForm";
 import { LifeHabitsView } from "Components/LifeHabitsForm/LifeHabitsView";
 import { PatientInfoFields } from "Components/PatientInfoFields";
@@ -9,7 +10,7 @@ import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap";
 export const LifeHabitsViewPage = () => {
     const { patient } = useSelectedPatient();
 
-    const patientAPI = new PatientAPI();
+    const patientAPI = usePatientApi();
 
     const { data: lifeHabitsInfo, error: connectionError, isLoading, isFetching } = patientAPI.useLifeHabitsInfo(patient?.id);
 

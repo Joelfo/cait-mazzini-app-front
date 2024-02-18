@@ -1,5 +1,5 @@
-import { PhysicalActivityAPI } from "Api/PhysicalActivityAPI";
-import { PhysicalExamAPI } from "Api/PhysicalExamAPI";
+import { PhysicalActivityAPI } from "Api/usePhysicalActivityApi";
+import { PhysicalExamAPI } from "Api/usePhysicalExamApi";
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";

@@ -1,9 +1,9 @@
 import { type } from "@testing-library/user-event/dist/type";
-import { BiopsyExamAPI } from "Api/BiopsyExamAPI";
-import { CulturesExamAPI } from "Api/CulturesExamAPI";
-import { PCRExamAPI } from "Api/PCRExamAPI";
-import { PPDExamAPI } from "Api/PPDExamAPI";
-import { ToraxXRayExamAPI } from "Api/ToraxXRayExamAPI";
+import { BiopsyExamAPI, useBiopsyExamApi } from "Api/useBiopsyExamApi";
+import { CulturesExamAPI, useCulturesExamApi } from "Api/useCulturesExamApi";
+import { PCRExamAPI, usePcrExamApi } from "Api/usePcrExamApi";
+import { PPDExamAPI, usePpdExamApi } from "Api/usePpdExamApi";
+import { ToraxXRayExamAPI, useToraxXRayExamApi } from "Api/useToraxXRayExamApi";
 import { ExamsTable } from "Components/ExamsTable";
 import { BiopsyForm } from "Components/Forms/Exams/BiopsyForm";
 import { CulturesForm } from "Components/Forms/Exams/CulturesForm";
@@ -36,11 +36,11 @@ export const ExamsPage = () => {
         setSelectedExamType(eventKey as string);
     }, [setSelectedExamType]);
 
-    const toraxXRayExamAPI = new ToraxXRayExamAPI();
-    const ppdExamAPI = new PPDExamAPI();
-    const pcrExamAPI = new PCRExamAPI();
-    const culturesExamAPI = new CulturesExamAPI();
-    const biopsyExamAPI = new BiopsyExamAPI();
+    const toraxXRayExamAPI = useToraxXRayExamApi();
+    const ppdExamAPI = usePpdExamApi();
+    const pcrExamAPI = usePcrExamApi();
+    const culturesExamAPI = useCulturesExamApi();
+    const biopsyExamAPI = useBiopsyExamApi();
 
     const { data: toraxXRayExams } = toraxXRayExamAPI.useAllByPatient(patient?.id);
 

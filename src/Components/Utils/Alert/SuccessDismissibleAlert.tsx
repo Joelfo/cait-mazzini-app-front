@@ -32,7 +32,7 @@ export const SuccessDismissibleAlert = ({ showTrigger, text } : SuccessDismissib
                 onClose={handleClose}
             >
                 <Alert.Heading>
-                    Registro apagado com sucesso.
+                    {text}
                 </Alert.Heading>
             </Alert>
         </Container>

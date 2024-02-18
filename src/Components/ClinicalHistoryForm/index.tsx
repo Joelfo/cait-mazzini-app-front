@@ -1,9 +1,9 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { getValue } from "@testing-library/user-event/dist/utils";
-import { ClinicalHistoryAPi } from "Api/ClinicalHistoryAPI";
-import { DatedImmunizationAPI } from "Api/DatedImmunizationAPI";
-import { DeseaseAPI } from "Api/DeseaseAPI";
-import { ImmunizationAPI } from "Api/ImmunizationAPI";
+import { ClinicalHistoryAPi, useClinicalHistoryApi } from "Api/useClinicalHistoryApi";
+import { DatedImmunizationAPI, useDatedImmunizationApi } from "Api/useDatedImmunizationApi";
+import { useDeseaseApi } from "Api/useDeseaseApi";
+import { ImmunizationAPI, useImmunizationApi } from "Api/useImmunizationApi";
 import { ConnectionErrorAlert } from "Components/Utils/Alert/ConnectionErrorAlert";
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
@@ -23,10 +23,10 @@ import * as yup from 'yup';
 export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defaultData } : ClinicalHistoryFormProps) => {
     const { patient, isError: isPatientError } = useSelectedPatient();
 
-    const deseaseAPI = new DeseaseAPI(); 
-    const immunizationAPI = new ImmunizationAPI();
-    const datedImmunizationAPI = new DatedImmunizationAPI();
-    const clinicalHistoryAPI = new ClinicalHistoryAPi();
+    const deseaseAPI = useDeseaseApi(); 
+    const immunizationAPI = useImmunizationApi();
+    const datedImmunizationAPI = useDatedImmunizationApi();
+    const clinicalHistoryAPI = useClinicalHistoryApi();
 
     const { data: deseases, isLoading: isDeseasesLoading, isError: isDeseasesError } = deseaseAPI.useAll();
     const { data: immunizations, isLoading: isImmunizationsLoading, isError: isImmunizationsError } = immunizationAPI.useAll();
@@ -49,7 +49,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                 }
                 return true;
             },
-            message: 'A data da imunizaçãod é obrigatória'
+            message: 'A data da imunização é obrigatória'
         }),
         otherPreviousDeseases: yup.string().default(defaultData?.otherPreviousDeseases),
         otherImmunizations: yup.string().default(defaultData?.otherImmunizations),

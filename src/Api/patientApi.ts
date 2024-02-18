@@ -5,11 +5,23 @@ import { API_URL } from "util/requests"
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { ClinicalHistory } from "types/Api/ClinicalHistory";
 import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
+import { PatientBasicInfo } from "types/Api/BasicInfo/PatientBasicInfo";
+import { PatientRelationshipsInfo } from "types/Api/BasicInfo/PatientRelationshipsInfo";
 
 export class PatientAPI extends ResourceAPI<Patient> {
     public constructor(){
         super('Patients');
     }
+
+    public useShowBasicInfo = (id: string) => useQuery(
+        ['Patients.ShowBasicInfo', id],
+        async () => {
+            const response = await axios.get<PatientBasicInfo>(
+                `${this.resourceRoute}/${id}/BasicInfo`
+            );
+            return response.data;
+        }
+    )
 
     public useAllByName = (name: string | undefined) => useQuery(
         ['Patients.AllByName', name],
@@ -62,5 +74,18 @@ export class PatientAPI extends ResourceAPI<Patient> {
         }, {
             enabled: !!patientId
         }
-    )
+    );
+
+    public useShowRelationshipsInfo = (patientId: number | undefined) => useQuery(
+        ['Patients.Relationships', patientId],
+        async () => {
+            const response = await axios.get<PatientRelationshipsInfo>(
+                `${this.resourceRoute}/${patientId}/Relationships`
+            );
+            return response.data;
+        }, {
+            enabled: !!patientId
+        }
+    );
+    
 }

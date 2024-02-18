@@ -6,7 +6,7 @@ import { PatientType } from 'types/enums/PatientType';
 import { SpecialPopulationType } from 'types/enums/SpecialPopulationType';
 import { API_URL } from 'util/requests';
 import './index.css';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { District } from 'types/Api/District';
 import { City } from 'types/Api/City';
 import { Country } from 'types/Api/Country';
@@ -22,25 +22,39 @@ import { EBiologicalGender } from 'types/enums/EBiologicalGender';
 import { MazziniFormSection } from 'util/components/MazziniFormSection';
 import { HookControlledFormSelect } from 'util/components/HookControlledFormSelect';
 import { useSelectedPatient } from 'Hooks/useSelectedPatient';
-import { CityAPI } from 'Api/CityAPI';
-import { DistrictAPI } from 'Api/DistrictAPI';
+import { CityAPI, useCityApi } from 'Api/useCityApi';
+import { DistrictAPI, useDistrictApi } from 'Api/useDistrictApi';
 import { EAddressZone } from 'types/enums/EAddressZone';
 import { ViaCepAPI } from 'Api/Vendor/ViaCepAPI';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
-import { Typeahead } from 'react-bootstrap-typeahead';
-import { CountryAPI } from 'Api/CountryAPI';
+import { Menu, MenuItem, Typeahead, TypeaheadMenu } from 'react-bootstrap-typeahead';
+import { CountryAPI, useCountryApi } from 'Api/useCountryApi';
 import { FederativeUnity } from 'types/Api/FederativeUnity';
-import { FederativeUnityAPI } from 'Api/FederativeUnityAPI';
+import { FederativeUnityAPI, useFederativeUnityApi } from 'Api/useFederativeUnityApi';
 import { PatientAPI } from 'Api/PatientAPI';
 import { validateCns, validateCpf } from 'util/Validations';
 import { Option } from 'react-bootstrap-typeahead/types/types';
-import { HealthUnityAPI } from 'Api/HealthUnityAPI';
+import { HealthUnityAPI, useHealthUnityApi } from 'Api/useHealthUnityApi';
 import InputMask, { Props } from 'react-input-mask';
+import { usePatientApi } from 'Api/usePatientApi';
 
 
 export const PatientForm = () => {
-    const selectedPatient = useSelectedPatient();
+    //useState
+    const [ isSavingError, setIsSavingError ] = useState<boolean>(false);
 
+    const [ checkedResponsability, setCheckedResponsability ] = useState<boolean>(false);
+
+    const [ selectedDistrict, setSelectedDistrict ] = useState<District>();
+    const [ selectedHealthUnity, setSelectedHealthUnity ] = useState<HealthUnity>();
+    const [ selectedFederativeUnity, setSelectedFederativeUnity ] = useState<FederativeUnity>();
+    const [ selectedCountry, setSelectedCountry ] = useState<Country>();
+    const [ selectedCity, setSelectedCity ] = useState<City>();
+
+    // useRef
+    const patientHasDependenciesToSaveRef = useRef(false);
+
+    // custom hooks
     const {
         register,
         setValue : setFormValue,
@@ -60,42 +74,31 @@ export const PatientForm = () => {
 
     const watchArrivalType = watch('arrivalType');
 
-    const cityAPI = new CityAPI();
-    const districtAPI = new DistrictAPI(); 
+    const cityAPI = useCityApi();
+    const districtAPI = useDistrictApi(); 
     const viaCepAPI = new ViaCepAPI();
-    const countryAPI = new CountryAPI();
-    const federativeUnityAPI = new FederativeUnityAPI();
-    const patientAPI = new PatientAPI();
-    const healthUnityAPI = new HealthUnityAPI();
+    const countryAPI = useCountryApi();
+    const federativeUnityAPI = useFederativeUnityApi();
+    const patientAPI = usePatientApi();
+    const healthUnityAPI = useHealthUnityApi();
 
     const { data: cities, isLoading: isCitiesLoading } = cityAPI.useAll();
 
-    const [ selectedCityId, setSelectedCityId ] = useState<number>();
-
-    const { data: districts, isLoading: isDistrictsLoading, isStale } = districtAPI.useAllByCity(selectedCityId);
+    const { data: districts, isLoading: isDistrictsLoading, isStale: isDistrictsQueryStale } = districtAPI.useAllByCity(selectedCity?.id === 0 ? undefined : selectedCity?.id);
 
     const { data: healthUnities, isLoading: isHealthUnitiesLoading } = healthUnityAPI.useAll();
 
-    const newCityRef = useRef<City>();
-    const [ newDistrict, setNewDistrict ] = useState<District>();
-    const [ newCountry, setNewCountry ] = useState<Country>();
-    const [ newFederativeUnity, setNewFederativeUnity ] = useState<FederativeUnity>();
-    const [ newHealthUnity, setNewHealthUnity ] = useState<HealthUnity>();
-    
     const watchCep = watch('cep', undefined);
+    const watchDistrictId = watch('districtId');
+    const watchBirthplaceId = watch('birthplaceId');
+
 
     const { data: viaCepInfo } = viaCepAPI.useViaCep(watchCep);
 
-    const watchCountryId = watch('birthCountryId');
 
-    const [ selectedCityName, setSelectedCityName ] = useState<string>();
-    const [ selectedDistrictName, setSelectedDistrictName ] = useState<string>();
-    const [ selectedCountryName, setSelectedCountryName ] = useState<string>();
-    const [ selectedFederativeUnityName, setSelectedFederativeUnityName ] = useState<string>();
+    const { data: countries, isLoading: isCountriesLoading } = countryAPI.useAll();
 
-    const { data: countries } = countryAPI.useAll();
-
-    const { data: federativeUnities } = federativeUnityAPI.useAllByCountry(watchCountryId);
+    const { data: federativeUnities, isLoading: isFederativeUnitiesLoading, isStale: isFederativeUnitiesQueryStale } = federativeUnityAPI.useAllByCountry(selectedCountry?.id === 0 ? undefined : selectedCountry?.id);
 
     const { mutate: savePatient, status: patientCreationStatus, data: createdPatientId } = patientAPI.useCreate();
 
@@ -109,67 +112,93 @@ export const PatientForm = () => {
 
     const { mutate: saveHealthUnity, status: healthUnityCreationStatus, data: createdHealthUnityId } = healthUnityAPI.useCreate();
 
-    const [ isSavingLoading, setIsSavingLoading ] = useState<boolean>(false);
-
-    const [ isSavingError, setIsSavingError ] = useState<boolean>(false);
-
-    const [ checkedResponsability, setCheckedResponsability ] = useState<boolean>(false);
-
-    const watchDistrictId = watch('districtId');
-    const watchFederativeUnityId = watch('birthplaceId');
 
     const patientToSaveRef = useRef<Patient>();
 
     const navigate = useNavigate();
 
-    const handleSubmit : SubmitHandler<Patient> = (value) => {
-        value.biologicalGender = parseInt(value.biologicalGender.toString());
-        value.type = parseInt(value.type.toString());
-        value.arrivalType = parseInt(value.arrivalType.toString());
+    //useMemo
+    const viaCepCityName = useMemo(() => viaCepInfo?.localidade, [viaCepInfo]);
+    const viaCepDistrictName = useMemo(() => viaCepInfo?.bairro, [viaCepInfo]);
 
-        if (!newCityRef.current && !newCityRef.current && !newDistrict && !newFederativeUnity) {
-            savePatient(value);
+    const isSavingLoading = useMemo(() => (patientCreationStatus === 'loading' || cityCreationStatus === 'loading' || districtCreationStatus === 'loading' || countryCreationStatus === 'loading' || federativeUnityCreationStatus === 'loading' || healthUnityCreationStatus === 'loading'),
+        [cityCreationStatus, districtCreationStatus, countryCreationStatus, federativeUnityCreationStatus, patientCreationStatus, healthUnityCreationStatus]);
+
+    // callbacks
+    const handleSubmit : SubmitHandler<Patient> = (patient) => {
+
+        if (!selectedCountry || !selectedCity || !selectedDistrict || !selectedFederativeUnity) {
             return;
         }
-        patientToSaveRef.current = value;
 
-        if (newCityRef.current) {
-            saveCity(newCityRef.current)
+        if (!!selectedHealthUnity) {
+            patient.healthUnityId = selectedHealthUnity.id;
         }
-        if (!!newDistrict && !newCityRef.current) {
-            saveDistrict(newDistrict);
-        }
-        if (!!newCountry) {
-            saveCountry(newCountry, );
-        }
-        if (!!newFederativeUnity && !newCountry) {
-            saveFederativeUnity(newFederativeUnity);
-        }
-        if (!!newHealthUnity) {
-            saveHealthUnity(newHealthUnity);
+
+        if (selectedDistrict.id > 0 && selectedFederativeUnity.id > 0) {    
+            savePatient(patient);
+        } else {
+            patientHasDependenciesToSaveRef.current = true;
+
+            if (selectedCountry.id === 0) {
+                saveCountry(selectedCountry, {
+                    onSuccess: (id) => {
+                        if (selectedFederativeUnity.id === 0) {
+                            selectedFederativeUnity.countryId = id;
+                            saveFederativeUnity(selectedFederativeUnity);
+                        }
+                    }
+                })
+            } else if (selectedFederativeUnity.id === 0) {
+                selectedFederativeUnity.countryId = selectedCountry.id;
+                saveFederativeUnity(selectedFederativeUnity);
+            }
+            
+            if (selectedCity.id === 0) {
+                saveCity(selectedCity, {
+                    onSuccess: (id) => {
+                        if (selectedDistrict.id === 0) {
+                            selectedDistrict.cityId = id;
+                            saveDistrict(selectedDistrict);
+                        }
+                        if (selectedHealthUnity && selectedHealthUnity.id === 0) {
+                            saveHealthUnity(selectedHealthUnity);
+                        }
+                    }
+                })
+            } else {
+                if (selectedDistrict.id === 0) {
+                    selectedDistrict.cityId = selectedCity.id;
+                    saveDistrict(selectedDistrict);
+                }
+                if (selectedHealthUnity && selectedHealthUnity.id === 0) {
+                    saveHealthUnity(selectedHealthUnity);
+                }
+            }
         }
     }
 
-    const trySavingPatient = () => {
-        if (
-            (cityCreationStatus === 'success' || !newCityRef.current) &&
-            (districtCreationStatus === 'success' || !newDistrict) &&
-            (countryCreationStatus === 'success' || !newCountry) &&
-            (federativeUnityCreationStatus === 'success' || !newFederativeUnity) &&
-            (healthUnityCreationStatus === 'success' || !newHealthUnity)
-        ) {
-            if (patientToSaveRef.current) {
-                savePatient(patientToSaveRef.current);
-            }
+    const handleSelectedCityChange = useCallback((selected: Option[]) => {
+        if (selected.length === 0) {
+            return;
         }
-    };
+        const selectedCity = selected[0] as City;
+        if (isNaN(selectedCity.id)) {
+            selectedCity.id = 0;
+        }
+        setSelectedCity(selectedCity);
+    }, []);
 
     const handleSelectedNationalityChange = useCallback((selected: Option[]) => {
         if (selected.length === 0) {
             return;
         }
         const selectedCountry = selected[0] as Country;
-        setFormValue('birthCountryId', selectedCountry.id);
+        if (isNaN(selectedCountry.id)) {
+            selectedCountry.id = 0;
+        }
+        setSelectedCountry(selectedCountry);
+        
     }, []);
 
     const handleSelectedFederativeUnityChange = useCallback((selected: Option[]) => {
@@ -177,13 +206,11 @@ export const PatientForm = () => {
             return;
         }
         const selectedFederativeUnity = selected[0] as FederativeUnity;
-        if (selectedFederativeUnity.id === 0 || isNaN(selectedFederativeUnity.id)) {
-            selectedFederativeUnity.countryId = getFormValues('birthCountryId');
-            setNewFederativeUnity(selectedFederativeUnity);
-        } else {
-            setFormValue('birthplaceId', selectedFederativeUnity.id);
+        if (isNaN(selectedFederativeUnity.id)) {
+            selectedFederativeUnity.id = 0;
         }
-    }, [setNewFederativeUnity]);
+        setSelectedFederativeUnity(selectedFederativeUnity);
+    }, [setFormValue, getFormValues]);
 
     const handleSelectedHealthUnityChange = useCallback((selected: Option[]) => {
         if (selected.length === 0) {
@@ -191,151 +218,43 @@ export const PatientForm = () => {
         }
 
         const selectedHealthUnity = selected[0] as HealthUnity;
-        if (selectedHealthUnity.id === 0 || isNaN(selectedHealthUnity.id)) {
-            setNewHealthUnity(selectedHealthUnity);
-        } else {
-            setFormValue('healthUnityId', selectedHealthUnity.id)
+        if (isNaN(selectedHealthUnity.id)) {
+            selectedHealthUnity.id = 0;
         }
+        setSelectedHealthUnity(selectedHealthUnity);
     }, []);
 
-    const validateHealthUnityId = useCallback((value: number | undefined, formValues: Patient) => (!!value || formValues.arrivalType !== ArrivalType.Fowarded || !!newHealthUnity), [newHealthUnity]) ;
-
-    useEffect(() => {
-        if (cityCreationStatus === 'error' || districtCreationStatus === 'error' || countryCreationStatus === 'error' || federativeUnityCreationStatus === 'error' || healthUnityCreationStatus === 'error') {
-            setIsSavingError(true)
-        } else {
-            setIsSavingError(false);
-        }
-
-        if (cityCreationStatus === 'loading' || districtCreationStatus === 'loading' || countryCreationStatus === 'loading' || federativeUnityCreationStatus === 'loading' || healthUnityCreationStatus === 'loading') {
-            setIsSavingLoading(true);
-        } else {
-            setIsSavingLoading(false);
-        }
-
-        if (cityCreationStatus === 'success' || districtCreationStatus === 'success' || countryCreationStatus === 'success' || federativeUnityCreationStatus === 'success' || healthUnityCreationStatus === 'success') {
-            trySavingPatient();
-        }
-    }, [cityCreationStatus, districtCreationStatus, countryCreationStatus, federativeUnityCreationStatus]);
-
-    useEffect(() => {
-        if (cityCreationStatus === 'success' && !!newDistrict) {
-            saveDistrict(newDistrict);
-        }
-    }, [cityCreationStatus]);
-
-    useEffect(() => {
-        if (countryCreationStatus === 'success' && !!newFederativeUnity) {
-            saveFederativeUnity(newFederativeUnity);
-        }
-    }, [countryCreationStatus]);
-
-    useEffect(() => {
-        if (createdFederativeUnityId && patientToSaveRef.current) {
-            patientToSaveRef.current.birthplaceId = createdFederativeUnityId;
-        }
-    }, [createdFederativeUnityId]);
-
-    useEffect(() => {
-        if (createdCountryId && patientToSaveRef.current) {
-            patientToSaveRef.current.birthCountryId = createdCountryId;
-        } 
-    }, [createdCountryId]);
-
-    useEffect(() => {
-        if (createdDistrictId && patientToSaveRef.current) {
-            patientToSaveRef.current.districtId = createdDistrictId;
-        }
-    })
-
-    useEffect(() => {
-        if (createdHealthUnityId && patientToSaveRef.current) {
-            patientToSaveRef.current.healthUnityId = createdHealthUnityId;
-        }
-    })
-
-
-    useEffect(() => {
-        if (!selectedCityName || selectedCityName === '') {
-            newCityRef.current = undefined;
+    const handleSelectedDistrictChange = useCallback((selected: Option[]) => {
+        if (selected.length === 0) {
             return;
         }
-        const city = cities?.find(city => city.name === selectedCityName);
-        
-        if (city) {
-            setSelectedCityId(city.id ?? 0);
-            newCityRef.current = undefined;
-        } else {
-            newCityRef.current = {
-                name: selectedCityName
-            }
-        }
-    }, [selectedCityName, cities]);
+        const selectedDistrict = selected[0] as District;
+        setSelectedDistrict(selectedDistrict);
+    }, []);
+
+    const validateHealthUnityId = useCallback((value: number | undefined, formValues: Patient) => (formValues.arrivalType !== ArrivalType.Fowarded || !!selectedHealthUnity) || requiredTextMessage('Unidade de saúde'), []);
+
+    // useEffect
 
     useEffect(() => {
-        if (!selectedDistrictName || selectedDistrictName === '') {
-            setNewDistrict(undefined);
-            return;
-        }
-        const district = districts?.find(district => district.name === selectedDistrictName);
-        if (!!district) {
-            setFormValue('districtId', district.id ?? 0);
-            setNewDistrict(undefined);
-        } else {
-            setNewDistrict({
-                name: selectedDistrictName,
-                cityId: selectedCityId ?? 0
-            });
-            setFormValue('districtId', 0);
-        }
-    }, [selectedDistrictName, districts])
-
-    useEffect(() => {
-        if (!selectedCountryName || selectedCountryName === '') {
-            setNewCountry(undefined);
-            return;
-        }
-        const country = countries?.find(country => country.name === selectedCountryName);
-        if (!!country ) {
-            setFormValue('birthCountryId', country.id);
-            setNewCountry(undefined);
-        } else {
-            setNewCountry({
-                id: 0,
-                name: selectedCountryName
-            });
-            setFormValue('birthCountryId', 0);
-        }
-    }, [selectedCountryName]);
-
-    useEffect(() => {
-        if (!selectedFederativeUnityName || selectedFederativeUnityName === '') {
-            setNewFederativeUnity(undefined)
-            return;
-        }
-        const FederativeUnity = federativeUnities?.find(FederativeUnity => FederativeUnity.name === selectedFederativeUnityName);
-        if (!!FederativeUnity) {
-            setFormValue('birthplaceId', FederativeUnity.id);
-            setNewFederativeUnity(undefined);
-        } else {
-            setNewFederativeUnity({
-                id: 0,
-                name: selectedFederativeUnityName,
-                countryId: getFormValues('birthCountryId')
-            });
-            setFormValue('birthplaceId', 0);
-        }
-
-    }, [selectedFederativeUnityName])
-
-    useEffect(() => {
-        if (viaCepInfo) {
+        if (!!viaCepInfo) {
             setFormValue('addressStreet', viaCepInfo.logradouro);
-            setSelectedCityName(viaCepInfo.localidade);
-            setSelectedDistrictName(viaCepInfo.bairro);
         }
-        
     }, [viaCepInfo]);
+
+    useEffect(() => {
+        if (!!viaCepCityName) {
+            const existingCity = cities?.find(city => city.name === viaCepCityName);
+            setSelectedCity(existingCity ?? { id: 0, name: viaCepCityName });
+        }
+    }, [viaCepCityName, cities]);
+
+    useEffect(() => {
+        if (!!viaCepDistrictName) {
+            const existingDistrict = districts?.find(district => district.name === viaCepDistrictName);
+            setSelectedDistrict(existingDistrict ?? { id: 0, name: viaCepDistrictName, cityId: 0 })
+        }
+    }, [viaCepDistrictName, districts])
 
     useEffect(() => {
         switch (patientCreationStatus) {
@@ -343,7 +262,6 @@ export const PatientForm = () => {
                 setIsSavingError(true);
                 break;
             case 'loading':
-                setIsSavingLoading(true);
                 break;
         }
         
@@ -354,6 +272,43 @@ export const PatientForm = () => {
             navigate('/patientInfo?patientId' + createdPatientId);
         }
     }, [createdPatientId])
+
+    useEffect(() => {
+        if (!!selectedDistrict) {
+            setFormValue('districtId', selectedDistrict.id);
+        }
+
+    }, [selectedDistrict]);
+
+    useEffect(() => {
+        if (selectedFederativeUnity) {
+            setFormValue('birthplaceId', selectedFederativeUnity.id)
+        }
+    }, [selectedFederativeUnity]);
+
+    useEffect(() => {
+        if (!!selectedHealthUnity) {
+            setFormValue('healthUnityId', selectedHealthUnity.id);
+        }
+    }, [selectedHealthUnity]);
+
+    useEffect(() => {
+        if (patientHasDependenciesToSaveRef.current) {
+            if ((!!createdDistrictId || (selectedDistrict?.id ?? 0) > 0) && (!!createdFederativeUnityId || (selectedFederativeUnity?.id ?? 0) > 0) && (!!createdHealthUnityId ||(selectedHealthUnity?.id ?? 1) > 0)) {
+                const patient = getFormValues();
+                if (!!createdDistrictId) {
+                    patient.districtId = createdDistrictId;
+                }
+                if (!!createdFederativeUnityId) {
+                    patient.birthplaceId = createdFederativeUnityId;
+                }
+                if (!!createdHealthUnityId) {
+                    patient.healthUnityId = createdHealthUnityId;
+                }
+                savePatient(patient);
+            }
+        }
+    }, [createdDistrictId, createdFederativeUnityId, createdHealthUnityId]);
 
     return (
         <>
@@ -472,7 +427,9 @@ export const PatientForm = () => {
                                             <>
                                             
                                                 <Form.Select
-                                                    onChange={onChange}
+                                                    onChange={(event) => {
+                                                        setFormValue('type', parseInt(event.target.value))
+                                                    }}
                                                     value={value}
                                                     isInvalid={invalid}
                                                 >
@@ -525,10 +482,12 @@ export const PatientForm = () => {
                                             fieldState: { invalid }
                                         }) => (
                                             <Typeahead
-                                                options={healthUnities ?? []}
                                                 allowNew
-                                                labelKey='name'
                                                 onChange={handleSelectedHealthUnityChange}
+                                                selected={selectedHealthUnity ? [selectedHealthUnity] : []}
+                                                options={healthUnities ?? []}
+                                                labelKey='name'
+                                                newSelectionPrefix='Novo: '
                                                 renderInput={
                                                     ({
                                                         inputRef,
@@ -538,13 +497,14 @@ export const PatientForm = () => {
                                                     }) => (
                                                         <>
                                                             <Form.Control
-                                                                ref={(input: HTMLInputElement) => {
+                                                               ref={(input: HTMLInputElement) => {
                                                                     inputRef(input);
-                                                                    referenceElementRef(input);
+                                                                    referenceElementRef(input)
                                                                 }}
-                                                                value={typeof value === 'object' ? [...value] : value}
-                                                                isInvalid={invalid}
+                                                                type='text'
+                                                                value = {typeof value === 'object' ? [...value] : value}
                                                                 {...inputProps}
+                                                                disabled={isHealthUnitiesLoading}
                                                             />
                                                             <Form.Control.Feedback type='invalid'>{requiredTextMessage('Unidade de saúde')}</Form.Control.Feedback>
                                                         </>
@@ -651,7 +611,7 @@ export const PatientForm = () => {
                                     }) => (
                                         <>
                                         <Form.Select
-                                            onChange={onChange}
+                                            onChange={event => setFormValue('biologicalGender', parseInt(event.target.value))}
                                             value={value}
                                             onBlur={onBlur}
                                             isInvalid={invalid}
@@ -674,40 +634,32 @@ export const PatientForm = () => {
                                 <HookControlledFormControl control={control} name='birthDate' rules={justRequiredRule('Data de nascimento')} formControlType='date'/>
                             </Form.Group>
                             <Form.Group as={Col} md='2'>
-                                <Controller
-                                    control={control}
-                                    name='birthCountryId'
-                                    rules={justRequiredRule('Nacionalidade (País)')}
-                                    render={({
-                                        fieldState: {invalid}
+                                <Typeahead
+                                    options={countries ?? []}
+                                    onChange={handleSelectedNationalityChange}
+                                    allowNew
+                                    newSelectionPrefix='Novo: '
+                                    labelKey='name'
+                                    renderInput={({
+                                        inputRef,
+                                        referenceElementRef,
+                                        value,
+                                        ...inputProps
                                     }) => (
-                                        <Typeahead
-                                            options={countries ?? []}
-                                            onChange={handleSelectedNationalityChange}
-                                            allowNew
-                                            labelKey='name'
-                                            renderInput={({
-                                                inputRef,
-                                                referenceElementRef,
-                                                value,
-                                                ...inputProps
-                                            }) => (
-                                                <>
-                                                    <Form.Label>Nacionalidade (País)</Form.Label>
-                                                    <Form.Control 
-                                                        ref={(input: HTMLInputElement) => {
-                                                            inputRef(input);
-                                                            referenceElementRef(input);
-                                                        }}
-                                                        isInvalid={!newCountry && !!errors.birthCountryId}
-                                                        type='text'
-                                                        value={typeof value === 'object' ? [...value] : value}
-                                                        {...inputProps}
-                                                    />
-                                                    <Form.Control.Feedback type='invalid'>{errors.birthCountryId?.message}</Form.Control.Feedback>
-                                                </>
-                                            )}
+                                        <>
+                                        <Form.Label>Nacionalidade</Form.Label>
+                                        <Form.Control
+                                            ref={(input: HTMLInputElement) => {
+                                                inputRef(input);
+                                                referenceElementRef(input)
+                                            }}
+                                            type='text'
+                                            value = {typeof value === 'object' ? [...value] : value}
+                                            {...inputProps}
+                                            disabled={isCountriesLoading}
                                         />
+                                        </>
+                                        
                                     )}
                                 />
                             </Form.Group>
@@ -716,7 +668,7 @@ export const PatientForm = () => {
                                     control={control}
                                     name='birthplaceId'
                                     rules={{
-                                        validate: value => (!!value || !!newFederativeUnity) || requiredTextMessage('Naturalidade (UF)')
+                                        validate: value => (!!value || !!selectedFederativeUnity) || requiredTextMessage('Naturalidade (UF)')
                                     }}
                                     render={({
                                         fieldState: {invalid}
@@ -724,6 +676,7 @@ export const PatientForm = () => {
                                         <Typeahead
                                             options={federativeUnities ?? []}
                                             onChange={handleSelectedFederativeUnityChange}
+                                            newSelectionPrefix='Novo'
                                             allowNew
                                             labelKey='name'
                                             renderInput={({
@@ -739,10 +692,11 @@ export const PatientForm = () => {
                                                         inputRef(input);
                                                         referenceElementRef(input)
                                                     }}
-                                                    isInvalid={!newFederativeUnity && !!errors.birthplaceId}
+                                                    isInvalid={invalid}
                                                     type='text'
                                                     value = {typeof value === 'object' ? [...value] : value}
                                                     {...inputProps}
+                                                    disabled={!selectedCountry || (isFederativeUnitiesLoading && !isFederativeUnitiesQueryStale)}
                                                 />
                                                 <Form.Control.Feedback type='invalid'>{requiredTextMessage('Naturalidade (UF)')}</Form.Control.Feedback>
                                                 </>
@@ -752,6 +706,14 @@ export const PatientForm = () => {
                                     )}
                                 />
                             </Form.Group>
+                            {
+                                        isFederativeUnitiesLoading && selectedCountry && !isFederativeUnitiesQueryStale
+                                        &&
+                                        <Col md='1' className='d-flex align-items-end justify-content-start'>
+                                            <Spinner style={{marginBottom: '4px'}} animation='border'/>
+                                        </Col>
+                                        
+                            }
                         </Row>
                     </MazziniFormSection>
                     <MazziniFormSection title='Contato'>
@@ -806,18 +768,33 @@ export const PatientForm = () => {
                         </Row>
                         <Row className='form-mazzini-row'>
                             <Form.Group as={Col} md='2'>
-                                <Form.Label>Cidade</Form.Label>
                                 <Typeahead
-                                    onChange={selected => {
-                                        const value = !!selected[0] ? (selected[0] as Record<string, any>)['label'] ?? selected[0] as string : '';
-                                        if (!!value || value === '') {
-                                            setSelectedCityName(value as string);
-                                        }
-                                    }
-                                }
+                                    onChange={handleSelectedCityChange}
+                                    labelKey='name'
                                     options={cities?.map(city => city.name) ?? []}
-                                    selected={!!selectedCityName ? [selectedCityName] : []}
+                                    selected={selectedCity ? [selectedCity] : []}
                                     allowNew
+                                    newSelectionPrefix='Novo: '
+                                    renderInput={({
+                                        inputRef,
+                                        referenceElementRef,
+                                        value,
+                                        ...inputProps
+                                    }) => (
+                                        <>
+                                            <Form.Label>Cidade</Form.Label>
+                                            <Form.Control
+                                                type='text'
+                                                ref={(input: HTMLInputElement) => {
+                                                    inputRef(input);
+                                                    referenceElementRef(input);
+                                                }}
+                                                value={typeof value === 'object' ? [...value] : value}
+                                                {...inputProps}
+                                                disabled={isCitiesLoading}
+                                            />
+                                        </>
+                                    )}
                                 />
                                 <Form.Control.Feedback type='invalid'>{requiredTextMessage('Cidade')}</Form.Control.Feedback>
                             </Form.Group>
@@ -826,21 +803,19 @@ export const PatientForm = () => {
                                     <Controller
                                         control={control}
                                         name='districtId'
-                                        rules={justRequiredRule('Bairro')}
+                                        rules={{
+                                            validate: value => (!!value || !!selectedDistrict!) || requiredTextMessage('Bairro')
+                                        }}
                                         render={({
                                             fieldState: { invalid }
                                         }) => (
                                             <Typeahead 
                                                 options={districts?.map(district => district.name) ?? []}
-                                                onChange={selected => {
-                                                    const value = !!selected[0] ? (selected[0] as Record<string, any>)['label'] ?? selected[0] as string : '';
-                                                    if (!!value || value === '') {
-                                                        setSelectedDistrictName(value as string);
-                                                    }
-                                                }
-                                            }
+                                                onChange={handleSelectedDistrictChange}
+                                                selected={selectedDistrict ? [selectedDistrict] : []}
                                                 allowNew
-                                                selected={!!selectedDistrictName ? [selectedDistrictName] : []}  
+                                                newSelectionPrefix='Novo: '
+                                                labelKey='name'
                                                 renderInput={({
                                                     inputRef,
                                                     referenceElementRef,
@@ -855,9 +830,10 @@ export const PatientForm = () => {
                                                                 inputRef(input);
                                                                 referenceElementRef(input);
                                                             }}
-                                                            isInvalid={!newDistrict && !!errors.districtId}
+                                                            isInvalid={invalid}
                                                             value={typeof value === 'object' ? [...value] : value}
                                                             {...inputProps}
+                                                            disabled={!selectedCity || (isDistrictsLoading && !isDistrictsQueryStale)}
                                                         />
                                                         <Form.Control.Feedback 
                                                             type='invalid'
@@ -871,7 +847,7 @@ export const PatientForm = () => {
                                 </Stack>
                             </Form.Group>
                             {
-                                        isDistrictsLoading && selectedCityId
+                                        isDistrictsLoading && selectedCity && !isDistrictsQueryStale
                                         &&
                                         <Col md='1' className='d-flex align-items-end justify-content-start'>
                                             <Spinner style={{marginBottom: '4px'}} animation='border'/>

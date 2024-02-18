@@ -1,4 +1,4 @@
-import { LifeHabitsInfoAPI } from 'Api/LifeHabitsInfoAPI';
+import { LifeHabitsInfoAPI, useLifeHabitsInfoApi } from 'Api/useLifeHabitsInfoApi';
 import { useMemo } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { LifeHabitsInfo } from 'types/Api/LifeHabitsInfo';
@@ -7,7 +7,7 @@ import { MazziniFormSection } from 'util/components/MazziniFormSection';
 
 export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
 
-    const lifeHabitsInfoAPI = new LifeHabitsInfoAPI();
+    const lifeHabitsInfoAPI = useLifeHabitsInfoApi();
 
     const { data: physicalActivities, error: physicalActivitiesError } = lifeHabitsInfoAPI.usePhysicalActivities(data.id);
 

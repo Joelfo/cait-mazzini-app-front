@@ -1,7 +1,7 @@
-import { ClinicalHistoryAPi } from "Api/ClinicalHistoryAPI";
-import { LifeHabitsInfoAPI } from "Api/LifeHabitsInfoAPI";
-import { PhysicalActivityAPI } from "Api/PhysicalActivityAPI";
-import { PhysicalExamAPI } from "Api/PhysicalExamAPI";
+import { ClinicalHistoryAPi, useClinicalHistoryApi } from "Api/useClinicalHistoryApi";
+import { LifeHabitsInfoAPI, useLifeHabitsInfoApi } from "Api/useLifeHabitsInfoApi";
+import { PhysicalActivityAPI, usePhysicalActivityApi } from "Api/usePhysicalActivityApi";
+import { PhysicalExamAPI, usePhysicalExamApi } from "Api/usePhysicalExamApi";
 import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm";
 import { FirstAppointmentForm } from "Components/FirstAppointmentForm";
 import { LifeHabitsForm } from "Components/LifeHabitsForm";
@@ -11,16 +11,16 @@ import { produce } from "immer";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Col, Container, Form, ProgressBar, Row } from "react-bootstrap"
 import { ClinicalHistory } from "types/Api/ClinicalHistory";
-import { LifeHabitsInfo } from "types/Api/LifeHabitsInfoDTO";
 import { PhysicalActivity } from "types/Api/PhysicalActivity";
 import { PhysicalExam } from "types/Api/PhysicalExam";
 import { FirstAppointment } from "types/Api/FirstAppointment";
 import { FirsNurseryAppointmentEndingForm } from "Components/FirstAppointmentForm/FirstNurseryAppointmentEndingForm";
 import { FirstNurseryAppointment } from "types/Api/FirstNurseryAppointment";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
-import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
+import { FirstNurseryAppointmentAPI, useFirstNurseryAppointmentApi } from "Api/useFirstNurseryAppointmentApi";
 import { useNavigate } from "react-router-dom";
 import { PatientInfoFields } from "Components/PatientInfoFields";
+import { LifeHabitsInfo } from "types/Api/LifeHabitsInfo";
 
 export const FirstNurseryChartPage = () => {
     
@@ -38,11 +38,11 @@ export const FirstNurseryChartPage = () => {
 
     const navigate = useNavigate();
 
-    const physicalActivityAPI = new PhysicalActivityAPI();
-    const lifeHabitsInfoAPI = new LifeHabitsInfoAPI();
-    const clinicalHistoryAPI = new ClinicalHistoryAPi();
-    const physicalExamAPI = new PhysicalExamAPI();
-    const firstNurseryAppointmentAPI = new FirstNurseryAppointmentAPI();
+    const physicalActivityAPI = usePhysicalActivityApi();
+    const lifeHabitsInfoAPI = useLifeHabitsInfoApi();
+    const clinicalHistoryAPI = useClinicalHistoryApi();
+    const physicalExamAPI = usePhysicalExamApi();
+    const firstNurseryAppointmentAPI = useFirstNurseryAppointmentApi();
     const { mutate: savePhysicalActivity } = physicalActivityAPI.useCreate();
     const { mutate: saveLifeHabitsInfo, isSuccess: isLifeHabitsInfoSaved } = lifeHabitsInfoAPI.useCreate();
     const { mutate: saveClinicalHistory, isSuccess: isClinicalHistorySaved } = clinicalHistoryAPI.useCreate();

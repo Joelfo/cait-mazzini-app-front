@@ -1,11 +1,12 @@
 import { PatientAPI } from "Api/PatientAPI";
-import { TrackingAppointmentChartAPI } from "Api/TrackingAppointmentChartAPI"
+import { TrackingAppointmentChartAPI, useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartApi"
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { useEffect, useRef, useState } from "react";
 import { Col, Container, Modal, Row, Stack } from "react-bootstrap"
 import './styles.css';
 import ReactQuill from "react-quill";
 import { DoubleMovingArrows } from "Components/Utils/DoubleMovingArrows";
+import { usePatientApi } from "Api/usePatientApi";
 
 export type TrackingAppointmentChartPopupProps = {
     show: boolean,
@@ -14,12 +15,12 @@ export type TrackingAppointmentChartPopupProps = {
 }
 
 export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : TrackingAppointmentChartPopupProps) => {
-    const trackingAppointmentChartAPI = new TrackingAppointmentChartAPI();
-    const patientAPI = new PatientAPI();
+    const trackingAppointmentChartAPI = useTrackingAppointmentChartApi();
+    const patientAPI = usePatientApi();
 
     const [ selectedId, setSelectedId ] = useState<number>();
     const { data: trackingAppointmentChart } = trackingAppointmentChartAPI.useShow(selectedId);
-    const selectedPatient = useSelectedPatient();
+    const { patient: selectedPatient } = useSelectedPatient();
 
     const[ patientIdToSearch, setPatientIdToSearch ] = useState<number>();
 

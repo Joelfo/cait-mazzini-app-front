@@ -1,6 +1,6 @@
 
 export type District = {
-    id?: number,
+    id: number,
     name: string,
     cityId: number
 }

@@ -1,10 +1,10 @@
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { Button, Form, Stack } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { HealthUnity } from "types/Api/HealthUnity";
+import { ContraceptiveMethod } from "types/Api/ContraceptiveMethod";
 import { justRequiredRule } from "util/validation";
 
-export const HealthUnityForm = ({ onSubmit } : Props) => {
+export const ContraceptiveMethodForm = ({ onSubmit } : Props) => {
 
     const {
         handleSubmit,
@@ -12,7 +12,7 @@ export const HealthUnityForm = ({ onSubmit } : Props) => {
         control,
         setValue,
         register
-    } = useForm<HealthUnity>({
+    } = useForm<ContraceptiveMethod>({
     });
 
 
@@ -33,5 +33,5 @@ export const HealthUnityForm = ({ onSubmit } : Props) => {
 }
 
 type Props = {
-    onSubmit: (data: HealthUnity)=> void
+    onSubmit: (data: ContraceptiveMethod)=> void
 }

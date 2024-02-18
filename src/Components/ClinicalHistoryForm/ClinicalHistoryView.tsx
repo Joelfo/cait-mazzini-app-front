@@ -1,4 +1,4 @@
-import { ClinicalHistoryAPi } from "Api/ClinicalHistoryAPI";
+import { ClinicalHistoryAPi, useClinicalHistoryApi } from "Api/useClinicalHistoryApi";
 import { formToJSON } from "axios";
 import { Col, Container, Form, Row, Stack } from "react-bootstrap";
 import { ClinicalHistory } from "types/Api/ClinicalHistory";
@@ -6,7 +6,7 @@ import { MazziniFormSection } from "util/components/MazziniFormSection";
 
 export const ClinicalHistoryView = ({ data } : ClinicalHistoryViewProps) => {
 
-    const clinicalHistoryAPI = new ClinicalHistoryAPi();
+    const clinicalHistoryAPI = useClinicalHistoryApi();
 
     const { data: immunizations } = clinicalHistoryAPI.useImmunizations(data.id);
     const { data: clinicalHistoriesHasDatedImmunizations } = clinicalHistoryAPI.useDatedImmunizations(data.id);
@@ -136,7 +136,7 @@ export const ClinicalHistoryView = ({ data } : ClinicalHistoryViewProps) => {
                                 <Form.Group as={Stack}>
                                     <Form.Check
                                         checked
-                                        label={clinicalHistoryHasDatedImmunization.datedImmunization.name}
+                                        label={''}
                                     />
                                 </Form.Group>
                                 <Form.Group as={Stack} style={{marginTop: 10}}>

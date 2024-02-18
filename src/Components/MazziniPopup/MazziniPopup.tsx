@@ -3,9 +3,16 @@ import { ReactNode } from "react"
 import { Button, Modal, Stack } from "react-bootstrap"
 import { JsxElement } from "typescript"
 
-export const MazziniPopup = ({ show, title, children, onClose } : MazziniPopupProps) => {
+export const MazziniPopup = ({ show, title, children, onClose, width = '60%' } : MazziniPopupProps) => {
     return (
-        <Modal show={show} dialogClassName="modal-60w border-dark shadow">
+        <Modal  
+        show={show} 
+        dialogClassName="border-dark shadow"
+        style={{
+            width: width,
+            maxWidth: 'none !important',
+        }}
+        >
             <Modal.Header className='bg-primary border-dark justify-content-between d-flex'>
                 
                 <Modal.Title>{title}</Modal.Title> 
@@ -27,5 +34,6 @@ export type MazziniPopupProps = {
     show: boolean,
     title?: string,
     children: ReactNode,
-    onClose?: () => void
+    onClose?: () => void,
+    width?: string
 }

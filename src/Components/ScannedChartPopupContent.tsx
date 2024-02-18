@@ -2,7 +2,7 @@ import { Modal, Spinner, Stack } from "react-bootstrap";
 import { MazziniPopup } from "./MazziniPopup/MazziniPopup";
 import { IconButton2 } from "./IconButton/IconButton2";
 import IconButton from "./IconButton";
-import { useScannedChartAPI } from "Api/ScannedChartAPI";
+import { useScannedChartAPI } from "Api/useScannedChartApi";
 import { useCallback, useEffect, useRef } from "react";
 
 export type ScannedChartPopupProps = {

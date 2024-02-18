@@ -16,6 +16,12 @@ import * as yup from 'yup';
 import { LifeHabitsViewPage } from "Pages/LifeHabits/LifeHabitsViewPage";
 import { ClinicalHistoryViewPage } from "Pages/ClinicalHistory/ClinicalHistoryViewPage";
 import { ExamsPage } from "Pages/Exams/ExamsPage";
+import { LifeHabitsFormPage } from "Pages/LifeHabits/LifeHabitsFormPage";
+import { LoginPage } from "Pages/LoginPage";
+import { useAuthStore } from "Stores/useAuthStore";
+import { useCookies } from "react-cookie";
+import { SecureRoute } from "SecureRoute";
+import { useMemo } from "react";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,54 +30,74 @@ function App() {
       element: <Root/>,
       children: [
         {
-          path: "",
-          element: <ReceptionistHome/>
-        },
+          element: <SecureRoute/>,
+          children: [
+            {
+              path: "",
+              element: <ReceptionistHome/>
+            },
+            {
+              path: "/Home",
+              element: <ReceptionistHome/>
+            },
+            {
+              path:"patient",
+              element: <PatientDetails/>
+            },
+            {
+              path:"/patientForm",
+              element: <PatientForm/>
+            },
+            {
+              path:"/trackingAppointmentChart",
+              element: <TrackingAppointmentChart/>
+            },
+            {
+              path:"/patientInfo",
+              element: <PatientInfo/>
+            },
+            {
+              path: '/lifeHabits',
+              element: <LifeHabitsFormPage />
+            },
+            {
+              path:'/lifeHabitsView',
+              element: <LifeHabitsViewPage/>
+            },
+            {
+              path: '/clinicalHistory/view',
+              element: <ClinicalHistoryViewPage/>
+            },
+            {
+              path: '/physicalExam',
+              element: <></>
+            },
+            {
+              path: '/firstNurseryChart',
+              element: <FirstNurseryChartPage/>
+            },
+            {
+              path: '/exams',
+              element: <ExamsPage/>
+            }
+          ]
+        }, 
         {
-          path: "/Home",
-          element: <ReceptionistHome/>
-        },
-        {
-          path:"patient",
-          element: <PatientDetails/>
-        },
-        {
-          path:"/patientForm",
-          element: <PatientForm/>
-        },
-        {
-          path:"/trackingAppointmentChart",
-          element: <TrackingAppointmentChart/>
-        },
-        {
-          path:"/patientInfo",
-          element: <PatientInfo/>
-        },
-        {
-          path:'/lifeHabits/view',
-          element: <LifeHabitsViewPage/>
-        },
-        {
-          path: '/clinicalHistory/view',
-          element: <ClinicalHistoryViewPage/>
-        },
-        {
-          path: '/physicalExam',
-          element: <></>
-        },
-        {
-          path: '/firstNurseryChart',
-          element: <FirstNurseryChartPage/>
-        },
-        {
-          path: '/exams',
-          element: <ExamsPage/>
+          path: '/login',
+          element: <LoginPage/>
         }
       ]
     }
   ]);
   
-  const queryClient = new QueryClient();
+  const queryClient = useMemo(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false
+      }
+    }
+  }), []);
+  
 
   const requiredInputMessage = 'O campo ${label} é obrigatório.';
   const positiveInputMessage = 'O campo ${label} deve conter um valor positivo.';
@@ -89,7 +115,7 @@ function App() {
     }
 
   });
-
+ 
   return (
     <>
       <QueryClientProvider client={queryClient}>

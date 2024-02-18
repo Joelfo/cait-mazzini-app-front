@@ -1,8 +1,8 @@
-import { CityAPI } from "Api/CityAPI";
-import { CountryAPI } from "Api/CountryAPI";
-import { DistrictAPI } from "Api/DistrictAPI";
-import { FederativeUnityAPI } from "Api/FederativeUnityAPI";
-import { FirstNurseryAppointmentAPI } from "Api/FirstNurseryAppointmentAPI";
+import { CityAPI, useCityApi } from "Api/useCityApi";
+import { CountryAPI, useCountryApi } from "Api/useCountryApi";
+import { DistrictAPI, useDistrictApi } from "Api/useDistrictApi";
+import { FederativeUnityAPI, useFederativeUnityApi } from "Api/useFederativeUnityApi";
+import { FirstNurseryAppointmentAPI, useFirstNurseryAppointmentApi } from "Api/useFirstNurseryAppointmentApi";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
 import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
@@ -16,14 +16,14 @@ import { MazziniFormSection } from "util/components/MazziniFormSection";
 export const PatientInfo = () => {
     const { patient } = useSelectedPatient();
 
-    const countryAPI = new CountryAPI();
-    const federativeUnityAPI = new FederativeUnityAPI();
-    const districtAPI = new DistrictAPI();
-    const cityAPI = new CityAPI();
-    const firstNurseryAppointmentAPI = new FirstNurseryAppointmentAPI();
+    const countryAPI = useCountryApi();
+    const federativeUnityAPI = useFederativeUnityApi();
+    const districtAPI = useDistrictApi();
+    const cityAPI = useCityApi();
+    const firstNurseryAppointmentAPI = useFirstNurseryAppointmentApi();
 
-    const { data: country } = countryAPI.useShow(patient?.birthCountryId);
-    const { data: federativeUnity } = federativeUnityAPI.useShow(patient?.birthplaceId);
+    const { data: federativeUnity } = federativeUnityAPI.useShow(patient?.birthplaceId === 0 ? undefined : patient?.birthplaceId);
+    const { data: country } = countryAPI.useShow(federativeUnity?.countryId);
     const { data: district } = districtAPI.useShow(patient?.districtId);
     const { data: city } = cityAPI.useShow(district?.cityId);
 
@@ -166,7 +166,7 @@ export const PatientInfo = () => {
                             </Form.Group>
                             <Form.Group as={Col} md='2'>
                                 <Form.Label>Naturalidade (UF)</Form.Label>
-                                <Form.Control disabled value={federativeUnity?.id} />
+                                <Form.Control disabled value={federativeUnity?.name} />
                             </Form.Group>
                         </Row>
                     </MazziniFormSection>

@@ -2,13 +2,14 @@ import { usePatientsStore } from "Stores/UsePatientsStore"
 import { useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { PatientAPI } from 'Api/PatientAPI';
+import { usePatientApi } from "Api/usePatientApi";
 
 export const useSelectedPatient = () => {
     const selectedPatient = usePatientsStore(state => state.selectedPatient);
     const setSelectedPatient = usePatientsStore(state => state.setSelectedPatient);
     const [queryStringParams, setQueryStringParams] = useSearchParams()
 
-    const patientAPI = new PatientAPI();
+    const patientAPI = usePatientApi();
 
     const [ patientIdToSearch, setPatientIdToSearch ] = useState<number>();
 

@@ -1,4 +1,4 @@
-import { VitalSignsMeasurementAPI } from "Api/VitalSignsMeasurementAPI"
+import { VitalSignsMeasurementAPI, useVitalSignsMeasurementApi } from "Api/useVitalSignsMeasurementApi"
 import AddButton from "Components/IconButton/AddButton";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
@@ -14,7 +14,7 @@ export type VitalSignsMeasurementsListProps = {
 }
 
 export const VitalSignsMeasurementsList = ({ show, onClose } : VitalSignsMeasurementsListProps) => {
-    const vitalSignsMeasurementsAPI = new VitalSignsMeasurementAPI();
+    const vitalSignsMeasurementsAPI = useVitalSignsMeasurementApi();
     const { patient } = useSelectedPatient();
     const { data: vitalSignsMeasurements, refetch: refetchVitalSignsMeasurements } = vitalSignsMeasurementsAPI.useAllByPatient(patient?.id)
     const [ isAddPopupOpened, setIsAddPopupOpened ] = useState<boolean>(false);

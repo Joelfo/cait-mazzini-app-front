@@ -1,4 +1,5 @@
 import { PatientAPI } from "Api/PatientAPI";
+import { usePatientApi } from "Api/usePatientApi";
 import { ClinicalHistoryView } from "Components/ClinicalHistoryForm/ClinicalHistoryView";
 import { PatientInfoFields } from "Components/PatientInfoFields";
 import { LoadingAlert } from "Components/Utils/Alert/LoadingAlert";
@@ -10,7 +11,7 @@ export const ClinicalHistoryViewPage = () => {
     
     const { patient, isError: isConnectionError } = useSelectedPatient();
 
-    const patientAPI = new PatientAPI();
+    const patientAPI = usePatientApi();
 
     const { data: clinicalHistory, isLoading: isQueryLoading, fetchStatus } = patientAPI.useClincalHistory(patient?.id);
 
