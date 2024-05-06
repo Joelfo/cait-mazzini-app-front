@@ -1,4 +1,4 @@
-import { ContraceptiveMethod } from "types/Api/ContraceptiveMethod";
+import { ContraceptiveMethod } from "Api/Types/ContraceptiveMethod";
 import { ResourceAPI } from "./Base/ResourceAPI"
 import { useResourceAPI } from "./Base/useResourceAPI";
 

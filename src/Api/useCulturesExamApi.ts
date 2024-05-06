@@ -1,4 +1,4 @@
-import { CulturesExam } from "types/Api/Exams/CulturesExam";
+import { CulturesExam } from "Api/Types/Exams/CulturesExam";
 import { ComplementaryExamAPI } from "./Base/ComplementaryExamAPI";
 import { useComplementaryExamApi } from "./Base/useComplementaryExamApi";
 

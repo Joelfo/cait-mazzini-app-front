@@ -1,6 +1,6 @@
-import { Button, Col, Form, Row } from "react-bootstrap"
+import { Button, Col, Form, Row, Stack } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form";
-import { PCRExam } from "types/Api/PCRExam";
+import { PCRExam } from "Api/Types/PCRExam";
 import { ExamFormProps } from "./ExamFormProps";
 import { justRequiredRule } from "util/validation";
 
@@ -20,15 +20,18 @@ export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) =>
 
     return (
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+            <Stack gap={4}>
             <Row>
-                <Form.Group as={Col} md='3'>
+                <Form.Group as={Col} md='6'>
                     <Form.Label>
                         Data
                     </Form.Label>
                     <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
                     <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group as={Col} md='2' className='d-flex align-items-center'>
+            </Row>
+            <Row>
+                <Form.Group as={Col} className='d-flex align-items-center'>
                     <Controller 
                         control={control}
                         name="isPositiveResult"
@@ -46,6 +49,26 @@ export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) =>
                         )}
                     />
                 </Form.Group>
+                </Row>
+                <Row>
+                    <Form.Group as={Col} md='4'>
+                        <Form.Label>Método</Form.Label>
+                        <Form.Control {...register('method', justRequiredRule('Método'))}/>
+                    </Form.Group>
+                </Row>
+                <Row>
+                    <Form.Group as={Col} md='4'>
+                        <Form.Label>Kit</Form.Label>
+                        <Form.Control {...register('kit', justRequiredRule('Kit'))}/>
+                    </Form.Group>
+                </Row>
+                <Row>
+                    <Form.Group as={Col} md='4'>
+                        <Form.Label>Material</Form.Label>
+                        <Form.Control {...register('material', justRequiredRule('Material'))}/>
+                    </Form.Group>
+                </Row>
+                <Row>
                 <Form.Group as={Col} md='5'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
@@ -58,6 +81,7 @@ export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) =>
                     </Button>
                 </Col>
             </Row>
+            </Stack>
         </Form>
     )
 }

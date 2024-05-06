@@ -9,8 +9,8 @@ import { TrackingAppointmentChart } from "Pages/TrackingAppointmentChart";
 import 'react-quill/dist/quill.snow.css';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PatientInfo } from "Pages/Patient/PatientInfo";
-import { LifeHabitsForm } from "Components/LifeHabitsForm";
-import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm";
+import { LifeHabitsForm } from "Components/LifeHabitsForm/LifeHabitsForm";
+import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm/ClinicalHistoryForm";
 import { FirstNurseryChartPage } from "Pages/FirstNurseryChart";
 import * as yup from 'yup';
 import { LifeHabitsViewPage } from "Pages/LifeHabits/LifeHabitsViewPage";
@@ -22,6 +22,13 @@ import { useAuthStore } from "Stores/useAuthStore";
 import { useCookies } from "react-cookie";
 import { SecureRoute } from "SecureRoute";
 import { useMemo } from "react";
+import { ClinicalHistoryFormPage } from "Pages/ClinicalHistory/ClinicalHistoryFormPage";
+import { PhysicalExamFormPage } from "Pages/PhysicalExamFormPage";
+import { PhysicalExamViewPage } from "Pages/PhysicalExamViewPage";
+import { UserFormPage } from "Pages/Users/UserFormPage";
+import { Container } from "react-bootstrap";
+import { UserList } from "Components/User/UserList";
+import { UserListPage } from "Pages/Users/UserListPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -69,16 +76,32 @@ function App() {
               element: <ClinicalHistoryViewPage/>
             },
             {
-              path: '/physicalExam',
-              element: <></>
-            },
-            {
               path: '/firstNurseryChart',
               element: <FirstNurseryChartPage/>
             },
             {
               path: '/exams',
               element: <ExamsPage/>
+            },
+            {
+              path: '/clinicalHistoryForm',
+              element: <ClinicalHistoryFormPage/>
+            },
+            {
+              path: '/physicalExamForm',
+              element: <PhysicalExamFormPage/>
+            },
+            {
+              path: '/physicalExam',
+              element: <PhysicalExamViewPage/>
+            },
+            {
+              path: '/user',
+              element: <UserFormPage/>
+            },
+            {
+              path: '/userList',
+              element: <UserListPage/>
             }
           ]
         }, 
@@ -129,10 +152,8 @@ function App() {
 function Root() {
   return (
     <div className="bg-secondary" style={{minHeight: '100vh'}}>
-      <div className="navbar-container">
-       <Navbar/>
-      </div>
-      <Outlet/>
+
+        <Outlet/>
     </div>
   )
 }

@@ -1,4 +1,4 @@
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
+import { PhysicalActivity } from "Api/Types/PhysicalActivity";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

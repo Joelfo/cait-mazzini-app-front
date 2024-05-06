@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { Button, Col, Form, Modal, ModalBody, OverlayTrigger, Row } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "Api/Types/VitalSignsMeasurement";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { justRequiredRule, requiredTextMessage } from "util/validation";
 import * as Api from 'Api/useVitalSignsMeasurementApi';
@@ -31,19 +31,6 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
         }
     })
 
-    const schema : yup.ObjectSchema<VitalSignsMeasurement> = yup.object({
-        id: yup.number().default(0).required(),
-        mmhgPa: yup.string().required(requiredTextMessage('PA (mmhg)')).max(6),
-        bpmFc: yup.number().typeError(requiredTextMessage('FC (bpm)')).required().positive(),
-        irpmFr: yup.number().typeError(requiredTextMessage('FR (irpm)')).required().positive(),
-        celsiusTax: yup.number().typeError(requiredTextMessage('Tax °C')).required().positive(),
-        oxygenSaturationPercentage: yup.number().positive().typeError(requiredTextMessage('Saturação de O² (%)')).required(),
-        kgWeight: yup.number().positive().typeError(requiredTextMessage('Peso (kg)')).required(),
-        mHeight: yup.number().positive().typeError(requiredTextMessage('Altura (m)')).required(),
-        measurementDateTime: yup.string().required(),
-        patientId: yup.number().required()
-    })
-
     const {
         handleSubmit,
         formState: { errors },
@@ -51,7 +38,6 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
         setValue,
         register
     } = useForm<VitalSignsMeasurement>({
-        resolver: yupResolver(schema),
     });
 
     
@@ -115,7 +101,7 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
                                 <Form.Group as={Col}>
                                     <Form.Label>PA (mmHg)</Form.Label>
                                     <Form.Control 
-                                        {...register('mmhgPa', justRequiredRule('PA'))}
+                                        {...register('mmhgPa')}
                                         isInvalid={!!errors.mmhgPa}
                                         maxLength={6}
                                     />
@@ -183,6 +169,16 @@ export const VitalSignsMeasurementFormPopup = ({ show, onClose, onSave } : IVita
                                     <Form.Label>Altura (m)</Form.Label>
                                     <Form.Control
                                         {...register('mHeight')}
+                                        type='number'
+                                        step={0.01}
+                                        isInvalid={!!errors.mHeight}
+                                    />
+                                    <Form.Control.Feedback type='invalid'>{errors.mHeight?.message}</Form.Control.Feedback>
+                                </Form.Group>
+                                <Form.Group as={Col}>
+                                    <Form.Label>HGT (mg/dl)</Form.Label>
+                                    <Form.Control
+                                        {...register('mgdlHgt')}
                                         type='number'
                                         step={0.01}
                                         isInvalid={!!errors.mHeight}

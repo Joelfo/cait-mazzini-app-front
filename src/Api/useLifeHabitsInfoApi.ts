@@ -1,10 +1,11 @@
-import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
+import { LifeHabitsInfoDTO } from "Api/Types/LifeHabitsInfoDTO";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { LifeHabitsInfo } from "types/Api/LifeHabitsInfo";
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
+import { LifeHabitsInfo } from "Api/Types/LifeHabitsInfo";
+import { PhysicalActivity } from "Api/Types/PhysicalActivity";
 import { useResourceAPI } from "./Base/useResourceAPI";
+import { ContraceptiveMethod } from "Api/Types/ContraceptiveMethod";
 
 export class LifeHabitsInfoAPI extends ResourceAPI<LifeHabitsInfo, LifeHabitsInfoDTO> {
     constructor(){
@@ -25,10 +26,10 @@ export class LifeHabitsInfoAPI extends ResourceAPI<LifeHabitsInfo, LifeHabitsInf
 }
 
 export const useLifeHabitsInfoApi = () => {
-    const {headers, ...resourceApi} = useResourceAPI<LifeHabitsInfo>('LifeHabitsInfo');
+    const {headers, ...resourceApi} = useResourceAPI<LifeHabitsInfo, LifeHabitsInfoDTO>('LifeHabitsInfo');
 
-    const usePhysicalActivities = (lifeHabitsInfoId?: number) => useQuery(
-        ['LifeHabitsInfo.PhysicalActivities'],
+    const usePhysicalActivities = (lifeHabitsInfoId?: number) => useQuery<PhysicalActivity[]>(
+        ['LifeHabitsInfo.PhysicalActivitiess'],
         async () => {
             const response = await axios.get<PhysicalActivity[]>(
                 resourceApi.resourceUrl + `/${lifeHabitsInfoId}/PhysicalActivities`,
@@ -40,7 +41,21 @@ export const useLifeHabitsInfoApi = () => {
         }, {
             enabled: !!lifeHabitsInfoId
         }
-    ) 
+    );
 
-    return { ...resourceApi, usePhysicalActivities }
+    const useContraceptiveMethods = (lifeHabitsInfoId?: number) => useQuery<ContraceptiveMethod[]>(
+        ['LifeHabitsInfo.ContraceptiveMethods'],
+        async () => {
+            const response = await axios.get<ContraceptiveMethod[]>(
+                resourceApi.resourceUrl + `/${lifeHabitsInfoId}/ContraceptiveMethods`,
+                {
+                    headers
+                }
+            );
+            return response.data;
+        }, {
+            enabled: !!lifeHabitsInfoId
+        }
+    )
+    return { ...resourceApi, usePhysicalActivities, useContraceptiveMethods }
 }

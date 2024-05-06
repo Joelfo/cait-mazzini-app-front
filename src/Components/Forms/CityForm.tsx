@@ -1,7 +1,7 @@
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { Button, Form, Stack } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { City } from "types/Api/City";
+import { City } from "Api/Types/City";
 import { justRequiredRule } from "util/validation";
 
 export const CityForm = ({ onSubmit } : Props) => {

@@ -1,4 +1,4 @@
 import { createContext } from "react";
-import { Patient } from "types/Api/Patient";
+import { Patient } from "Api/Types/Patient";
 
 export const SelectedPatientContext = createContext<Patient | null>(null);

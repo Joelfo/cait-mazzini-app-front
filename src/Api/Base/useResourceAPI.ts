@@ -17,7 +17,7 @@ export const useResourceAPI = <TResource, TDto = TResource>(resourceName: string
     const useAll = () => useQuery<TResource[]>(
         [resourceName, '.All'],
         async () => {
-            const response = await axios.get(
+            const response = await axios.get<TResource[]>(
                 resourceUrl,
                 {
                     headers
@@ -98,7 +98,7 @@ export const useResourceAPI = <TResource, TDto = TResource>(resourceName: string
         retry: 99999,
     });
 
-    const useDelete = () => useMutation({
+    const useRemove = () => useMutation({
         mutationFn: async ({ id } : { id: number }) => {
             console.log(id);
             const response = await axios.delete(`${resourceUrl}/${id}`, {
@@ -114,7 +114,7 @@ export const useResourceAPI = <TResource, TDto = TResource>(resourceName: string
         useShow,
         useCreate,
         useUpdate,
-        useDelete,
+        useRemove,
         headers,
         resourceName,
         resourceUrl

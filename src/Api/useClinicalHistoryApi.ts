@@ -1,12 +1,13 @@
-import { ClinicalHistory } from "types/Api/ClinicalHistory";
+import { ClinicalHistory } from "Api/Types/ClinicalHistory";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Immunization } from "types/Api/Immunization";
-import { ClinicalHistoryHasDatedImmunization } from "types/Api/ClinicalHistoryHasDatedImmunization";
-import { Desease } from "types/Api/Desease";
+import { Immunization } from "Api/Types/Immunization";
+import { ClinicalHistoryHasDatedImmunizationDTO } from "Api/Types/DTOs/ClinicalHistoryHasDatedImmunizationDTO";
+import { Desease } from "Api/Types/Desease";
 import { useResourceAPI } from "./Base/useResourceAPI";
 import { useAuthStore } from "Stores/useAuthStore";
+import { ClinicalHistoryHasDatedImmunization } from "Api/Types/ClinicalHistoryHasDatedImmunization";
 
 export class ClinicalHistoryAPi extends ResourceAPI<ClinicalHistory>{
     constructor(){
@@ -28,7 +29,7 @@ export class ClinicalHistoryAPi extends ResourceAPI<ClinicalHistory>{
     public useDatedImmunizations = (clinicalHistoryId?: number) => useQuery(
         ['ClinicalHistories.DatedImmunizations', clinicalHistoryId],
         async () => {
-            const response = await axios.get<ClinicalHistoryHasDatedImmunization[]>(
+            const response = await axios.get<ClinicalHistoryHasDatedImmunizationDTO[]>(
                 `${this.resourceRoute}/${clinicalHistoryId}/DatedImmunizations`
             );
             return response.data;

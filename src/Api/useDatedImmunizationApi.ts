@@ -1,4 +1,4 @@
-import { DatedImmunization } from "types/Api/DatedImmunization";
+import { DatedImmunization } from "Api/Types/DatedImmunization";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

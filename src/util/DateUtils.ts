@@ -1,6 +1,6 @@
 export const getActualDate = () => {
     const dateObj = new Date();
-    const actualDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
+    const actualDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`;
     return actualDate;
 }
 

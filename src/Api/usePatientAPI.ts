@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Patient } from "types/Api/Patient";
+import { Patient } from "Api/Types/Patient";
 import { API_URL } from "util/requests";
 import { useResourceAPI } from "./Base/useResourceAPI";
-import { PatientBasicInfo } from "types/Api/BasicInfo/PatientBasicInfo";
-import { ClinicalHistory } from "types/Api/ClinicalHistory";
-import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
-import { PatientRelationshipsInfo } from "types/Api/BasicInfo/PatientRelationshipsInfo";
+import { PatientBasicInfo } from "Api/Types/BasicInfo/PatientBasicInfo";
+import { ClinicalHistory } from "Api/Types/ClinicalHistory";
+import { LifeHabitsInfoDTO } from "Api/Types/LifeHabitsInfoDTO";
+import { PatientRelationshipsInfo } from "Api/Types/BasicInfo/PatientRelationshipsInfo";
+import { LifeHabitsInfo } from "Api/Types/LifeHabitsInfo";
 
 export const usePatientApi = () => {
     const { headers, resourceUrl, ...resourceApi  } = useResourceAPI<Patient>('Patients');
@@ -83,7 +84,7 @@ export const usePatientApi = () => {
     const useLifeHabitsInfo = (patientId?: number) => useQuery(
         ['Patients.LifeHabitsInfo', patientId],
         async () => {
-            const response = await axios.get<LifeHabitsInfoDTO>(
+            const response = await axios.get<LifeHabitsInfo>(
                 resourceUrl + `/${patientId}/LifeHabitsInfo`,
                 {
                     params: {

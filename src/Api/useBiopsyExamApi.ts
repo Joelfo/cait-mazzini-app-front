@@ -1,4 +1,4 @@
-import { BiopsyExam } from "types/Api/Exams/BiopsyExam";
+import { BiopsyExam } from "Api/Types/Exams/BiopsyExam";
 import { ComplementaryExamAPI } from "./Base/ComplementaryExamAPI";
 import { useComplementaryExamApi } from "./Base/useComplementaryExamApi";
 

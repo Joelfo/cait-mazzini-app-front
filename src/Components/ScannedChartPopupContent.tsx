@@ -12,7 +12,7 @@ export type ScannedChartPopupProps = {
 export const ScannedChartPopupContent = ({ patientId } : ScannedChartPopupProps) => {
     const { useShow, useCreate } = useScannedChartAPI();
 
-    const { data: scannedChartFile, isLoading: isScannedChartFileLoading, error: errorOnLoading } = useShow(patientId);
+    const { data: scannedChartFile, isLoading: isScannedChartFileLoading, error: errorOnLoading } = useShow();
 
     const { mutate: createScannedChart } = useCreate();
 

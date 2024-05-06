@@ -1,4 +1,4 @@
-import { Desease } from "types/Api/Desease";
+import { Desease } from "Api/Types/Desease";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

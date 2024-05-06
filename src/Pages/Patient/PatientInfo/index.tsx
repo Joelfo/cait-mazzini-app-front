@@ -1,32 +1,34 @@
-import { CityAPI, useCityApi } from "Api/useCityApi";
-import { CountryAPI, useCountryApi } from "Api/useCountryApi";
-import { DistrictAPI, useDistrictApi } from "Api/useDistrictApi";
-import { FederativeUnityAPI, useFederativeUnityApi } from "Api/useFederativeUnityApi";
-import { FirstNurseryAppointmentAPI, useFirstNurseryAppointmentApi } from "Api/useFirstNurseryAppointmentApi";
+import { useCityApi } from "Api/useCityApi";
+import { useCountryApi } from "Api/useCountryApi";
+import { useDistrictApi } from "Api/useDistrictApi";
+import { useFederativeUnityApi } from "Api/useFederativeUnityApi";
+import { useFirstNurseryAppointmentApi } from "Api/useFirstNurseryAppointmentApi";
+import { useHealthUnityApi } from "Api/useHealthUnityApi";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
 import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
-import { Patient } from "types/Api/Patient";
-import { ArrivalType } from "types/enums/ArrivalType";
-import { EAddressZone } from "types/enums/EAddressZone";
-import { EBiologicalGender } from "types/enums/EBiologicalGender";
-import { PatientType } from "types/enums/PatientType";
+import { Patient } from "Api/Types/Patient";
+import { ArrivalType } from "Api/Types/enums/ArrivalType";
+import { EAddressZone } from "Api/Types/enums/EAddressZone";
+import { EBiologicalGender } from "Api/Types/enums/EBiologicalGender";
+import { PatientType } from "Api/Types/enums/PatientType";
 import { MazziniFormSection } from "util/components/MazziniFormSection";
 
 export const PatientInfo = () => {
     const { patient } = useSelectedPatient();
 
-    const countryAPI = useCountryApi();
-    const federativeUnityAPI = useFederativeUnityApi();
-    const districtAPI = useDistrictApi();
-    const cityAPI = useCityApi();
-    const firstNurseryAppointmentAPI = useFirstNurseryAppointmentApi();
+    const countryApi = useCountryApi();
+    const federativeUnityApi = useFederativeUnityApi();
+    const districtApi = useDistrictApi();
+    const cityApi = useCityApi();
+    const firstNurseryAppointmentApi = useFirstNurseryAppointmentApi();
+    const healthUnityApi = useHealthUnityApi();
 
-    const { data: federativeUnity } = federativeUnityAPI.useShow(patient?.birthplaceId === 0 ? undefined : patient?.birthplaceId);
-    const { data: country } = countryAPI.useShow(federativeUnity?.countryId);
-    const { data: district } = districtAPI.useShow(patient?.districtId);
-    const { data: city } = cityAPI.useShow(district?.cityId);
-
+    const { data: federativeUnity } = federativeUnityApi.useShow(patient?.birthplaceId === 0 ? undefined : patient?.birthplaceId);
+    const { data: country } = countryApi.useShow(federativeUnity?.countryId);
+    const { data: district } = districtApi.useShow(patient?.districtId);
+    const { data: city } = cityApi.useShow(district?.cityId);
+    const { data: healthUnity } = healthUnityApi.useShow(patient?.healthUnityId);
     const navigate = useNavigate();
 
     const getPatientTypeLabel = (patient: Patient) => {
@@ -113,6 +115,14 @@ export const PatientInfo = () => {
                                     <Form.Check type='radio' checked={patient?.arrivalType === ArrivalType.Referenced} label='Referenciado'/>
                                     <Form.Check type='radio' checked={patient?.arrivalType === ArrivalType.Fowarded} label='Encaminhado'/>
                                 </Form.Group>
+                                {
+                                    patient?.arrivalType === ArrivalType.Fowarded
+                                    &&
+                                    <Form.Group>
+                                        <Form.Label>Unidade de saúde</Form.Label>
+                                        <Form.Control value={healthUnity?.name} disabled/>
+                                    </Form.Group>
+                                }
                             </Col>
                             <Col md='3'>
                                 <Form.Group>

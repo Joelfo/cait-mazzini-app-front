@@ -1,9 +1,12 @@
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, Row, Stack } from "react-bootstrap";
 import { ExamFormProps } from "./ExamFormProps";
-import { BiopsyExam } from "types/Api/Exams/BiopsyExam";
+import { BiopsyExam } from "Api/Types/Exams/BiopsyExam";
 import { useForm } from "react-hook-form";
 import { justRequiredRule } from "util/validation";
 import { useMemo } from "react";
+import IconButton from "Components/IconButton";
+import { IconButton2 } from "Components/IconButton/IconButton2";
+import { ComplementaryExamDTO } from "Api/Types/DTOs/ComplementaryExamDTO";
 
 export const BiopsyForm = ({ patient, onSubmit, data } : ExamFormProps<BiopsyExam>) => {
 
@@ -13,7 +16,7 @@ export const BiopsyForm = ({ patient, onSubmit, data } : ExamFormProps<BiopsyExa
         control,
         setValue,
         register
-    } = useForm<BiopsyExam>({
+    } = useForm<ComplementaryExamDTO<BiopsyExam>>({
         defaultValues: data ?? {
             patientId: patient.id
         }
@@ -21,23 +24,27 @@ export const BiopsyForm = ({ patient, onSubmit, data } : ExamFormProps<BiopsyExa
 
     return (
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-            <Container fluid> 
+            <Stack gap={3}> 
                 <Row>
-                    <Form.Group as={Col} md='3'>
+                    <Form.Group as={Col} md='6'>
                         <Form.Label>
                             Data
                         </Form.Label>
                         <Form.Control type='date' {...register('date', justRequiredRule('Data'))}  isInvalid={!!errors.date} />
                         <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md='3'>
+                </Row>
+                <Row>
+                    <Form.Group as={Col} md='6'>
                         <Form.Label>
                             Tecido Analisado
                         </Form.Label>
                         <Form.Control {...register('analyzedTissue', justRequiredRule('Tecido analisado'))}  isInvalid={!!errors.analyzedTissue}/>
                         <Form.Control.Feedback type='invalid'>{errors.analyzedTissue?.message}</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md='5'>
+                </Row>
+                <Row>
+                    <Form.Group as={Col} md='10'>
                         <Form.Label>
                            Resultado
                         </Form.Label>
@@ -45,12 +52,18 @@ export const BiopsyForm = ({ patient, onSubmit, data } : ExamFormProps<BiopsyExa
                         <Form.Control.Feedback type='invalid'>{errors.result?.message}</Form.Control.Feedback>
                     </Form.Group>
                 </Row>
-                <Row className='form-mazzini-row'>
+                <Row>
                     <Form.Group as={Col} md='5'>
                             <Form.Label>Observações</Form.Label>
                         <Form.Control {...register('observations')}/>
                     </Form.Group>
                 </Row>
+                <Row>
+                        <Form.Group as={Col} md='12'>
+                            <Form.Label>Arquivos</Form.Label>
+                            <Form.Control {...register('files')} type='file'  multiple/>
+                        </Form.Group>
+                    </Row>
                 <Row className="form-mazzini-row">
                 <Col md='2'>
                     <Button variant='success' type='submit'>
@@ -58,7 +71,7 @@ export const BiopsyForm = ({ patient, onSubmit, data } : ExamFormProps<BiopsyExa
                     </Button>
                 </Col>
             </Row>
-            </Container>
+            </Stack>
         </Form>
     )
 }

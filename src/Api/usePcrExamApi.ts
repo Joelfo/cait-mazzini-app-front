@@ -1,4 +1,4 @@
-import { PCRExam } from "types/Api/PCRExam";
+import { PCRExam } from "Api/Types/PCRExam";
 import { ComplementaryExamAPI } from "./Base/ComplementaryExamAPI";
 import { useComplementaryExamApi } from "./Base/useComplementaryExamApi";
 

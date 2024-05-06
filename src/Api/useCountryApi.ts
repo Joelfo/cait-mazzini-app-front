@@ -1,4 +1,4 @@
-import { Country } from "types/Api/Country";
+import { Country } from "Api/Types/Country";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

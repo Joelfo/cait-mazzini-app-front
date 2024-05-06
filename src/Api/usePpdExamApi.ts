@@ -1,4 +1,4 @@
-import { PPDExam } from "types/Api/Exams/PPDExam";
+import { PPDExam } from "Api/Types/Exams/PPDExam";
 import { ComplementaryExamAPI } from "./Base/ComplementaryExamAPI";
 import { useComplementaryExamApi } from "./Base/useComplementaryExamApi";
 

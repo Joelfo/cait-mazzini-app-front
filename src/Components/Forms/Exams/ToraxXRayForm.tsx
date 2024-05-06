@@ -1,12 +1,13 @@
 import { PatientInfoFields } from "Components/PatientInfoFields";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import { Controller, useForm } from "react-hook-form";
-import { ToraxXRayExam } from "types/Api/Exams/ToraxXRayExam";
-import { Patient } from "types/Api/Patient";
-import { EToraxXRayResult } from "types/enums/EToraxXRayResult";
+import { ToraxXRayExam } from "Api/Types/Exams/ToraxXRayExam";
+import { Patient } from "Api/Types/Patient";
+import { EToraxXRayResult } from "Api/Types/enums/EToraxXRayResult";
 import { justRequiredRule } from "util/validation";
 import { ExamFormProps } from "./ExamFormProps";
+import { ComplementaryExamDTO } from "Api/Types/DTOs/ComplementaryExamDTO";
 
 
 
@@ -18,9 +19,11 @@ export const ToraxXRayForm = ({ onSubmit, patient, data } : ExamFormProps<ToraxX
         control,
         setValue,
         register
-    } = useForm<ToraxXRayExam>({
+    } = useForm<ComplementaryExamDTO<ToraxXRayExam>>({
         defaultValues: data ?? {
-            patientId: patient.id
+            patientId: patient.id,
+            xRayResult: EToraxXRayResult.Common,
+            examFiles: []
         }
     });
 
@@ -31,16 +34,18 @@ export const ToraxXRayForm = ({ onSubmit, patient, data } : ExamFormProps<ToraxX
     return (
         <>
             <Form noValidate onSubmit={handleSubmit(onSubmit)}>
-                <PatientInfoFields patient={patient} />
-                <Row className='form-mazzini-row'>
-                    <Form.Group as={Col} md='3'>
+                <Stack gap={3}>
+                <Row>
+                    <Form.Group as={Col} md='6'>
                         <Form.Label>
                             Data
                         </Form.Label>
                         <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
                         <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                     </Form.Group>
-                    <Form.Group as={Col} md='2'>
+                    </Row>
+                    <Row>
+                    <Form.Group as={Col} md='4'>
                         <Form.Label>
                             Resultado
                         </Form.Label>
@@ -62,13 +67,20 @@ export const ToraxXRayForm = ({ onSubmit, patient, data } : ExamFormProps<ToraxX
                                 </Form.Select> 
                             )}
                         />
-
                     </Form.Group>
-                    <Form.Group as={Col} md='4'>
+                    </Row>
+                    <Row>
+                    <Form.Group as={Col} md='8'>
                         <Form.Label>Observações</Form.Label>
                         <Form.Control {...register('observations')}/>
                     </Form.Group>
-                </Row>
+                    </Row>
+                    <Row>
+                        <Form.Group as={Col} md='12'>
+                            <Form.Label>Arquivos</Form.Label>
+                            <Form.Control {...register('files')} type='file'  multiple/>
+                        </Form.Group>
+                    </Row>
                 <Row className="form-mazzini-row">
                     <Col md='2'>
                         <Button variant='success' type='submit'>
@@ -76,6 +88,7 @@ export const ToraxXRayForm = ({ onSubmit, patient, data } : ExamFormProps<ToraxX
                         </Button>
                     </Col>
                 </Row>
+                </Stack>
             </Form>
         </>
     );

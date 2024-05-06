@@ -1,4 +1,4 @@
-import { Immunization } from "types/Api/Immunization";
+import { Immunization } from "Api/Types/Immunization";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

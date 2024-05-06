@@ -1,4 +1,4 @@
-import { HealthUnity } from "types/Api/HealthUnity";
+import { HealthUnity } from "Api/Types/HealthUnity";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";
 

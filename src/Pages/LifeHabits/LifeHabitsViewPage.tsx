@@ -1,6 +1,7 @@
 import { PatientAPI } from "Api/PatientAPI";
+import { useLifeHabitsInfoApi } from "Api/useLifeHabitsInfoApi";
 import { usePatientApi } from "Api/usePatientApi";
-import { LifeHabitsForm } from "Components/LifeHabitsForm";
+import { LifeHabitsForm } from "Components/LifeHabitsForm/LifeHabitsForm";
 import { LifeHabitsView } from "Components/LifeHabitsForm/LifeHabitsView";
 import { PatientInfoFields } from "Components/PatientInfoFields";
 import { LoadingAlert } from "Components/Utils/Alert/LoadingAlert";
@@ -11,12 +12,17 @@ export const LifeHabitsViewPage = () => {
     const { patient } = useSelectedPatient();
 
     const patientAPI = usePatientApi();
+    const lifeHabitsInfoApi = useLifeHabitsInfoApi();
 
     const { data: lifeHabitsInfo, error: connectionError, isLoading, isFetching } = patientAPI.useLifeHabitsInfo(patient?.id);
 
+    const { data: physicalActivities, isLoading: isPhysicalActivitiesLoading } = lifeHabitsInfoApi.usePhysicalActivities(lifeHabitsInfo?.id);
+
+    const { data: contraceptiveMethods, isLoading: isContraceptiveMethodsLoading } = lifeHabitsInfoApi.useContraceptiveMethods(lifeHabitsInfo?.id);
+
     return (
         <>
-            <LoadingAlert show={isLoading && isFetching}/>
+            <LoadingAlert show={isLoading || isPhysicalActivitiesLoading || isContraceptiveMethodsLoading}/>
             <Container style={{paddingBottom: 20}}>
                 <Stack> 
                     <PatientInfoFields patient={patient}/>
@@ -27,6 +33,8 @@ export const LifeHabitsViewPage = () => {
                         &&
                         <LifeHabitsView
                             data={lifeHabitsInfo}
+                            physicalActivities={physicalActivities ?? []}
+                            contraceptiveMethods={contraceptiveMethods ?? []}
                         />
                     }
                 </Stack>

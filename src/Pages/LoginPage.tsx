@@ -1,6 +1,6 @@
 import { Button, Col, Container, Form, FormControlProps, Row, Stack } from "react-bootstrap"
 import { Controller, useForm } from "react-hook-form";
-import { LoginDTO } from "types/Api/DTOs/LoginDTO";
+import { LoginDTO } from "Api/Types/DTOs/LoginDTO";
 import ReactInputMask, { Props } from 'react-input-mask';
 import { justRequiredRule } from "util/validation";
 import { useAuthApi } from "Api/useAuthApi";
@@ -10,7 +10,7 @@ import { LoadingAlert } from "Components/Utils/Alert/LoadingAlert";
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { TimedAlert } from "Components/Utils/Alert/TimedAlert";
-
+import CaitMazziniLogo from "../assets/images/cait-mazzini-logo.png"
 export const LoginPage = () => {
 
     const [ showInvalidCredentialsAlert, setShowInvalidCredentialsAlert ] = useState(false);
@@ -36,7 +36,6 @@ export const LoginPage = () => {
     const setJwtToken = useAuthStore(state => state.setJwtToken);
 
     const handleAuthenticate = (data: LoginDTO) => {
-        data.cpf = data.cpf.replace(/\.|-/g, '');
         login(data, {
             onSuccess: (token) => {
                 setJwtToken(token);
@@ -56,46 +55,55 @@ export const LoginPage = () => {
     return (
         <>
             <Container>
-                    <Stack className="d-flex align-items-center justify-content-center">
-                        <h3>Autenticação</h3>
+                    <Stack style={{height: '100vh', alignItems: 'center', justifyContent: 'center'}}>
+                        <Stack gap={4} style={{justifyContent: 'center'}}>
+                            <Stack style={{justifyContent: 'center'}} direction="horizontal">
+                                <div style={{height: '250px', display: 'flex', justifyContent: 'center'}}>
+                                    <img style={{borderRadius: '5px'}} src={CaitMazziniLogo} alt='Logo do Cait Mazzini Bueno'/>
+                                </div>
+                            </Stack>
+                            <Stack style={{justifyContent: 'center'}} direction="horizontal">
+                                <h3>Autenticação</h3>
+                            </Stack>
+                            <div>
+                                <Form onSubmit={handleSubmit(handleAuthenticate)}>
+                                    <Row className="form-mazzini-row justify-content-center">
+                                        <Form.Group as={Col} md='4'>
+                                            <Form.Label>CPF</Form.Label>
+                                            <Controller
+                                                control={control}
+                                                name='cpf'
+                                                rules={justRequiredRule('CPF')}
+                                                render= {({
+                                                    field: { onChange, onBlur, value, name, ref },
+                                                    fieldState: { invalid, isTouched, isDirty, error },
+                                                    formState,
+                                                }) => (
+                                                    <ReactInputMask mask='999.999.999-99' onChange={onChange} value={value} onBlur={onBlur}>
+                                                        {((inputProps: Props & FormControlProps) => { return (<Form.Control {...inputProps} />)}) as any }
+                                                    </ReactInputMask>
+                                                )}
+                                            />
+                                            <Form.Control.Feedback type='invalid'>
+                                                {errors.cpf?.message}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Row>
+                                    <Row className='form-mazzini-row justify-content-center'>
+                                        <Form.Group as={Col} md='4'>
+                                            <Form.Label>Senha</Form.Label>
+                                            <Form.Control type='password' {...register('password', justRequiredRule('Senha'))} isInvalid={!!errors.password}/> 
+                                        </Form.Group>
+                                    </Row>
+                                    <Row className='form-mazzini-row'>
+                                        <Col className='d-flex justify-content-center'>
+                                            <Button type='submit'>Autenticar</Button>   
+                                        </Col>
+                                    </Row>
+                                </Form>
+                            </div>
+                        </Stack>
                     </Stack>
-                    
-                    <Form onSubmit={handleSubmit(handleAuthenticate)}>
-                        <Row className="form-mazzini-row justify-content-center">
-                            <Form.Group as={Col} md='4'>
-                                <Form.Label>CPF</Form.Label>
-                                <Controller
-                                    control={control}
-                                    name='cpf'
-                                    rules={justRequiredRule('CPF')}
-                                    render= {({
-                                        field: { onChange, onBlur, value, name, ref },
-                                        fieldState: { invalid, isTouched, isDirty, error },
-                                        formState,
-                                    }) => (
-                                        <ReactInputMask mask='999.999.999-99' onChange={onChange} value={value} onBlur={onBlur}>
-                                            {((inputProps: Props & FormControlProps) => { return (<Form.Control {...inputProps} />)}) as any }
-                                        </ReactInputMask>
-                                    )}
-                                />
-                                <Form.Control.Feedback type='invalid'>
-                                    {errors.cpf?.message}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-                        </Row>
-                        <Row className='form-mazzini-row justify-content-center'>
-                            <Form.Group as={Col} md='4'>
-                                <Form.Label>Senha</Form.Label>
-                                <Form.Control type='password' {...register('password', justRequiredRule('Senha'))} isInvalid={!!errors.password}/> 
-                            </Form.Group>
-                        </Row>
-                        <Row className='form-mazzini-row'>
-                            <Col className='d-flex justify-content-center'>
-                                <Button type='submit'>Autenticar</Button>   
-                            </Col>
-                        </Row>
-                    </Form>
-
             </Container>
             
             <LoadingAlert show={isLoading} text="Carregando... Por favor aguarde..."/>

@@ -1,9 +1,9 @@
-import { VitalSignsMeasurementAPI, useVitalSignsMeasurementApi } from "Api/useVitalSignsMeasurementApi"
+import { useVitalSignsMeasurementApi } from "Api/useVitalSignsMeasurementApi"
 import AddButton from "Components/IconButton/AddButton";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { Button, Modal, Stack, Table } from "react-bootstrap"
-import { VitalSignsMeasurement } from "types/Api/VitalSignsMeasurement";
+import { VitalSignsMeasurement } from "Api/Types/VitalSignsMeasurement";
 import { VitalSignsMeasurementFormPopup } from "./VitalSignsMeasurementFormPopup";
 import { useState } from "react";
 import date from 'date-and-time';
@@ -41,6 +41,7 @@ export const VitalSignsMeasurementsList = ({ show, onClose } : VitalSignsMeasure
                                 <th className='text-nowrap'>Saturação de O² (%)</th>
                                 <th className='text-nowrap'>Peso (kg)</th>
                                 <th className='text-nowrap'>Altura (m)</th>
+                                <th className='text-nowrap'>HGT (mg/dl)</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -62,6 +63,7 @@ export const VitalSignsMeasurementsList = ({ show, onClose } : VitalSignsMeasure
                                     <td className='text-nowrap'>{vitalSignsMeasurement.oxygenSaturationPercentage + '%'}</td>
                                     <td className='text-nowrap'>{vitalSignsMeasurement.kgWeight + ' kg'}</td>
                                     <td className='text-nowrap'>{vitalSignsMeasurement.mHeight + ' m'}</td>
+                                    <td className='text-nowrap'>{vitalSignsMeasurement.mgdlHgt ? vitalSignsMeasurement.mgdlHgt + ' mg/dl' : ''}</td>
                                 </tr>
                             ))
                         }

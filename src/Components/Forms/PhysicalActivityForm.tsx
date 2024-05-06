@@ -1,7 +1,7 @@
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
+import { PhysicalActivity } from "Api/Types/PhysicalActivity";
 import { justRequiredRule } from "util/validation";
 
 export const PhysicalActivityForm = ({ onSubmit } : Props) => {

@@ -1,7 +1,7 @@
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { Button, Form, Stack } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { ContraceptiveMethod } from "types/Api/ContraceptiveMethod";
+import { ContraceptiveMethod } from "Api/Types/ContraceptiveMethod";
 import { justRequiredRule } from "util/validation";
 
 export const ContraceptiveMethodForm = ({ onSubmit } : Props) => {

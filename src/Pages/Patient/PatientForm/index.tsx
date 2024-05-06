@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { Controller, FieldError, SubmitHandler, useForm } from 'react-hook-form'
-import { Patient } from 'types/Api/Patient'
-import { ArrivalType } from 'types/enums/ArrivalType';
-import { PatientType } from 'types/enums/PatientType';
-import { SpecialPopulationType } from 'types/enums/SpecialPopulationType';
+import { Patient } from 'Api/Types/Patient'
+import { ArrivalType } from 'Api/Types/enums/ArrivalType';
+import { PatientType } from 'Api/Types/enums/PatientType';
+import { SpecialPopulationType } from 'Api/Types/enums/SpecialPopulationType';
 import { API_URL } from 'util/requests';
 import './index.css';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { District } from 'types/Api/District';
-import { City } from 'types/Api/City';
-import { Country } from 'types/Api/Country';
-import { HealthUnity } from 'types/Api/HealthUnity';
+import { District } from 'Api/Types/District';
+import { City } from 'Api/Types/City';
+import { Country } from 'Api/Types/Country';
+import { HealthUnity } from 'Api/Types/HealthUnity';
 import { validate } from 'gerador-validador-cpf';
 import { redirect, useNavigate } from 'react-router';
 import { Alert, Button, Col, Container, Dropdown, Form, FormCheck, FormControlProps, FormGroup, Modal, Row, Spinner, Stack } from 'react-bootstrap';
@@ -18,18 +18,18 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { usePatientsStore } from 'Stores/UsePatientsStore';
 import { HookControlledFormControl } from 'util/components/HookControlledFormControl';
 import { justRequiredRule, requiredTextMessage } from 'util/validation';
-import { EBiologicalGender } from 'types/enums/EBiologicalGender';
+import { EBiologicalGender } from 'Api/Types/enums/EBiologicalGender';
 import { MazziniFormSection } from 'util/components/MazziniFormSection';
 import { HookControlledFormSelect } from 'util/components/HookControlledFormSelect';
 import { useSelectedPatient } from 'Hooks/useSelectedPatient';
 import { CityAPI, useCityApi } from 'Api/useCityApi';
 import { DistrictAPI, useDistrictApi } from 'Api/useDistrictApi';
-import { EAddressZone } from 'types/enums/EAddressZone';
+import { EAddressZone } from 'Api/Types/enums/EAddressZone';
 import { ViaCepAPI } from 'Api/Vendor/ViaCepAPI';
 import { ReactSearchAutocomplete } from 'react-search-autocomplete';
 import { Menu, MenuItem, Typeahead, TypeaheadMenu } from 'react-bootstrap-typeahead';
 import { CountryAPI, useCountryApi } from 'Api/useCountryApi';
-import { FederativeUnity } from 'types/Api/FederativeUnity';
+import { FederativeUnity } from 'Api/Types/FederativeUnity';
 import { FederativeUnityAPI, useFederativeUnityApi } from 'Api/useFederativeUnityApi';
 import { PatientAPI } from 'Api/PatientAPI';
 import { validateCns, validateCpf } from 'util/Validations';
@@ -135,7 +135,7 @@ export const PatientForm = () => {
             patient.healthUnityId = selectedHealthUnity.id;
         }
 
-        if (selectedDistrict.id > 0 && selectedFederativeUnity.id > 0) {    
+        if (selectedDistrict.id > 0 && selectedFederativeUnity.id > 0 && (patient.arrivalType !== ArrivalType.Fowarded || selectedHealthUnity?.id !== 0)) {    
             savePatient(patient);
         } else {
             patientHasDependenciesToSaveRef.current = true;
@@ -161,9 +161,6 @@ export const PatientForm = () => {
                             selectedDistrict.cityId = id;
                             saveDistrict(selectedDistrict);
                         }
-                        if (selectedHealthUnity && selectedHealthUnity.id === 0) {
-                            saveHealthUnity(selectedHealthUnity);
-                        }
                     }
                 })
             } else {
@@ -171,9 +168,10 @@ export const PatientForm = () => {
                     selectedDistrict.cityId = selectedCity.id;
                     saveDistrict(selectedDistrict);
                 }
-                if (selectedHealthUnity && selectedHealthUnity.id === 0) {
-                    saveHealthUnity(selectedHealthUnity);
-                }
+            }
+
+            if (selectedHealthUnity && selectedHealthUnity.id === 0) {
+                saveHealthUnity(selectedHealthUnity);
             }
         }
     }
@@ -232,7 +230,8 @@ export const PatientForm = () => {
         setSelectedDistrict(selectedDistrict);
     }, []);
 
-    const validateHealthUnityId = useCallback((value: number | undefined, formValues: Patient) => (formValues.arrivalType !== ArrivalType.Fowarded || !!selectedHealthUnity) || requiredTextMessage('Unidade de saúde'), []);
+    const validateHealthUnityId = useCallback((value: number | undefined, formValues: Patient) => {
+        return formValues.arrivalType !== ArrivalType.Fowarded || !!selectedHealthUnity ? true : requiredTextMessage('Unidade de saúde') }, [selectedHealthUnity]);
 
     // useEffect
 
@@ -269,7 +268,7 @@ export const PatientForm = () => {
 
     useEffect(() => {
         if (!!createdPatientId) {
-            navigate('/patientInfo?patientId' + createdPatientId);
+            navigate('/patient?patientId=' + createdPatientId);
         }
     }, [createdPatientId])
 
@@ -484,7 +483,6 @@ export const PatientForm = () => {
                                             <Typeahead
                                                 allowNew
                                                 onChange={handleSelectedHealthUnityChange}
-                                                selected={selectedHealthUnity ? [selectedHealthUnity] : []}
                                                 options={healthUnities ?? []}
                                                 labelKey='name'
                                                 newSelectionPrefix='Novo: '
@@ -503,6 +501,7 @@ export const PatientForm = () => {
                                                                 }}
                                                                 type='text'
                                                                 value = {typeof value === 'object' ? [...value] : value}
+                                                                isInvalid={invalid}
                                                                 {...inputProps}
                                                                 disabled={isHealthUnitiesLoading}
                                                             />
@@ -555,7 +554,7 @@ export const PatientForm = () => {
                                         fieldState: {invalid}
                                     }) => (
                                         <Form.Control 
-                                            type='number'
+                                            maxLength={15}
                                             isInvalid={invalid}
                                             value={value}
                                             onChange={onChange}

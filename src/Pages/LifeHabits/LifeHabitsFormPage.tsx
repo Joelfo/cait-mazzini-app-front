@@ -1,13 +1,16 @@
 import { ContraceptiveMethodAPI, useContraceptiveMethodApi } from "Api/useContraceptiveMethodApi";
 import { LifeHabitsInfoAPI, useLifeHabitsInfoApi } from "Api/useLifeHabitsInfoApi";
 import { PhysicalActivityAPI, usePhysicalActivityApi } from "Api/usePhysicalActivityApi";
+import { ContraceptiveMethodForm } from "Components/Forms/ContraceptiveMethodForm";
 import { PhysicalActivityForm } from "Components/Forms/PhysicalActivityForm";
-import { LifeHabitsForm } from "Components/LifeHabitsForm";
+import { LifeHabitsForm } from "Components/LifeHabitsForm/LifeHabitsForm";
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { ConnectionErrorAlert } from "Components/Utils/Alert/ConnectionErrorAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient"
-import { useMemo, useState } from "react";
-import { PhysicalActivity } from "types/Api/PhysicalActivity";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { ContraceptiveMethod } from "Api/Types/ContraceptiveMethod";
+import { PhysicalActivity } from "Api/Types/PhysicalActivity";
 
 export const LifeHabitsFormPage = () => {
     // useEffect
@@ -22,37 +25,39 @@ export const LifeHabitsFormPage = () => {
     // custom Hooks
     const { patient, isError: isPatientError } = useSelectedPatient();
 
-    const { data: physicalActivities, isLoading: isPhysicalActivitiesLoading, isError: isPhysicalActivitiesError } = physicalActivityAPI.useAll();
+    const { data: physicalActivities, isLoading: isPhysicalActivitiesLoading, isError: isPhysicalActivitiesError, refetch: refetchPhysicalActivities } = physicalActivityAPI.useAll();
 
-    const { data: contraceptiveMethods, isLoading: isContraceptiveMethodsLoading, isError: isContraceptiveMethodsError } = contraceptiveMethodAPI.useAll();
+    const { data: contraceptiveMethods, isLoading: isContraceptiveMethodsLoading, isError: isContraceptiveMethodsError, refetch: refetchContraceptiveMethods } = contraceptiveMethodAPI.useAll();
 
     const { mutate: saveLifeHabitsInfo, isLoading, isSuccess } = lifeHabitsInfoAPI.useCreate(); 
 
-    const { mutate: savePhysicalActivity, isLoading: isPhysicalActitivitySaveLoading } = physicalActivityAPI.useCreate()
-
+    const navigate = useNavigate();
     // useMemo
     const isConnectionError = useMemo(() => (isPatientError || isContraceptiveMethodsError || isPhysicalActivitiesError), [isPatientError, isContraceptiveMethodsError, isPhysicalActivitiesError])
 
+    useEffect(() => {
+        if (isSuccess) {
+            navigate(`/patient?patientId=${patient!.id}&savedData=true`);
+        }
 
-    // callbacks
-    const handleSavePhysicalActivity = (data: PhysicalActivity) => {
-        savePhysicalActivity(data, {
-            onSettled: () => setShowPhysicalActivityPopup(false)
-        });
-    }
-
-
+    }, [isSuccess]);
     return (
         <>
         {
             patient
             &&
             <> 
-                <LifeHabitsForm physicalActivities={physicalActivities ?? []} contraceptiveMethods={contraceptiveMethods ?? []} patient={patient} onSubmit={saveLifeHabitsInfo} onClickNewPhysicalActivity={() => setShowPhysicalActivityPopup(true)}/>
-                <MazziniPopup show={showPhysicalActivityPopup} title="Atividades físicas" onClose={() => setShowPhysicalActivityPopup(false)}>
-                    <PhysicalActivityForm onSubmit={handleSavePhysicalActivity} />
-                </MazziniPopup>
-            </>
+                <LifeHabitsForm 
+                    isSubmitLoading={isLoading}
+                    physicalActivities={physicalActivities ?? []}  
+                    isContraceptiveMethodsLoading={isContraceptiveMethodsLoading} 
+                    isPhysicalActivitiesLoading={isPhysicalActivitiesLoading} 
+                    contraceptiveMethods={contraceptiveMethods ?? []} 
+                    patient={patient} onSubmit={saveLifeHabitsInfo} 
+                    onClickNewPhysicalActivity={() => setShowPhysicalActivityPopup(true)} 
+                    onClickNewContraceptiveMethod={() => setShowContraceptiveMethodPopup(true)}
+                />
+             </>
         }
             <ConnectionErrorAlert show={isConnectionError}/>
         </>

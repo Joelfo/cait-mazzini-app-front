@@ -1,7 +1,7 @@
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup";
 import { Button, Form, Stack } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import { HealthUnity } from "types/Api/HealthUnity";
+import { HealthUnity } from "Api/Types/HealthUnity";
 import { justRequiredRule } from "util/validation";
 
 export const HealthUnityForm = ({ onSubmit } : Props) => {

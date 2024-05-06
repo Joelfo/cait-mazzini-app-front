@@ -1,16 +1,14 @@
 import { LifeHabitsInfoAPI, useLifeHabitsInfoApi } from 'Api/useLifeHabitsInfoApi';
 import { useMemo } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import { LifeHabitsInfo } from 'types/Api/LifeHabitsInfo';
-import { ESexualActivityLevel } from 'types/enums/ESexualActivityLevel';
+import { ContraceptiveMethod } from 'Api/Types/ContraceptiveMethod';
+import { LifeHabitsInfo } from 'Api/Types/LifeHabitsInfo';
+import { PhysicalActivity } from 'Api/Types/PhysicalActivity';
+import { ESexualActivityLevel } from 'Api/Types/enums/ESexualActivityLevel';
 import { MazziniFormSection } from 'util/components/MazziniFormSection';
 
-export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
-
-    const lifeHabitsInfoAPI = useLifeHabitsInfoApi();
-
-    const { data: physicalActivities, error: physicalActivitiesError } = lifeHabitsInfoAPI.usePhysicalActivities(data.id);
-
+export const LifeHabitsView = ({ data, physicalActivities, contraceptiveMethods } : LifeHabitsViewProps) => {
+    
     const physicalActivitiesText = useMemo(() => {
         return physicalActivities?.reduce<string>((text, physicalActivity, index) => {
             if (index === 0) {
@@ -19,7 +17,19 @@ export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
                 return text + ', ' + physicalActivity.name;
             }
         }, '');
-    }, [physicalActivities])
+    }, [physicalActivities]);
+
+    const contraceptiveMethodsText = useMemo(() => {
+        return contraceptiveMethods?.reduce<string>((text, contraceptiveMethod, index) => {
+            if (index === 0) {
+                return contraceptiveMethod.name;
+            } else {
+                return text + ', ' + contraceptiveMethod.name;
+            }
+        }, '');
+    }, [contraceptiveMethods]);
+
+    const hasContraceptiveMethod = useMemo(() => contraceptiveMethods.length > 0, [contraceptiveMethods]);
     
     return (
         <Container>
@@ -37,35 +47,11 @@ export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='2'>
                             <Form.Label> Observações </Form.Label>
-                            <Form.Control disabled value={data.mealsPerDay}/>
+                            <Form.Control disabled value={data.eatingAndWaterObs}/>
                         </Form.Group>
                     </Row>
                 </MazziniFormSection>
                 <MazziniFormSection title='Eliminações'>
-                    <Row>
-                        <Col>
-                            <b>Vesicais</b>
-                        </Col>
-                    </Row>
-                    <Row className='form-mazzini-row'>
-                        <Form.Group as={Col} md='4'>
-                            <Form.Label>Característica</Form.Label>
-                            <Form.Control disabled value={data.bladderEliminationsCharacteristic}/>
-                        </Form.Group>
-                        <Form.Group as={Col} md='2'>
-                            <Form.Label>Vezes ao dia</Form.Label>
-                            <Form.Control disabled value={data.bladderEliminationTimesPerDay}/>
-                        </Form.Group>
-                    </Row>
-                    <Row className='form-mazzini-row'>
-                        <Form.Group as={Col} md='4'>
-                            <Form.Check
-                                checked={data.hasPainOnBladderEliminations}
-                                disabled={!data.hasPainOnBladderEliminations}
-                                label='Dor'
-                            />
-                        </Form.Group>
-                    </Row>
                     <Row className='form-mazzini-row'>
                         <Col>
                             <b>Intestinais</b>
@@ -90,6 +76,31 @@ export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
                             />
                         </Form.Group>
                     </Row>
+                    <Row>
+                        <Col>
+                            <b>Vesicais</b>
+                        </Col>
+                    </Row>
+                    <Row className='form-mazzini-row'>
+                        <Form.Group as={Col} md='4'>
+                            <Form.Label>Característica</Form.Label>
+                            <Form.Control disabled value={data.bladderEliminationsCharacteristic}/>
+                        </Form.Group>
+                        <Form.Group as={Col} md='2'>
+                            <Form.Label>Vezes ao dia</Form.Label>
+                            <Form.Control disabled value={data.bladderEliminationTimesPerDay}/>
+                        </Form.Group>
+                    </Row>
+                    <Row className='form-mazzini-row'>
+                        <Form.Group as={Col} md='4'>
+                            <Form.Check
+                                checked={data.hasPainOnBladderEliminations}
+                                disabled={!data.hasPainOnBladderEliminations}
+                                label='Dor'
+                            />
+                        </Form.Group>
+                    </Row>
+                    
                 </MazziniFormSection>
                 <MazziniFormSection title='Uso de'>
                     <Row>
@@ -258,9 +269,23 @@ export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
                     <Form.Group as={Col} md='2'>
                         <Form.Check
                             label='Método contraceptivo'
-                        />
-                        <Form.Group> { /*TODO: Adicionar quais */}</Form.Group>
+                            disabled
+                            checked={hasContraceptiveMethod}
+                        />                        
                     </Form.Group>
+                        {
+                            hasContraceptiveMethod
+                            &&
+                            <Form.Group as={Col} md='4'>
+                                <Form.Label>
+                                    Qual(is)
+                                </Form.Label>
+                                <Form.Control
+                                    value={contraceptiveMethodsText}
+                                    disabled
+                                />
+                            </Form.Group>
+                        }
                     <Form.Group as={Col} md='3'>
                         <Form.Check
                             checked={data.isPreservativeUser}
@@ -291,5 +316,7 @@ export const LifeHabitsView = ({ data } : LifeHabitsViewProps) => {
 }
 
 export type LifeHabitsViewProps = {
-    data: LifeHabitsInfo
+    data: LifeHabitsInfo,
+    physicalActivities: PhysicalActivity[],
+    contraceptiveMethods: ContraceptiveMethod[],
 }

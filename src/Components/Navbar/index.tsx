@@ -3,14 +3,17 @@ import CaitMazziniLogo from "../../assets/images/cait-mazzini-logo.png";
 import '@popperjs/core';
 import 'bootstrap/js/src/collapse';
 import { Link } from "react-router-dom";
+import { useUserContext } from "Contexts/useUserContext";
+import { EUserRole } from "Api/Types/enums/EUserRole";
 
 const Navbar = () => {
+  const user = useUserContext();
   return (
     <nav className="navbar navbar-expand-md bg-primary main-nav">
       <div className="container">
         <Link to="/home">
           <div className="d-flex align-items-center">
-            <img src={CaitMazziniLogo} alt="logo do CAIT Mazzini Bueno" />
+            <img style={{borderRadius: '2.5px'}} src={CaitMazziniLogo} alt="logo do CAIT Mazzini Bueno" />
             <h4>CAIT Mazzini Bueno e CASIC</h4>
           </div>
         </Link>
@@ -36,6 +39,15 @@ const Navbar = () => {
                     Inicio
                 </Link>
             </li>
+            {
+              user.role === EUserRole.Admin
+              &&
+              <li className="nav-item">
+                <Link to="/adminPainel">
+                  Administrador
+                </Link>
+              </li>
+            }
           </ul>
         </div>
       </div>

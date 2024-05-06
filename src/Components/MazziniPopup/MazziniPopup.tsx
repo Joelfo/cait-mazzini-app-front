@@ -6,11 +6,10 @@ import { JsxElement } from "typescript"
 export const MazziniPopup = ({ show, title, children, onClose, width = '60%' } : MazziniPopupProps) => {
     return (
         <Modal  
-        show={show} 
-        dialogClassName="border-dark shadow"
+        show={show}
         style={{
-            width: width,
             maxWidth: 'none !important',
+            boxShadow: '10px black'
         }}
         >
             <Modal.Header className='bg-primary border-dark justify-content-between d-flex'>

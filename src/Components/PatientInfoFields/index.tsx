@@ -1,5 +1,5 @@
 import { Col, Form, Row } from "react-bootstrap"
-import { Patient } from "types/Api/Patient"
+import { Patient } from "Api/Types/Patient"
 
 export const PatientInfoFields = ({ patient } : PatientInfoFieldProps) => {
     return (

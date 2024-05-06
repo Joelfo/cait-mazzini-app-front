@@ -2,9 +2,9 @@ import './styles.css';
 
 import { PatientSearchBar } from "Components/SearchBar";
 import PersonIconButton from 'Components/IconButton/PersonIconButton';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { LaravelPage } from 'types/vendor/LaravelPage/LaravelPage';
-import { Patient } from 'types/Api/Patient';
+import { Patient } from 'Api/Types/Patient';
 import { AxiosParams } from 'types/vendor/AxiosParams';
 import { API_URL } from 'util/requests';
 import axios from 'axios';
@@ -12,12 +12,18 @@ import AddButton from 'Components/IconButton/AddButton';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { usePatientsStore } from 'Stores/UsePatientsStore';
 import { PatientAPI } from 'Api/PatientAPI';
-import { Alert, Container, Spinner } from 'react-bootstrap';
+import { Alert, Container, Modal, Spinner } from 'react-bootstrap';
 import { TimedAlert } from 'Components/Utils/Alert/TimedAlert';
 import { usePatientApi } from 'Api/usePatientApi';
 import { useSelectedPatient } from 'Hooks/useSelectedPatient';
+import { UserView } from 'Components/User/UserView';
+import { UserContext } from 'Contexts/UserContext';
+import { useUserApi } from 'Api/useUserApi';
+import { MazziniPopup } from 'Components/MazziniPopup/MazziniPopup';
 
 const ReceptionistHome = () => {
+    const user = useContext(UserContext);
+
     const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
 
     const patientAPI = usePatientApi();
@@ -30,14 +36,14 @@ const ReceptionistHome = () => {
     const [ isSavedDataAlertVisible, setIsSavedDataAlertVisible ] = useState<boolean>(false);
     const searchParams = useSearchParams()[0];
 
+    const [ showUserDetails, setShowUserDetails ] = useState(false);
+
     useEffect(() => {
         const savedData = searchParams.get('savedData');
         if (savedData) {
             setIsSavedDataAlertVisible(Boolean(savedData));
         }
     }, []);
-
-
 
     return(
         <>
@@ -47,7 +53,7 @@ const ReceptionistHome = () => {
                     <AddButton/>
                 </Link>
                 <PatientSearchBar/>
-                <PersonIconButton text="Usuário"/>
+                <PersonIconButton text="Usuário" onClick={() => setShowUserDetails(true)}/>
                 </div>
                 <div className="bottom-container row">
                 
@@ -84,6 +90,13 @@ const ReceptionistHome = () => {
                     </Alert.Heading>
                 </Alert>
             </Container>
+            <MazziniPopup title='Detalhes do usuário' show={showUserDetails} onClose={() => setShowUserDetails(false)}>
+                {
+                    !!user
+                    &&
+                    <UserView data={user} onClickEditButton={() => {}}/>
+                }
+            </MazziniPopup>
         </>
         
     )

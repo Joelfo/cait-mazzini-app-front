@@ -14,7 +14,8 @@ export const  useSubResourceAPI = <TSubResource, >(resourceName: string, subReso
             );
             return response.data;
         }
-    });
+    }
+    );
 
     const useShow = (resourceId: number) => useQuery(
         [resourceName, subResourceName, 'show'],
@@ -29,6 +30,7 @@ export const  useSubResourceAPI = <TSubResource, >(resourceName: string, subReso
     return {
         ...resourceApi,
         useShow,
-        useCreate
+        useCreate,
+        useAll: resourceApi.useShow
     }
 }

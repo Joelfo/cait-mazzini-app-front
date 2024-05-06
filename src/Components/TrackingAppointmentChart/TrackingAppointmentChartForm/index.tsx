@@ -5,19 +5,22 @@ import { Fragment, useEffect, useState } from 'react';
 import { Alert, Button, Col, Container, Form, Row, Spinner } from 'react-bootstrap';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import ReactQuill from 'react-quill';
-import { Patient } from 'types/Api/Patient';
-import { TrackingAppointmentChart } from 'types/Api/TrackingAppointmentChart';
+import { Patient } from 'Api/Types/Patient';
+import { TrackingAppointmentChart } from 'Api/Types/TrackingAppointmentChart';
 import { justRequiredRule, requiredTextMessage } from 'util/validation';
 import './index.css';
 import { registerForBootstrap } from 'util/HookFormBootstrapUtils';
 import { HookControlledFormControl } from 'util/components/HookControlledFormControl';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ETrackingAppointmentChartType } from 'types/enums/ETrackingAppointmentChartType';
+import { ETrackingAppointmentChartType } from 'Api/Types/enums/ETrackingAppointmentChartType';
 import { getActualDate } from 'util/DateUtils';
-import { TrackingAppointmentChartAPI, useTrackingAppointmentChartApi } from 'Api/useTrackingAppointmentChartApi';
+import { useTrackingAppointmentChartApi } from 'Api/useTrackingAppointmentChartApi';
 import { ConnectionErrorAlert } from 'Components/Utils/Alert/ConnectionErrorAlert';
+import { useUserContext } from 'Contexts/useUserContext';
 
 export const TrackingAppointmentChartForm = () => {
+    const user = useUserContext();
+
     const {
         register,
         setValue : setFormValue,
@@ -26,9 +29,11 @@ export const TrackingAppointmentChartForm = () => {
         formState : { errors },
         setValue,
         control
-    } = useForm<TrackingAppointmentChart>();
-
-    const [isFormValidated, setIsFormValidated] = useState<boolean>(false);
+    } = useForm<TrackingAppointmentChart>({
+        defaultValues: {
+            creatorId: user.id
+        }
+    });
 
     const { patient, isError: isPatientError } = useSelectedPatient();
 
@@ -160,12 +165,14 @@ export const TrackingAppointmentChartForm = () => {
                         </Form.Group>
                     </Row>
                     <Row className='mt-5'>
-                        <Col md={12} style={{display:'flex', justifyContent:'center'}}>
+                        <Form.Control as={Col} md='12' style={{display:'flex', justifyContent:'center'}}>
                             <Form.Check
                                 type='checkbox'
                                 label='Assumo responsabilidade pelo envio dos dados'
+                                isInvalid={!!errors.creatorId}
                             />
-                        </Col>
+                            <Form.Control.Feedback type='invalid'>{errors.creatorId?.message}</Form.Control.Feedback>
+                        </Form.Control>
                     </Row>
                     <Row className='mt-4'>
                         <Col md={12} style={{display:'flex', justifyContent:'center'}}>

@@ -1,7 +1,7 @@
 import { PatientAPI } from "Api/PatientAPI";
-import { TrackingAppointmentChartAPI, useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartApi"
+import { useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartApi"
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Col, Container, Modal, Row, Stack } from "react-bootstrap"
 import './styles.css';
 import ReactQuill from "react-quill";
@@ -29,6 +29,11 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
     const [ showArrowLeft, setShowArrowLeft ] = useState<boolean>(true);
     const [ showArrowRight, setShowArrowRight ] = useState<boolean>(true);
 
+    const formattedDate = useMemo(() => {
+        if (!!trackingAppointmentChart)
+            return new Date(trackingAppointmentChart.date).toLocaleDateString()
+    }, [trackingAppointmentChart])
+
     useEffect(() => {
         if (!!trackingAppointmentChart && selectedPatient?.id !== trackingAppointmentChart.patientId) {
             setPatientIdToSearch(trackingAppointmentChart.patientId);
@@ -43,7 +48,7 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
 
     return (
         <>
-            <Modal show={show} onHide={onClose} dialogClassName='modal-50w'>
+            <Modal animation={false} show={show} onHide={onClose} dialogClassName='modal-50w'>
                 <Modal.Header className='bg-primary' closeButton closeVariant="light">
                     <h5>
                         Ficha de Acompanhamento
@@ -77,6 +82,21 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
                                     </p>
                                 </Stack>
                             </Col>
+                        </Row>
+                        <Row>
+                            <Col md='12'>
+                                <hr></hr>
+                            </Col>
+                        </Row>
+                        <Row className='tracking-chart-row'>
+                            <Stack>
+                                <h3 className='tracking-chart-title'>
+                                    Data
+                                </h3>
+                                <b>
+                                    {formattedDate}
+                                </b>
+                            </Stack>
                         </Row>
                         <Row>
                             <Col md='12'>

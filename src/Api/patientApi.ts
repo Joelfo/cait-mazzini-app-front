@@ -1,12 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios"
-import { Patient } from "types/Api/Patient";
+import { Patient } from "Api/Types/Patient";
 import { API_URL } from "util/requests"
 import { ResourceAPI } from "./Base/ResourceAPI";
-import { ClinicalHistory } from "types/Api/ClinicalHistory";
-import { LifeHabitsInfoDTO } from "types/Api/LifeHabitsInfoDTO";
-import { PatientBasicInfo } from "types/Api/BasicInfo/PatientBasicInfo";
-import { PatientRelationshipsInfo } from "types/Api/BasicInfo/PatientRelationshipsInfo";
+import { ClinicalHistory } from "Api/Types/ClinicalHistory";
+import { LifeHabitsInfoDTO } from "Api/Types/LifeHabitsInfoDTO";
+import { PatientBasicInfo } from "Api/Types/BasicInfo/PatientBasicInfo";
+import { PatientRelationshipsInfo } from "Api/Types/BasicInfo/PatientRelationshipsInfo";
 
 export class PatientAPI extends ResourceAPI<Patient> {
     public constructor(){

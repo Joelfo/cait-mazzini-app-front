@@ -1,7 +1,7 @@
-import { CulturesExam } from "types/Api/Exams/CulturesExam";
+import { CulturesExam } from "Api/Types/Exams/CulturesExam";
 import { ExamFormProps } from "./ExamFormProps";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Col, Form, Row } from "react-bootstrap";
+import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import { justRequiredRule } from "util/validation";
 
 export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesExam>) => {
@@ -20,15 +20,18 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
 
     return (
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+            <Stack gap={3}>
             <Row>
-                <Form.Group as={Col} md='3'>
+                <Form.Group as={Col} md='6'>
                     <Form.Label>
                         Data
                     </Form.Label>
                     <Form.Control type='date' {...register('date', justRequiredRule('Data'))} isInvalid={!!errors.date} />
                     <Form.Control.Feedback type='invalid'>{errors.date?.message}</Form.Control.Feedback>
                 </Form.Group>
-                <Form.Group as={Col} md='2' className='d-flex align-items-center'>
+            </Row>
+            <Row>
+                <Form.Group as={Col} className='d-flex align-items-center'>
                     <Controller 
                         control={control}
                         name="isPositiveResult"
@@ -46,7 +49,9 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
                         )}
                     />
                 </Form.Group>
-                <Form.Group as={Col} md='2'>
+                </Row>
+                <Row>
+                <Form.Group as={Col} md='6'>
                     <Form.Label>
                         Sítio
                     </Form.Label>
@@ -54,7 +59,7 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
                     <Form.Control.Feedback type='invalid'>{errors.site?.message}</Form.Control.Feedback>
                 </Form.Group>
             </Row>
-            <Row className='form-mazzini-row'>
+            <Row>
                 <Form.Group as={Col} md='6'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
@@ -67,6 +72,7 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
                     </Button>
                 </Col>
             </Row>
+            </Stack>
         </Form>
     )
 }

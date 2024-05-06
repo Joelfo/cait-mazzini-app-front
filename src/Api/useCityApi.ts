@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ResourceAPI } from "./Base/ResourceAPI";
-import { City } from "types/Api/City";
+import { City } from "Api/Types/City";
 import { useResourceAPI } from "./Base/useResourceAPI";
 
 export class CityAPI extends ResourceAPI<City> {

@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
 import axios from "axios"
-import { VitalSignsMeasurement } from 'types/Api/VitalSignsMeasurement'
+import { VitalSignsMeasurement } from 'Api/Types/VitalSignsMeasurement'
 import { API_URL } from "util/requests"
 import { getApiAuthHeaders } from "./Util/ApiAuthHeaders"
 import { LaravelPage } from "types/vendor/LaravelPage/LaravelPage"
@@ -25,6 +25,4 @@ export const useVitalSignsMeasurementApi = () => {
     );
 
     return { ...resourceAPI, useAllByPatient }
-
-
 }

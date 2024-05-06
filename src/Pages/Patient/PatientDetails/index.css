@@ -8,4 +8,6 @@
 
 .chart-container {
     margin-right: 80px;
+    display: flex;
+    align-items: start; 
 }

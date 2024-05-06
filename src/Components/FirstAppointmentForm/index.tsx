@@ -2,7 +2,7 @@ import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { useEffect } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap"
 import { useForm } from "react-hook-form";
-import { FirstAppointment } from "types/Api/FirstAppointment";
+import { FirstAppointment } from "Api/Types/FirstAppointment";
 import { QUILL_DEFAULT_MODULES } from "util/QuillDefaultModules";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledReactQuill } from "util/components/HookControlledReactQuill";

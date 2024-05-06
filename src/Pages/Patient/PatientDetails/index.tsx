@@ -1,22 +1,22 @@
 import { ChartIconButton } from "Components/IconButton/ChartIconButton";
 import PersonIconButton from "Components/IconButton/PersonIconButton";
 import "./index.css";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { API_URL } from "util/requests";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { LaravelPage } from "types/vendor/LaravelPage/LaravelPage";
-import { TrackingAppointmentChart } from "types/Api/TrackingAppointmentChart";
-import { ETrackingAppointmentChartType } from "types/enums/ETrackingAppointmentChartType";
+import { TrackingAppointmentChart } from "Api/Types/TrackingAppointmentChart";
+import { ETrackingAppointmentChartType } from "Api/Types/enums/ETrackingAppointmentChartType";
 import AddButton from "Components/IconButton/AddButton";
-import { Patient } from "types/Api/Patient";
+import { Patient } from "Api/Types/Patient";
 import { usePatientsStore } from "Stores/UsePatientsStore";
 import { StatsIconButton } from "Components/IconButton/StatsIconButton";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { VitalSignsMeasurementsList } from "Components/VitalSignsMeasurementList";
 import FirstChartIconButton from "Components/IconButton/FirstChartIconButton";
 import DatabaseIconButton from "Components/IconButton/DatabaseIconButton";
-import { TrackingAppointmentChartAPI, useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartApi";
+import { useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartApi";
 import date from 'date-and-time'
 import { TrackingAppointmentChartCarrousel } from "Components/TrackingAppointmentChart/TrackingAppointmentChartCarousel";
 import { Spinner, Stack } from "react-bootstrap";
@@ -34,13 +34,20 @@ import { SaveSuccessAlert } from "Components/Utils/Alert/SaveSuccessAlert";
 import { SuccessDismissibleAlert } from "Components/Utils/Alert/SuccessDismissibleAlert";
 import { PatientAPI } from "Api/PatientAPI";
 import { usePatientApi } from "Api/usePatientApi";
+import { PhysicalExamsList } from "Components/PhysicalExamsList";
+import { UserContext } from "Contexts/UserContext";
+import { useUserContext } from "Contexts/useUserContext";
+import { EUserRole } from "Api/Types/enums/EUserRole";
 
 
 export const PatientDetails = () => {
     // useState
     const [ vitalSignsMeasurementPopupOpen, setVitalSignsMeasurementPopupOpen ] = useState<boolean>(false);
-    const [ selectedTrackingAppointmentChartId, setSelectedTrackingAppointmentChartId ] = useState<number>();
+    const [ selectedNurseryTrackingChartId, setSelectedNurseryTrackingChartId ] = useState<number>();
+    const [ selectedMedicalTrackingChartId, setSelectedMedicalTrackingChartId ] = useState<number>();
+    const [ selectedPharmaceuticalTrackingChartId, setSelectedPharmaceuticalTrackingChartId ] = useState<number>();
     const [ showScannedChartPopup, setShowScannedChartPopup ] = useState<boolean>(false);
+    const [ showPhysicalExamsPopup, setShowPhysicalExamsPopup ] = useState<boolean>(false);
 
     // useRef
     const scannedChartInputRef = useRef<HTMLInputElement | null>(null);
@@ -51,6 +58,7 @@ export const PatientDetails = () => {
     const patientAPI = usePatientApi();
 
     // custom Hooks
+    const user = useUserContext();
     const { useCheck: useCheckScannedChart, useShow: useShowScannedChart, useCreate: useCreateScannedChart } = useScannedChartAPI();
 
     const navigate = useNavigate();
@@ -59,7 +67,7 @@ export const PatientDetails = () => {
     const { patient, isLoading: isPatientLoading } = useSelectedPatient();
     const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
     const { data: firstNurseryAppointment, isLoading: isFirstNurseryAppointmentLoading } = firstNurseryAppointmentAPI.useGetByPatient(patient?.id);
-    const { data: trackingAppointmentCharts } = trackingAppointmentChartApi.useAll();
+    const { data: trackingAppointmentCharts } = trackingAppointmentChartApi.useAllBasicInfoByPatient(patient?.id);
     const { data: hasScannedChart, refetch: refetchScannedChartChecking } = useCheckScannedChart(patient?.id);
     const { mutate: getScannedChartFile } = useShowScannedChart();
     const { mutate: saveScannedChart, isLoading: isScannedChartSaveLoading, isSuccess: isScannedChartSaveSuccess } = useCreateScannedChart(); 
@@ -68,7 +76,8 @@ export const PatientDetails = () => {
     // useMemo
     const nurseryTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.FromNursery) ?? [], [trackingAppointmentCharts]);
     const medicalTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.Medical) ?? [], [trackingAppointmentCharts]);
-    const farmaceuticalTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.Farmaceuthical) ?? [], [trackingAppointmentCharts]);
+    const pharmaceuticalTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.Farmaceuthical) ?? [], [trackingAppointmentCharts]);
+    const showSavingSuccessedAlert = useMemo(() => (searchParams.get('savedData') ?? false) as boolean, [searchParams]);
 
     // callbacks
     const handleAddScannedChartButton = () => scannedChartInputRef.current?.click(); 
@@ -95,11 +104,15 @@ export const PatientDetails = () => {
             }
         });
     }
-    const handleLifeHabitsButton = useCallback(() => navigate('/lifeHabits/view?patientId=' + patient?.id), [patient, navigate])
+    const handleLifeHabitsButton = useCallback(() => navigate('/lifeHabitsView?patientId=' + patient?.id), [patient, navigate])
     const handleClinicalHistoryButton = useCallback(() => navigate('/clinicalHistory/view?patientId=' + patient?.id), [patient, navigate]);
-    const handleExamsButton = useCallback(() => navigate('/exams?patientId' + patient?.id), [navigate, patient]);
-    const handleNewTrackingChart = useCallback((chartType: ETrackingAppointmentChartType) => navigate(`/trackingAppointmentChart?patientId=${patient?.id}&type=${chartType}`), [patient, navigate]) 
-    const handleNewNurseryChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.FromNursery), [handleNewTrackingChart]);
+    const handleExamsButton = useCallback(() => navigate('/exams?patientId=' + patient?.id), [navigate, patient]);
+    const handleNewTrackingChart = useCallback((chartType: ETrackingAppointmentChartType) => {
+        navigate(`/trackingAppointmentChart?patientId=${patient?.id}&type=${chartType}`)
+    }, [patient, navigate]) 
+    const handleNewNurseryChart = useCallback(() => {
+        handleNewTrackingChart(ETrackingAppointmentChartType.FromNursery)
+    }, [handleNewTrackingChart]);
     const handleNewMedicalChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.Medical), [handleNewTrackingChart]);
     const handleNewFarmaceuthicalChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.Farmaceuthical), [handleNewTrackingChart]);
 
@@ -116,7 +129,7 @@ export const PatientDetails = () => {
                 &&
                 <>
                     <div className="container">
-                        <div className="row   mb-4 mt-5">
+                        <div className="row   mb-4 mt-5 align-items-start">
                             <div className="col-1 chart-container">
                                 <PersonIconButton text={patient.name}/>
                             </div>
@@ -133,7 +146,9 @@ export const PatientDetails = () => {
                                     patientRelationshipsInfo?.hasLifeHabitsInfo ?
                                         <LifeHabitsIconButton onClick={handleLifeHabitsButton}/>
                                         :
-                                        <IconButton2 iconClass="bi-clipboard-plus" text="Criar hábitos de vida"/>
+                                        <Link to={'/lifeHabits?patientId=' + patient.id}>
+                                            <IconButton2 iconClass="bi-clipboard-plus" text="Criar hábitos de vida"/>
+                                        </Link>
                                 }
                                 
                             </div>
@@ -142,28 +157,33 @@ export const PatientDetails = () => {
                                     patientRelationshipsInfo?.hasClinicalHistory ?
                                         <ClinicalHistoryIconButton onClick={handleClinicalHistoryButton}/>
                                         :
-                                        <IconButton2 iconClass="bi-clipboard-plus" text="Criar histórico clínico"/>
+                                        <IconButton2 iconClass="bi-clipboard-plus" text="Criar histórico clínico" onClick={() => navigate('/clinicalHistoryForm?patientId=' + patient.id)}/>
                                 }
                             </div>
                             <div className="col-1 chart-container">
                                 <IconButton2 text='Exames' iconClass='bi-graph-up' onClick={handleExamsButton}/>
                             </div>
+                        </div>
+                        <div className="row mb-4 align-items-start">
                             <div className="col-1 chart-container">
                                 {
                                     hasScannedChart && !!patient ? 
-                                        <IconButton2 text='Ficha escaneada' iconClass='bi-clipboard-check' onClick={handleOpenScannedChartClick}/>
+                                        <IconButton2 text='Abrir ficha escaneada' iconClass='bi-paperclip' onClick={handleOpenScannedChartClick}/>
                                         :
                                         <>
                                             <input style={{visibility: 'hidden'}} ref={scannedChartInputRef} type='file' onChange={handleSelectedScannedChartFileChange}/>
-                                            <IconButton2 text='Adicionar ficha escaneada' iconClass="bi-clipboard-plus" onClick={handleAddScannedChartButton}/>
+                                            <IconButton2 text='Adicionar ficha escaneada' iconClass="bi-paperclip" onClick={handleAddScannedChartButton}/>
                                         </>
                                 }
                             </div>
+                            <div className="col-2 chart-container">
+                                <IconButton2 text='Exames físicos' iconClass='bi-clipboard-check' onClick={() => setShowPhysicalExamsPopup(true)}/>
+                            </div>
                         </div>
                         <Stack gap={2}>
-                            <ChartsBar isLoading={isFirstNurseryAppointmentLoading} title='Enfermagem' charts={nurseryTrackingCharts} onClickNew={handleNewNurseryChart} /> 
-                            <ChartsBar title='Médico' charts={medicalTrackingCharts} onClickNew={handleNewMedicalChart}/>
-                            <ChartsBar title='Farmacêutico' charts={farmaceuticalTrackingCharts} onClickNew={handleNewFarmaceuthicalChart}/>
+                            <ChartsBar isLoading={isFirstNurseryAppointmentLoading} title='Enfermagem' canAddNew={user.role === EUserRole.Nurse} charts={nurseryTrackingCharts} onClickNew={handleNewNurseryChart} onClickOnChart={chart => setSelectedNurseryTrackingChartId(chart.id)} /> 
+                            <ChartsBar title='Médico' charts={medicalTrackingCharts} canAddNew={user.role === EUserRole.Physician} onClickNew={handleNewMedicalChart} onClickOnChart={chart => setSelectedMedicalTrackingChartId(chart.id)}/>
+                            <ChartsBar title='Farmacêutico' charts={pharmaceuticalTrackingCharts} canAddNew={user.role === EUserRole.Pharmaceutical} onClickNew={handleNewFarmaceuthicalChart} onClickOnChart={chart => setSelectedPharmaceuticalTrackingChartId(chart.id)}/>
                         </Stack>
                     </div>
                     <MazziniPopup show={showScannedChartPopup} onClose={() => setShowScannedChartPopup(false)}>
@@ -175,10 +195,17 @@ export const PatientDetails = () => {
             
             <VitalSignsMeasurementsList show={vitalSignsMeasurementPopupOpen} onClose={() => setVitalSignsMeasurementPopupOpen(false)}/>
             
-            <TrackingAppointmentChartCarrousel chartIds={/*nurseryTrackingAppointmentCharts?.map(x => x.id) ?? []*/ []} defaultSelectedId={selectedTrackingAppointmentChartId} onClose={() => setSelectedTrackingAppointmentChartId(undefined)} />
+            <TrackingAppointmentChartCarrousel chartIds={nurseryTrackingCharts.map(x => x.id)} defaultSelectedId={selectedNurseryTrackingChartId} onClose={() => setSelectedNurseryTrackingChartId(undefined)} />
+            <TrackingAppointmentChartCarrousel chartIds={medicalTrackingCharts.map(x => x.id)} defaultSelectedId={selectedMedicalTrackingChartId} onClose={() => setSelectedMedicalTrackingChartId(undefined)} />
+            <TrackingAppointmentChartCarrousel chartIds={pharmaceuticalTrackingCharts.map(x => x.id)} defaultSelectedId={selectedPharmaceuticalTrackingChartId} onClose={() => setSelectedPharmaceuticalTrackingChartId(undefined)} />
+
+            <MazziniPopup title="Exames físicos" show={showPhysicalExamsPopup} onClose={() => setShowPhysicalExamsPopup(false)}>
+                <PhysicalExamsList/>
+            </MazziniPopup>
 
             <SaveLoadingAlert show={isScannedChartSaveLoading}/>
             <SuccessDismissibleAlert showTrigger={isScannedChartSaveSuccess} text="Ficha escaneada salva com sucesso."/>
+            <SuccessDismissibleAlert showTrigger={showSavingSuccessedAlert} text="Dados salvos com sucesso."/>
         </>
     );
 }

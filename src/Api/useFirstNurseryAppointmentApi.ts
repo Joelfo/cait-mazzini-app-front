@@ -1,4 +1,4 @@
-import { FirstNurseryAppointment } from "types/Api/FirstNurseryAppointment";
+import { FirstNurseryAppointment } from "Api/Types/FirstNurseryAppointment";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { useQuery } from "@tanstack/react-query";
 import { API_URL } from "util/requests";

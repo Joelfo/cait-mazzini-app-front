@@ -1,0 +1,33 @@
+import { ESexualActivityLevel } from "Api/Types/enums/ESexualActivityLevel"
+
+export type LifeHabitsInfo = {
+    id: number,
+    mealsPerDay: number,
+    waterCupsPerDay: number,
+    eatingAndWaterObs?: string,
+    bladderEliminationsCharacteristic: string,
+    bladderEliminationTimesPerDay: number,
+    hasPainOnBladderEliminations: boolean,
+    intestinalEliminationsCharacteristic: string,
+    intestinalEliminationTimesPerDay: number,
+    hasPainOnIntestinalEliminations: boolean,
+    isAlcoholUser: boolean,
+    alcoholQuantityObs?: string,
+    isSmoker: boolean,
+    cigarretesPerDay?: number,
+    isFormerSmoker: boolean,
+    timeWithoutSmoking?: string,
+    isIllicitDrugsUser: boolean,
+    illicitDrugsUsingObs?: string,
+    hasSatisfactorySleepingTime: boolean,
+    sleepingHoursPerNight: number,
+    sleepingTimeObs?: string,
+    physicalActivitiesObservation?: string,
+    physicalActivityTimesPerWeek: number,
+    leisureObservation?: string,
+    sexualActivityLevel: ESexualActivityLevel,
+    sexualPartnersQuantity: number,
+    hasPrEP: boolean,
+    hasPEP: boolean,
+    isPreservativeUser: boolean
+}

@@ -1,4 +1,4 @@
-import { ToraxXRayExam } from "types/Api/Exams/ToraxXRayExam";
+import { ToraxXRayExam } from "Api/Types/Exams/ToraxXRayExam";
 import { ResourceAPI } from "./Base/ResourceAPI";
 import { ComplementaryExamAPI } from "./Base/ComplementaryExamAPI";
 import { useResourceAPI } from "./Base/useResourceAPI";

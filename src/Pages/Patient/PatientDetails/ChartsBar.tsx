@@ -1,18 +1,22 @@
 import AddButton from "Components/IconButton/AddButton";
 import { ChartIconButton } from "Components/IconButton/ChartIconButton";
+import { IconButton2 } from "Components/IconButton/IconButton2";
 import { Spinner, Stack } from "react-bootstrap";
-import { FirstAppointment } from "types/Api/FirstAppointment";
-import { TrackingAppointmentChart } from "types/Api/TrackingAppointmentChart";
+import { TrackingAppointmentChartBasicInfo } from "Api/Types/BasicInfo/TrackingAppointmentChartBasicInfo";
+import { FirstAppointment } from "Api/Types/FirstAppointment";
+import { TrackingAppointmentChart } from "Api/Types/TrackingAppointmentChart";
 
 export type ChartsBarProps = {
-    charts: TrackingAppointmentChart[],
+    charts: TrackingAppointmentChartBasicInfo[],
     title: string,
     onClickNew: () => void,
     isLoading?: boolean,
-    firstChart?: FirstAppointment
+    firstChart?: FirstAppointment,
+    onClickOnChart: (chart: TrackingAppointmentChartBasicInfo) => void,
+    canAddNew: boolean
 };
 
-export const ChartsBar = ({ charts, title, onClickNew, isLoading = false } : ChartsBarProps) => {
+export const ChartsBar = ({ charts, title, onClickNew, isLoading = false, onClickOnChart, canAddNew } : ChartsBarProps) => {
 
     return (
         <Stack gap={1}>
@@ -28,7 +32,7 @@ export const ChartsBar = ({ charts, title, onClickNew, isLoading = false } : Cha
                         charts.map(chart => (
                             <div style={{width: 'fit-content', padding: '0px 40px'}}>
                                 <ChartIconButton
-                                    onClick={onClickNew}
+                                    onClick={() => onClickOnChart(chart)}
                                     date={chart.date}
                                     text='Acompanhamento'
                                     key={chart.id}
@@ -36,11 +40,13 @@ export const ChartsBar = ({ charts, title, onClickNew, isLoading = false } : Cha
                             </div>
                         ))
                 }
-                <div style={{padding: '0px 40px'}}>
-                    <AddButton
-                        label='Novo'
-                    />
-                </div>
+                {
+                    canAddNew
+                    &&
+                    <div style={{padding: '0px 40px'}}>
+                        <IconButton2 text="Novo" iconClass="bi-clipboard-plus" onClick={onClickNew}/>
+                    </div>
+                }
                 
                 
             </Stack>

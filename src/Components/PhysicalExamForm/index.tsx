@@ -1,20 +1,21 @@
 import { PhysicalActivityAPI } from "Api/usePhysicalActivityApi";
-import { PhysicalExamAPI } from "Api/usePhysicalExamApi";
 import { SaveErrorAlert } from "Components/Utils/Alert/SaveErrorAlert";
 import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { useEffect } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, Form, FormLabel, Row } from "react-bootstrap";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { PhysicalExam } from "types/Api/PhysicalExam";
+import { PhysicalExam } from "Api/Types/PhysicalExam";
+import { ETrackingAppointmentChartType } from "Api/Types/enums/ETrackingAppointmentChartType";
+import { getActualDate } from "util/DateUtils";
 import { QUILL_DEFAULT_MODULES } from "util/QuillDefaultModules";
 import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { HookControlledReactQuill } from "util/components/HookControlledReactQuill";
 import { justRequiredRule } from "util/validation";
 
-export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData } : PhysicalExamFormProps) => {
+export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData, physicalExamType } : PhysicalExamFormProps) => {
 
     const { patient } = useSelectedPatient();
 
@@ -26,12 +27,11 @@ export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButt
         getValues,
         register
     } = useForm<PhysicalExam>({
-        defaultValues: defaultData ?? {}
+        defaultValues: defaultData ?? {
+            date: getActualDate(),
+            type: physicalExamType
+        }
     });
-
-    const physicalExamAPI = new PhysicalExamAPI();
-    const { mutate: savePhysicalExam, isLoading: isPhysicalExamSavingLoading, isError: isPhysicalExamSavingError, isSuccess: isPhysicalExamSaved } = physicalExamAPI.useCreate();
-
     //const onSubmit = (data: PhysicalExam) => savePhysicalExam({...data});
 
     const navigate = useNavigate();
@@ -42,16 +42,18 @@ export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButt
         }
     }, [patient])
 
-    useEffect(() => {
-        if (isPhysicalExamSaved) {
-            navigate('/home?savedData=true');
-        }
-    }, [isPhysicalExamSaved])
-
     return (
         <>
             <Container fluid>
                 <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+                    <Row className='form-mazzini-row'>
+                        <Form.Group as={Col} md='2'>
+                            <Form.Label>
+                                Data
+                            </Form.Label>
+                            <Form.Control {...register('date', justRequiredRule('Data'))} type='date'/>
+                        </Form.Group>
+                    </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
                             <Form.Label>Aspecto geral e emocional*</Form.Label>
@@ -117,8 +119,6 @@ export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButt
                     </Row>
                 </Form>
             </Container>
-            <SaveLoadingAlert show={isPhysicalExamSavingLoading}/>
-            <SaveErrorAlert show={isPhysicalExamSavingError}/>
         </>
     );
 };
@@ -127,5 +127,6 @@ export type PhysicalExamFormProps = {
     onSubmit: (data: PhysicalExam) => void,
     onReturn?: () => void,
     showReturnButton?: boolean,
-    defaultData?: PhysicalExam
+    defaultData?: PhysicalExam,
+    physicalExamType: ETrackingAppointmentChartType
 }
