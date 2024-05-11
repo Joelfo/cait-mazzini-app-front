@@ -17,6 +17,7 @@ import { getActualDate } from 'util/DateUtils';
 import { useTrackingAppointmentChartApi } from 'Api/useTrackingAppointmentChartApi';
 import { ConnectionErrorAlert } from 'Components/Utils/Alert/ConnectionErrorAlert';
 import { useUserContext } from 'Contexts/useUserContext';
+import { VitalSignsMeasurementsList } from 'Components/VitalSignsMeasurementList';
 
 export const TrackingAppointmentChartForm = () => {
     const user = useUserContext();
@@ -42,6 +43,8 @@ export const TrackingAppointmentChartForm = () => {
     const navigate = useNavigate();
 
     const onSubmit: SubmitHandler<TrackingAppointmentChart> = (data) => mutate(data);
+
+    const [showVitalSignsMeasurementList, setShowVitalSignsMeasurementList] = useState(false);
 
 
     const quillModules = {
@@ -123,6 +126,14 @@ export const TrackingAppointmentChartForm = () => {
                             <HookControlledFormControl control={control} name='schema' rules={justRequiredRule('Esquema')} formControlType='text' />
                             <Form.Control.Feedback type='invalid'>{errors.schema?.message}</Form.Control.Feedback>
                         </Form.Group>
+                    </Row>
+                    <Row className='mt-5 d-flex justify-content-center'>
+                        <Col md='2'>
+                            <Button size='lg' onClick={() => setShowVitalSignsMeasurementList(true)}>
+                                <i className='bi bi-bar-chart-fill' style={{fontSize: '20px', marginRight: '5px'}}></i>
+                                Sinais vitais
+                            </Button>
+                        </Col>
                     </Row>
                     <Row className='mt-5'>
                         <Form.Group>
@@ -209,7 +220,7 @@ export const TrackingAppointmentChartForm = () => {
                 <p>Por favor, verifique sua conexão à internet e tente novamente em alguns instantes. Se o erro persistir, por favor contacte-nos para resolver o problema.</p>
             </Alert>
             <ConnectionErrorAlert show={isPatientError} />
-            
+            <VitalSignsMeasurementsList show={showVitalSignsMeasurementList} onClose={() => setShowVitalSignsMeasurementList(false)}/>
         </>
     );
 }

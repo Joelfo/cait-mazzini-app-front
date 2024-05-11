@@ -1,12 +1,14 @@
-import { Container, Nav, NavDropdown } from 'react-bootstrap';
+import { Container, Nav, NavDropdown, Stack } from 'react-bootstrap';
 import Navbar from 'react-bootstrap/Navbar';
 import CaitMazziniLogo from "../../assets/images/cait-mazzini-logo.png";
 import { useUserContext } from 'Contexts/useUserContext';
 import './styles.css';
 import { Link } from 'react-router-dom';
+import { useLogout } from 'Hooks/useLogout';
 
 export const MazziniNavbar = () => {
     const user = useUserContext();
+    const logout = useLogout();
     return (
         <Navbar variant='dark' className='bg-primary'>
             <Container>
@@ -28,9 +30,14 @@ export const MazziniNavbar = () => {
                 </Nav>
                 <Navbar.Toggle />
                 <Navbar.Collapse className="justify-content-end">
-                <Navbar.Text style={{color: 'white'}}>
-                    Usuário: {user.name}
-                </Navbar.Text>
+                    <Stack direction='horizontal' gap={3}>
+                        <Navbar.Text style={{color: 'white'}}>
+                            Usuário: {user.name}
+                        </Navbar.Text>
+                        <Navbar.Text style={{color: 'white', cursor: 'pointer'}} onClick={logout}>
+                            <b>Sair</b>
+                        </Navbar.Text>
+                    </Stack>
                 </Navbar.Collapse>
             </Container>
         </Navbar>
