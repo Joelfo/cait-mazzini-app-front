@@ -1,4 +1,4 @@
-import { PatientAPI } from "Api/PatientAPI";
+
 import { useLifeHabitsInfoApi } from "Api/useLifeHabitsInfoApi";
 import { usePatientApi } from "Api/usePatientApi";
 import { LifeHabitsForm } from "Components/LifeHabitsForm/LifeHabitsForm";

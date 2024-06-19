@@ -42,7 +42,7 @@ export const FirstNurseryAppointmentChartPopup = ({ show, chart, onClose } : Fir
             <Modal animation={false} show={show} onHide={onClose} dialogClassName='modal-50w'>
                 <Modal.Header className='bg-primary' closeButton closeVariant="light">
                     <h5>
-                        Primeira Ficha - Enfermagem
+                        Primeira Ficha - Enfermeiro(a)
                     </h5>
                 </Modal.Header>
                 <Modal.Body>
