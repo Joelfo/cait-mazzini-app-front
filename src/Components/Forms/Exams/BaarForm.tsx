@@ -27,7 +27,7 @@ export const BaarForm = ({ patient, onSubmit, data } : ExamFormProps<BaarExam>) 
         }
     });
 
-    const isIsputumMaterial = watch('isSputumMaterial');
+    const isMaterialSputum = watch('isMaterialSputum');
 
     return (
         <Form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -59,7 +59,7 @@ export const BaarForm = ({ patient, onSubmit, data } : ExamFormProps<BaarExam>) 
                     <Row>
                         <Form.Group as={Col} md='4' >
                             <Controller
-                                name="isSputumMaterial"
+                                name="isMaterialSputum"
                                 control={control}
                                 render={({
                                     field: {onChange, onBlur, value},
@@ -68,14 +68,18 @@ export const BaarForm = ({ patient, onSubmit, data } : ExamFormProps<BaarExam>) 
                                 )}
                             />
                         </Form.Group>
-                        <Form.Group as={Col} md='5'>
-                            <Form.Label>Outro Material</Form.Label>
-                            <Form.Control {...register('otherMaterial')}/>
-                        </Form.Group>
+                        {
+                            !isMaterialSputum
+                            &&
+                            <Form.Group as={Col} md='5'>
+                                <Form.Label>Outro Material</Form.Label>
+                                <Form.Control {...register('otherMaterial')}/>
+                            </Form.Group>
+                        }
                     </Row>
                 </Row>
                 {
-                    isIsputumMaterial
+                    isMaterialSputum
                     &&
                     <Row>
                     

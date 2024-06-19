@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import { PCRExam } from "Api/Types/PCRExam";
 import { ExamFormProps } from "./ExamFormProps";
 import { justRequiredRule } from "util/validation";
+import { ComplementaryExamDTO } from "Api/Types/DTOs/ComplementaryExamDTO";
 
 export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) => {
   
@@ -12,7 +13,7 @@ export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) =>
         control,
         setValue,
         register
-    } = useForm<PCRExam>({
+    } = useForm<ComplementaryExamDTO<PCRExam>>({
         defaultValues: data ?? {
             patientId: patient.id
         }
@@ -72,6 +73,12 @@ export const PcrForm = ({ patient, onSubmit, data } : ExamFormProps<PCRExam>) =>
                 <Form.Group as={Col} md='5'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
+                </Form.Group>
+            </Row>
+            <Row>
+                <Form.Group as={Col} md='12'>
+                    <Form.Label>Arquivos</Form.Label>
+                    <Form.Control {...register('files')} type='file'  multiple/>
                 </Form.Group>
             </Row>
             <Row className="form-mazzini-row">

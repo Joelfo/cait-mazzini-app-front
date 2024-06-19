@@ -7,7 +7,7 @@ export const useLogout = () => {
 
     const removeCookie = useCookies(['caitMazziniAppApiJwt'])[2];
 
-    const setJwt = useAuthStore(state => state.setJwtToken);
+    const setJwt = useAuthStore(state => state.setJwt);
 
     const navigate = useNavigate();
 

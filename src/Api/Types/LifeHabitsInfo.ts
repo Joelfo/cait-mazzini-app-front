@@ -29,5 +29,6 @@ export type LifeHabitsInfo = {
     sexualPartnersQuantity: number,
     hasPrEP: boolean,
     hasPEP: boolean,
-    isPreservativeUser: boolean
+    isPreservativeUser: boolean,
+    creatorId: number
 }

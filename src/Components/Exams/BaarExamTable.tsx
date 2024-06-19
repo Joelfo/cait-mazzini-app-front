@@ -3,9 +3,42 @@ import { ExamsTable } from "./ExamsTable"
 import { MazziniPopup } from "Components/MazziniPopup/MazziniPopup"
 import { BaarForm } from "Components/Forms/Exams/BaarForm"
 import { ExamTableProps } from "./Types/ExamTableProps"
+import { useCallback } from "react"
+import { EBaarResult } from "Api/Types/enums/EBaarResult"
+import { ESputumAspect } from "Api/Types/enums/ESputumAspect"
 
 
 export const BaarExamTable = ({ patient } : ExamTableProps) => {
+
+    const getResultLabel = useCallback((result: EBaarResult) => {
+        switch (result) {
+            case EBaarResult.Negative:
+                return 'Negativo';
+            case EBaarResult.Positive:
+                return 'Positivo';
+            case EBaarResult.PositivePlus:
+                return 'Positivo (+)';
+            case EBaarResult.PositiveDoublePlus:
+                return 'Positivo (++)';
+            case EBaarResult.PositiveTriplePlus:
+                return 'Positivo (+++)';
+        }
+    }, []);
+
+    const getSputumAspectLabel = useCallback((aspect: ESputumAspect) => {
+        switch (aspect) {
+            case ESputumAspect.Spittle:
+                return 'Saliva';
+            case ESputumAspect.Bloody:
+                return 'Sanguinolento';
+            case ESputumAspect.Purulent:
+                return 'Purulento';
+            case ESputumAspect.Mucopurulent:
+                return 'Mucopurulento';
+            case ESputumAspect.Liquefied:
+                return 'Liquefeito';
+        }
+    }, []); 
 
     return (
         <ExamsTable
@@ -19,7 +52,7 @@ export const BaarExamTable = ({ patient } : ExamTableProps) => {
                         Mês
                     </th>
                     <th>
-                        Amostra
+                        Nº da Amostra
                     </th>
                     <th>
                         Material
@@ -41,7 +74,23 @@ export const BaarExamTable = ({ patient } : ExamTableProps) => {
                         <td>
                             {exam.date}
                         </td>
-                        
+                        <td>
+                            {exam.monthNumber}
+                        </td>
+                        <td>
+                            {exam.sampleNumber}
+                        </td>
+                        <td>
+                            {
+                                exam.isMaterialSputum ? 'Escarro' : exam.otherMaterial
+                            }
+                        </td>
+                        <td>
+                            {exam.sputumAspect ? getSputumAspectLabel(exam.sputumAspect) : 'Outro material utilizado'}
+                        </td>
+                        <td>
+                            {getResultLabel(exam.result)}
+                        </td>
                         <td>
                             {exam.observations}
                         </td>

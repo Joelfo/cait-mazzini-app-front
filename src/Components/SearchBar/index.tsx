@@ -7,20 +7,24 @@ import { Form, Spinner } from "react-bootstrap";
 import { Typeahead } from "react-bootstrap-typeahead";
 import { redirect, useNavigate } from "react-router-dom";
 import { usePatientApi } from "Api/usePatientApi";
+import { Patient } from "Api/Types/Patient";
+import { PatientBasicInfo } from "Api/Types/BasicInfo/PatientBasicInfo";
 
+type Props = {
+  patients: PatientBasicInfo[];
+  isLoading: boolean;
+  nameToSearch: string | undefined;
+  onChange: (nameToSearch: string) => void;
+}
 
-export const PatientSearchBar = () => {
+export const PatientSearchBar = ({ patients, isLoading, nameToSearch, onChange } : Props) => {
 
   const [showNotFoundAlert, setShowNotFoundAlert ] = useState<boolean>(false);
 
   const patientAPI = usePatientApi();
-  const [ nameToSearch, setNameToSearch ] = useState<string>();
-  const { data: patients, isLoading, isStale, isPaused } = patientAPI.useAllByName(nameToSearch)
   
   const navigate = useNavigate();
 
-
-  const isPatientsLoading = useMemo(() => isLoading && !isPaused && !isStale, [isLoading, isPaused, isStale]);
 
   const searchPatient = (name: string) => {
     const selectedPatient = patients?.find(patient => patient.name === name);
@@ -40,7 +44,7 @@ export const PatientSearchBar = () => {
               <Typeahead
                 options={patients?.map(country => country.name) ?? new Array() as string[]}
                 onInputChange={(value) => {
-                  setNameToSearch(value);
+                  onChange(value);
                 }}
                 onChange={(selected) => {
                   const selectedName = selected[0] as string;
@@ -76,9 +80,9 @@ export const PatientSearchBar = () => {
               
             </div>
             <div className="col-3">
-              <button className="btn btn-primary" onClick={() => searchPatient(nameToSearch ?? '')} disabled={isPatientsLoading}>
+              <button className="btn btn-primary" onClick={() => searchPatient(nameToSearch ?? '')} disabled={isLoading}>
                 {
-                  isPatientsLoading ?
+                  isLoading ?
                     <Spinner/>
                     :
                     <h6>Buscar</h6>

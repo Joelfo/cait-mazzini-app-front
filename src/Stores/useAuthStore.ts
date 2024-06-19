@@ -2,16 +2,16 @@ import { create } from "zustand"
 
 interface IUseAuthStoreProps {
 
-    jwtToken: string,
+    jwt: string,
     bearerJwt: string,
 
-    setJwtToken: (value: string) => void
+    setJwt: (value: string) => void
 };
 
 export const useAuthStore = create<IUseAuthStoreProps>(set => ({
-        jwtToken: '',
+        jwt: '',
 
         bearerJwt: '',
     
-        setJwtToken: (value: string) => set({ jwtToken: value, bearerJwt: 'Bearer ' + value })
+        setJwt: (value: string) => set({ jwt: value, bearerJwt: 'Bearer ' + value })
 }));

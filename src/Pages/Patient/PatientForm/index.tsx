@@ -433,7 +433,7 @@ export const PatientForm = () => {
                                                     isInvalid={invalid}
                                                 >
                                                     <option value={PatientType.TB}> TB </option>
-                                                    <option value={PatientType.Chemoprofilaxys}> Quimioprofilaxia </option>
+                                                    <option value={PatientType.Chemoprofilaxys}> ILTB </option>
                                                     <option value={PatientType.PNT}> PNT </option>
                                                 </Form.Select>
                                                 <Form.Control.Feedback type='invalid'>

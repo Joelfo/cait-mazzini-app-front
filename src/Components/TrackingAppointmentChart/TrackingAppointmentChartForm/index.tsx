@@ -102,6 +102,13 @@ export const TrackingAppointmentChartForm = () => {
             <Form noValidate onSubmit={handleSubmit(onSubmit)}>
                 <Container fluid>
                     <Row>
+                        <Form.Group as={Col} md='3'>
+                            <Form.Label>Profissional de saúde</Form.Label>
+                            <Form.Control disabled value={user.name}/>
+                        </Form.Group>
+                    </Row>
+                    <Row className='mt-5
+                    '>
                         <Form.Group as={Col} md='6'>
                             <Form.Label>Nome do paciente</Form.Label>
                             <Form.Control type='text' disabled value={patient?.name}/>

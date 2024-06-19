@@ -13,8 +13,8 @@ import { Outlet, useNavigate } from "react-router";
 export const SecureRoute = () => {
 
     const { jwt, setJwt } = useAuthStore(state => ({
-        jwt: state.jwtToken,
-        setJwt: state.setJwtToken
+        jwt: state.jwt,
+        setJwt: state.setJwt
       }));
 
  

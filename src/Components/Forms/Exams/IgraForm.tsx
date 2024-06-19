@@ -4,6 +4,7 @@ import { PCRExam } from "Api/Types/PCRExam";
 import { ExamFormProps } from "./ExamFormProps";
 import { justRequiredRule } from "util/validation";
 import { IgraExam } from "Api/Types/IgraExam";
+import { ComplementaryExamDTO } from "Api/Types/DTOs/ComplementaryExamDTO";
 
 export const IgraForm = ({ patient, onSubmit, data } : ExamFormProps<IgraExam>) => {
   
@@ -13,7 +14,7 @@ export const IgraForm = ({ patient, onSubmit, data } : ExamFormProps<IgraExam>) 
         control,
         setValue,
         register
-    } = useForm<IgraExam>({
+    } = useForm<ComplementaryExamDTO<IgraExam>>({
         defaultValues: data ?? {
             patientId: patient.id
         }
@@ -73,6 +74,12 @@ export const IgraForm = ({ patient, onSubmit, data } : ExamFormProps<IgraExam>) 
                 <Form.Group as={Col} md='5'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
+                </Form.Group>
+            </Row>
+            <Row>
+                <Form.Group as={Col} md='12'>
+                    <Form.Label>Arquivos</Form.Label>
+                    <Form.Control {...register('files')} type='file'  multiple/>
                 </Form.Group>
             </Row>
             <Row className="form-mazzini-row">

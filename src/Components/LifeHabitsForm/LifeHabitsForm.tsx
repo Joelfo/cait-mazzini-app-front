@@ -13,7 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert, Button, Col, Container, Form, Row, Spinner, Stack } from "react-bootstrap"
 import { Typeahead } from "react-bootstrap-typeahead";
 import { Option } from "react-bootstrap-typeahead/types/types";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
+import { Controller, FormProvider, SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ContraceptiveMethod } from "Api/Types/ContraceptiveMethod";
 import { LifeHabitsInfoDTO } from "Api/Types/LifeHabitsInfoDTO";
@@ -64,15 +64,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
     }
 
 
-    const {
-        handleSubmit,
-        formState: { errors },
-        control,
-        setValue,
-        getValues,
-        register,
-        watch
-    } = useForm<LifeHabitsInfoDTO>({
+    const formData = useForm<LifeHabitsInfoDTO>({
         defaultValues: defaultData ?? {
             cigarretesPerDay: 0,
             physicalActivityIds: [],
@@ -104,10 +96,10 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
 
     const navigate = useNavigate();
 
-    const watchIsSmoker = watch('isSmoker');
-    const watchIsAlcoholUser = watch('isAlcoholUser');
-    const watchIsFormerSmoker = watch('isFormerSmoker')
-    const watchIsIllicitDrugsUser = watch('isIllicitDrugsUser');
+    const watchIsSmoker = formData.watch('isSmoker');
+    const watchIsAlcoholUser = formData.watch('isAlcoholUser');
+    const watchIsFormerSmoker = formData.watch('isFormerSmoker')
+    const watchIsIllicitDrugsUser = formData.watch('isIllicitDrugsUser');
 
     
     // useMemo
@@ -129,7 +121,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
 
     const handleSelectContraceptiveMethod = useCallback((selecteds: Option[]) => {
         const selectedIds = selecteds.map(selected => (selected as ContraceptiveMethod).id);
-        setValue('contraceptiveMethodIds', selectedIds);
+        formData.setValue('contraceptiveMethodIds', selectedIds);
     }, [contraceptiveMethods])
 
     const onFormSubmit = useCallback(async (data: LifeHabitsInfoDTO) => {
@@ -158,7 +150,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
     
     useEffect(() => {
         if (!!patient)
-            setValue('patientId', patient.id); 
+            formData.setValue('patientId', patient.id); 
     }, [patient]);
 
     useEffect(() => {
@@ -169,35 +161,36 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
     return (
         <>
             <Container>
-                <Form noValidate onSubmit={handleSubmit(onFormSubmit)}>
+                <Form noValidate onSubmit={formData.handleSubmit(onFormSubmit)}>
+                    <FormProvider {...formData}>
                     <MazziniFormSection title='Alimentação e Hidratação'>
                         <Row className=''>
                             <Form.Group as={Col} md='1'>
                                 <Form.Label className='text-nowrap'>{labels.mealsPerDay} *</Form.Label>
                                 <Form.Control 
                                     
-                                    {...register('mealsPerDay')} 
-                                    isInvalid={!!errors.mealsPerDay}
+                                    {...formData.register('mealsPerDay')} 
+                                    isInvalid={!!formData.formState.errors.mealsPerDay}
                                     type='number'
                                     defaultValue={defaultData?.mealsPerDay}
                                 />
                                 <Form.Control.Feedback
                                     type='invalid'
-                                > {errors.mealsPerDay?.message} </Form.Control.Feedback>
+                                > {formData.formState.errors.mealsPerDay?.message} </Form.Control.Feedback>
                                 
                             </Form.Group>
                             <Form.Group as={Col} md='1' className='offset-1'>
                                 <Form.Label className='text-nowrap'>{labels.waterCupsPerDay}*</Form.Label>
                                 <Form.Control 
                                     
-                                    {...register('waterCupsPerDay', justRequiredRule('Copos de água/líquido por dia'))} 
-                                    isInvalid={!!errors.waterCupsPerDay}
+                                    {...formData.register('waterCupsPerDay', justRequiredRule('Copos de água/líquido por dia'))} 
+                                    isInvalid={!!formData.formState.errors.waterCupsPerDay}
                                     type='number'
                                     defaultValue={defaultData?.waterCupsPerDay}
                                 />
                                 <Form.Control.Feedback
                                     type='invalid'
-                                > {errors.waterCupsPerDay?.message} </Form.Control.Feedback>
+                                > {formData.formState.errors.waterCupsPerDay?.message} </Form.Control.Feedback>
                                 
                             </Form.Group>
                         </Row>
@@ -208,7 +201,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 </Form.Label>
                                 <Form.Control 
                                     
-                                    {...register('eatingAndWaterObs')}
+                                    {...formData.register('eatingAndWaterObs')}
                                     defaultValue={defaultData?.eatingAndWaterObs}
                                 />
                             </Form.Group>
@@ -228,34 +221,34 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Característica *</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('intestinalEliminationsCharacteristic', justRequiredRule('Característica'))}
-                                    isInvalid={!!errors.intestinalEliminationsCharacteristic}
+                                    {...formData.register('intestinalEliminationsCharacteristic', justRequiredRule('Característica'))}
+                                    isInvalid={!!formData.formState.errors.intestinalEliminationsCharacteristic}
                                     defaultValue={defaultData?.intestinalEliminationsCharacteristic}
                                 />
                                 <Form.Control.Feedback
                                     type='invalid'
                                 >
-                                    {errors.intestinalEliminationsCharacteristic?.message}
+                                    {formData.formState.errors.intestinalEliminationsCharacteristic?.message}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group 
                                 as={Col}
                                 md='2'
                             >
-                                <Form.Label>Vezes ao dia *</Form.Label>
+                                <Form.Label>Vezes por semana *</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('intestinalEliminationTimesPerDay', justRequiredRule('Vezes ao dia'))}
-                                    isInvalid={!!errors.intestinalEliminationTimesPerDay}
+                                    {...formData.register('intestinalEliminationTimesPerDay', justRequiredRule('Vezes ao dia'))}
+                                    isInvalid={!!formData.formState.errors.intestinalEliminationTimesPerDay}
                                     type='number'
                                     defaultValue={defaultData?.intestinalEliminationTimesPerDay}
                                 />
-                                <Form.Control.Feedback type='invalid'>{errors.intestinalEliminationTimesPerDay?.message}</Form.Control.Feedback>
+                                <Form.Control.Feedback type='invalid'>{formData.formState.errors.intestinalEliminationTimesPerDay?.message}</Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md='1' className='d-flex align-items-end'>
                                 <Controller
                                     name='hasPainOnIntestinalEliminations'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {onChange, onBlur, value}
                                     }) => (
@@ -285,15 +278,15 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Característica *</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('bladderEliminationsCharacteristic', justRequiredRule('Característica'))}
-                                    isValid={!!errors.physicalActivityIds}
-                                    isInvalid={!!errors.bladderEliminationsCharacteristic}
+                                    {...formData.register('bladderEliminationsCharacteristic', justRequiredRule('Característica'))}
+                                    isValid={!!formData.formState.errors.physicalActivityIds}
+                                    isInvalid={!!formData.formState.errors.bladderEliminationsCharacteristic}
                                     defaultValue={defaultData?.bladderEliminationsCharacteristic}
                                 />
                                 <Form.Control.Feedback
                                     type='invalid'
                                 >
-                                    {errors.bladderEliminationsCharacteristic?.message}
+                                    {formData.formState.errors.bladderEliminationsCharacteristic?.message}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group 
@@ -303,17 +296,17 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Vezes ao dia *</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('bladderEliminationTimesPerDay', justRequiredRule('Vezes ao dia'))}
-                                    isInvalid={!!errors.bladderEliminationTimesPerDay}
+                                    {...formData.register('bladderEliminationTimesPerDay', justRequiredRule('Vezes ao dia'))}
+                                    isInvalid={!!formData.formState.errors.bladderEliminationTimesPerDay}
                                     type='number'
                                     defaultValue={defaultData?.bladderEliminationTimesPerDay}
                                 />
-                                <Form.Control.Feedback type='invalid'>{errors.bladderEliminationTimesPerDay?.message}</Form.Control.Feedback>
+                                <Form.Control.Feedback type='invalid'>{formData.formState.errors.bladderEliminationTimesPerDay?.message}</Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md='1' className='d-flex align-items-end'>
                                 <Controller
                                     name='hasPainOnBladderEliminations'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {onChange, onBlur, value}
                                     }) => (
@@ -336,7 +329,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller
                                     name='isAlcoholUser'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {value, onChange, onBlur }
                                     }) => (
@@ -355,7 +348,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Form.Label>Quantidade</Form.Label>
                                 <Form.Control
-                                    {...register('alcoholQuantityObs')}
+                                    {...formData.register('alcoholQuantityObs')}
                                     defaultValue={defaultData?.alcoholQuantityObs}
                                     disabled={!watchIsAlcoholUser}
                                 />
@@ -363,7 +356,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller
                                     name='isSmoker'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {value, onChange, onBlur}
                                     }) => (
@@ -382,7 +375,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Form.Label>Cigarros por dia</Form.Label>
                                 <Form.Control
-                                    {...register('cigarretesPerDay')}
+                                    {...formData.register('cigarretesPerDay')}
                                     disabled={!watchIsSmoker}
                                 />
                             </Form.Group>
@@ -391,7 +384,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller 
                                     name='isFormerSmoker'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {value, onChange, onBlur}
                                     }) => (
@@ -409,7 +402,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Form.Label>Quanto tempo parou</Form.Label>
                                 <Form.Control
-                                    {...register('timeWithoutSmoking')}
+                                    {...formData.register('timeWithoutSmoking')}
                                     defaultValue={defaultData?.timeWithoutSmoking}
                                     disabled={!watchIsFormerSmoker}
                                 />
@@ -417,7 +410,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller 
                                     name='isIllicitDrugsUser'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {value, onChange, onBlur}
                                     }) => (
@@ -436,7 +429,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Qual(is)</Form.Label>
                                 <Form.Control 
                                     
-                                    {...register('illicitDrugsUsingObs')}
+                                    {...formData.register('illicitDrugsUsingObs')}
                                     defaultValue={defaultData?.illicitDrugsUsingObs}
                                     disabled={!watchIsIllicitDrugsUser}
                                 />
@@ -450,7 +443,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller 
                                     name='hasSatisfactorySleepingTime'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {value, onChange, onBlur}
                                     }) => (
@@ -469,20 +462,20 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Horas por noite *</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('sleepingHoursPerNight', justRequiredRule('Horas por noite'))}
-                                    isInvalid={!!errors.sleepingHoursPerNight}
+                                    {...formData.register('sleepingHoursPerNight', justRequiredRule('Horas por noite'))}
+                                    isInvalid={!!formData.formState.errors.sleepingHoursPerNight}
                                     type='number'
                                     defaultValue={defaultData?.sleepingHoursPerNight}
                                 />
                                 <Form.Control.Feedback type='invalid'>
-                                    {errors.sleepingHoursPerNight?.message}
+                                    {formData.formState.errors.sleepingHoursPerNight?.message}
                                 </Form.Control.Feedback>
                             </Form.Group>
                             <Form.Group as={Col} md='4'>
                                 <Form.Label>Observações</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('sleepingTimeObs')}
+                                    {...formData.register('sleepingTimeObs')}
                                     defaultValue={defaultData?.sleepingTimeObs}
                                 />
                             </Form.Group>
@@ -523,7 +516,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label className='text-nowrap'>Vezes por semana</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('physicalActivityTimesPerWeek')}
+                                    {...formData.register('physicalActivityTimesPerWeek')}
                                     type='number'
                                     defaultValue={defaultData?.physicalActivityTimesPerWeek ?? 0}
                                 />
@@ -532,7 +525,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>Observações</Form.Label>
                                 <Form.Control 
                                     
-                                    {...register('physicalActivitiesObservation')}
+                                    {...formData.register('physicalActivitiesObservation')}
                                     defaultValue={defaultData?.physicalActivitiesObservation}
                                 />
                             </Form.Group>
@@ -544,7 +537,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Label>Observações</Form.Label>
                             <Form.Control
                                 
-                                {...register('leisureObservation')}
+                                {...formData.register('leisureObservation')}
                                 defaultValue={defaultData?.leisureObservation}
                             />
                         </Form.Group>
@@ -555,7 +548,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label>{labels.sexualActivityLevel}</Form.Label>
                             <Controller
                                 name='sexualActivityLevel'
-                                control={control}
+                                control={formData.control}
                                 render={({
                                     field: { value, onBlur ,onChange }
                                 }) => (
@@ -564,36 +557,36 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                             
                                             type='radio'
                                             name='sexualActivityLevel'
-                                            onChange={() => setValue('sexualActivityLevel', ESexualActivityLevel.Active)}
+                                            onChange={() => formData.setValue('sexualActivityLevel', ESexualActivityLevel.Active)}
                                             onBlur={onBlur}
                                             label='Ativa'
                                             defaultChecked={defaultData?.sexualActivityLevel === ESexualActivityLevel.Active}
                                             checked={value === ESexualActivityLevel.Active}
-                                            isInvalid={!!errors.sexualActivityLevel}
+                                            isInvalid={!!formData.formState.errors.sexualActivityLevel}
                                         />
                                         <Form.Check
                                             
                                             type='radio'
                                             name='sexualActivityLevel'
                                             value={ESexualActivityLevel.Eventual}
-                                            onChange={() => setValue('sexualActivityLevel', ESexualActivityLevel.Eventual)}
+                                            onChange={() => formData.setValue('sexualActivityLevel', ESexualActivityLevel.Eventual)}
                                             onBlur={onBlur}
                                             label='Eventual'
                                             defaultChecked={defaultData?.sexualActivityLevel === ESexualActivityLevel.Eventual}
                                             checked={value === ESexualActivityLevel.Eventual}
-                                            isInvalid={!!errors.sexualActivityLevel}
+                                            isInvalid={!!formData.formState.errors.sexualActivityLevel}
                                         />  
                                         <Form.Check
                                              
                                             type='radio'
                                             name='sexualActivityLevel'
                                             value={ESexualActivityLevel.NonExistent}
-                                            onChange={() => setValue('sexualActivityLevel', ESexualActivityLevel.NonExistent)}
+                                            onChange={() => formData.setValue('sexualActivityLevel', ESexualActivityLevel.NonExistent)}
                                             onBlur={onBlur}
                                             label='Inexistente'
                                             defaultChecked={defaultData?.sexualActivityLevel === ESexualActivityLevel.NonExistent}
                                             checked={value === ESexualActivityLevel.NonExistent}
-                                            isInvalid={!!errors.sexualActivityLevel}
+                                            isInvalid={!!formData.formState.errors.sexualActivityLevel}
                                         />
                                     </>
                                 )}
@@ -601,10 +594,10 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Control 
                                  
                                 style={{display: 'none'}} 
-                                isInvalid={!!errors.sexualActivityLevel}
+                                isInvalid={!!formData.formState.errors.sexualActivityLevel}
                             />
                             <Form.Control.Feedback type='invalid'>
-                                {errors.sexualActivityLevel?.message}
+                                {formData.formState.errors.sexualActivityLevel?.message}
                             </Form.Control.Feedback>
                             
 
@@ -613,7 +606,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                                 <Form.Label className='text-nowrap'>Quantos parceiros(as)</Form.Label>
                                 <Form.Control
                                     
-                                    {...register('sexualPartnersQuantity')}
+                                    {...formData.register('sexualPartnersQuantity')}
                                     defaultValue={defaultData?.sexualPartnersQuantity ?? 0}
                                     type='number'
                                 />
@@ -654,7 +647,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='3'>
                                 <Controller 
                                     name='isPreservativeUser'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {onChange, onBlur, value}
                                     }) => (
@@ -672,7 +665,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller
                                     name='hasPrEP'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {onChange, onBlur, value}
                                     }) => (
@@ -690,7 +683,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             <Form.Group as={Col} md='2'>
                                 <Controller
                                     name='hasPEP'
-                                    control={control}
+                                    control={formData.control}
                                     render={({
                                         field: {onChange, onBlur, value}
                                     }) => (
@@ -707,7 +700,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                             </Form.Group>
                         </Row>
                     </MazziniFormSection>
-                    <ResponsabilityCheckbox/>
+                    <ResponsabilityCheckbox fieldName='creatorId'/>
                     <Row className='form-mazzini-row justify-content-center gx-5'>
                         {
                             showReturnButton
@@ -725,6 +718,7 @@ export const LifeHabitsForm = ({ onSubmit, isSubmitLoading, onReturn = () => {},
                     </Row>
                    
                     <SaveLoadingAlert show={isSubmitLoading}/>
+                    </FormProvider>
                 </Form>
             </Container>
         </>

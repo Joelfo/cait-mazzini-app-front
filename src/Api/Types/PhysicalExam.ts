@@ -14,4 +14,5 @@ export type PhysicalExam = {
     patientId: number,
     type: ETrackingAppointmentChartType,
     date: string,
+    creatorId: number
 }

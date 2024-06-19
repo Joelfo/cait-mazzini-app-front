@@ -1,7 +1,7 @@
 import "./assets/styles/custom.scss";
 import './App.css';
 import Navbar from './Components/Navbar';
-import ReceptionistHome from "Pages/ReceptionistHome";
+import Home from "Pages/Home";
 import { Outlet, Router, RouterProvider, createBrowserRouter } from "react-router-dom";
 import { PatientDetails } from "Pages/Patient/PatientDetails";
 import { PatientForm } from "Pages/Patient/PatientForm";
@@ -11,7 +11,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PatientInfo } from "Pages/Patient/PatientInfo";
 import { LifeHabitsForm } from "Components/LifeHabitsForm/LifeHabitsForm";
 import { ClinicalHistoryForm } from "Components/ClinicalHistoryForm/ClinicalHistoryForm";
-import { FirstNurseryChartPage } from "Pages/FirstNurseryChart";
 import * as yup from 'yup';
 import { LifeHabitsViewPage } from "Pages/LifeHabits/LifeHabitsViewPage";
 import { ClinicalHistoryViewPage } from "Pages/ClinicalHistory/ClinicalHistoryViewPage";
@@ -29,6 +28,8 @@ import { UserFormPage } from "Pages/Users/UserFormPage";
 import { Container } from "react-bootstrap";
 import { UserList } from "Components/User/UserList";
 import { UserListPage } from "Pages/Users/UserListPage";
+import { FirstNurseryAppointmentForm } from "Components/FirstAppointment/FirstNurseryAppointmentForm";
+import { FirstMedicalAppointmentForm } from "Components/FirstAppointment/FirstMedicalAppointmentForm";
 
 function App() {
   const router = createBrowserRouter([
@@ -41,11 +42,11 @@ function App() {
           children: [
             {
               path: "",
-              element: <ReceptionistHome/>
+              element: <Home/>
             },
             {
               path: "/Home",
-              element: <ReceptionistHome/>
+              element: <Home/>
             },
             {
               path:"patient",
@@ -76,10 +77,6 @@ function App() {
               element: <ClinicalHistoryViewPage/>
             },
             {
-              path: '/firstNurseryChart',
-              element: <FirstNurseryChartPage/>
-            },
-            {
               path: '/exams',
               element: <ExamsPage/>
             },
@@ -102,7 +99,15 @@ function App() {
             {
               path: '/userList',
               element: <UserListPage/>
-            }
+            },
+            {
+              path: '/firstNurseryChart',
+              element: <FirstNurseryAppointmentForm/>
+            },
+            {
+              path: '/firstMedicalChart',
+              element: <FirstMedicalAppointmentForm/>
+            },
           ]
         }, 
         {

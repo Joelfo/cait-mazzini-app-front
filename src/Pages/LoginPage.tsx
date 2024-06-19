@@ -33,7 +33,7 @@ export const LoginPage = () => {
 
     const { mutate: login, isLoading, error } = useLogin();
 
-    const setJwtToken = useAuthStore(state => state.setJwtToken);
+    const setJwtToken = useAuthStore(state => state.setJwt);
 
     const handleAuthenticate = (data: LoginDTO) => {
         login(data, {

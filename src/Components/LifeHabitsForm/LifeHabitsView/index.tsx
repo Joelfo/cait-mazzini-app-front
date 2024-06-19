@@ -63,7 +63,7 @@ export const LifeHabitsView = ({ data, physicalActivities, contraceptiveMethods 
                             <Form.Control disabled value={data.intestinalEliminationsCharacteristic}/>
                         </Form.Group>
                         <Form.Group as={Col} md='2'>
-                            <Form.Label>Vezes ao dia</Form.Label>
+                            <Form.Label>Vezes por semana</Form.Label>
                             <Form.Control disabled value={data.intestinalEliminationTimesPerDay}/>
                         </Form.Group>
                     </Row>

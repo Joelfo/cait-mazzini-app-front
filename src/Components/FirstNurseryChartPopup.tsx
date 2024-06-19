@@ -3,24 +3,22 @@ import { useTrackingAppointmentChartApi } from "Api/useTrackingAppointmentChartA
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Col, Container, Modal, Row, Stack } from "react-bootstrap"
-import './styles.css';
 import ReactQuill from "react-quill";
 import { DoubleMovingArrows } from "Components/Utils/DoubleMovingArrows";
 import { usePatientApi } from "Api/usePatientApi";
 import { useUserApi } from "Api/useUserApi";
+import { useFirstNurseryAppointmentApi } from "Api/useFirstNurseryAppointmentApi";
+import { FirstNurseryAppointmentChart } from "Api/Types/FirstNurseryAppointmentChart";
 
-export type TrackingAppointmentChartPopupProps = {
+export type FirstNurseryAppointmentChartPopupProps = {
     show: boolean,
-    chartId: number;
+    chart: FirstNurseryAppointmentChart;
     onClose: () => void;
 }
 
-export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : TrackingAppointmentChartPopupProps) => {
-    const trackingAppointmentChartAPI = useTrackingAppointmentChartApi();
+export const FirstNurseryAppointmentChartPopup = ({ show, chart, onClose } : FirstNurseryAppointmentChartPopupProps) => {
     const patientAPI = usePatientApi();
 
-    const [ selectedId, setSelectedId ] = useState<number>();
-    const { data: trackingAppointmentChart } = trackingAppointmentChartAPI.useShow(selectedId);
     const { patient: selectedPatient } = useSelectedPatient();
 
     const[ patientIdToSearch, setPatientIdToSearch ] = useState<number>();
@@ -31,31 +29,20 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
     const [ showArrowRight, setShowArrowRight ] = useState<boolean>(true);
 
     const userApi = useUserApi();
-    const { data: creator } = userApi.useShow(trackingAppointmentChart?.creatorId);
-
-    const formattedDate = useMemo(() => {
-        if (!!trackingAppointmentChart)
-            return new Date(trackingAppointmentChart.date).toLocaleDateString()
-    }, [trackingAppointmentChart])
+    const { data: creator } = userApi.useShow(chart?.creatorId);
 
     useEffect(() => {
-        if (!!trackingAppointmentChart && selectedPatient?.id !== trackingAppointmentChart.patientId) {
-            setPatientIdToSearch(trackingAppointmentChart.patientId);
+        if (!!chart && selectedPatient?.id !== chart.patientId) {
+            setPatientIdToSearch(chart.patientId);
         }
     }, [selectedPatient]);
-    
-    useEffect(() => {
-        if (show) {
-            setSelectedId(chartId);
-        } 
-    }, [show]);
 
     return (
         <>
             <Modal animation={false} show={show} onHide={onClose} dialogClassName='modal-50w'>
                 <Modal.Header className='bg-primary' closeButton closeVariant="light">
                     <h5>
-                        Ficha de Acompanhamento
+                        Primeira Ficha - Enfermagem
                     </h5>
                 </Modal.Header>
                 <Modal.Body>
@@ -107,30 +94,19 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
                                 <hr></hr>
                             </Col>
                         </Row>
-                        <Row className='tracking-chart-row'>
-                            <Stack>
-                                <h3 className='tracking-chart-title'>
-                                    Data
-                                </h3>
-                                <b>
-                                    {formattedDate}
-                                </b>
-                            </Stack>
-                        </Row>
-                        <Row>
-                            <Col md='12'>
-                                <hr></hr>
-                            </Col>
-                        </Row>
-                        <Row className='tracking-chart-row'>
-                            <Col>
+                        <Row className='justify-content-start tracking-chart-row'>
+                            <Col md='10'>
                                 <Stack>
                                     <h3 className='tracking-chart-title'>
-                                        Esquema
+                                        Queixas principais
                                     </h3>
-                                    <p>
-                                        {trackingAppointmentChart?.schema}
-                                    </p>
+                                    
+                                    <ReactQuill
+                                        value={chart?.mainIssues}
+                                        readOnly={true}
+                                        theme='bubble'
+                                    />
+                                    
                                 </Stack>
                             </Col>
                         </Row>
@@ -143,13 +119,14 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
                             <Col md='10'>
                                 <Stack>
                                     <h3 className='tracking-chart-title'>
-                                        Evolução
+                                        Medicamentos em uso
                                     </h3>
                                     
                                     <ReactQuill
-                                        value={trackingAppointmentChart?.evolution}
+                                        style={{minHeight: 'auto'}}
+                                        value={chart?.drugsInUse}
                                         readOnly={true}
-                                        theme='bubble'
+                                        theme={'bubble'}
                                     />
                                     
                                 </Stack>
@@ -169,9 +146,51 @@ export const TrackingAppointmentChartPopup = ({ show, chartId, onClose } : Track
                                     
                                     <ReactQuill
                                         style={{minHeight: 'auto'}}
-                                        value={trackingAppointmentChart?.conduct}
+                                        value={chart?.conduct}
                                         readOnly={true}
                                         theme={'bubble'}
+                                    />
+                                    
+                                </Stack>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md='12'>
+                                <hr></hr>
+                            </Col>
+                        </Row>
+                        <Row className='justify-content-start tracking-chart-row'>
+                            <Col md='10'>
+                                <Stack>
+                                    <h3 className='tracking-chart-title'>
+                                        Diagnóstico de enfermagem
+                                    </h3>
+                                    
+                                    <ReactQuill
+                                        value={chart?.nurseryDiagnostic}
+                                        readOnly={true}
+                                        theme='bubble'
+                                    />
+                                    
+                                </Stack>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md='12'>
+                                <hr></hr>
+                            </Col>
+                        </Row>
+                        <Row className='justify-content-start tracking-chart-row'>
+                            <Col md='10'>
+                                <Stack>
+                                    <h3 className='tracking-chart-title'>
+                                        Informações complementares
+                                    </h3>
+                                    
+                                    <ReactQuill
+                                        value={chart?.complementaryInfo}
+                                        readOnly={true}
+                                        theme='bubble'
                                     />
                                     
                                 </Stack>

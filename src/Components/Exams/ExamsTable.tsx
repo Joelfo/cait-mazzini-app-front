@@ -52,7 +52,11 @@ export const ExamsTable = <TExam extends ComplementaryExam,>( { tableHeaders, re
 
     const handleRemove = useCallback(() => {
         if (idToRemove) {
-            remove({id: idToRemove});
+            remove({id: idToRemove}, {
+                onSuccess:() => {
+                    refetch();
+                }
+            });
             setIdToRemove(null);
         }
     }, [idToRemove, remove]);
@@ -65,6 +69,12 @@ export const ExamsTable = <TExam extends ComplementaryExam,>( { tableHeaders, re
         document.body.appendChild(fileLink);
         fileLink.click();
         fileLink.remove();
+    }
+
+    const handleDownloadAll = (exam: TExam) => {
+        exam.examFiles.forEach(examFile => {
+            getFile({ examId: exam.id, fileId: examFile.id }).then(file => handleFileDownload(file, examFile.name))
+        });
     }
 
     useEffect(() => {
@@ -105,7 +115,7 @@ export const ExamsTable = <TExam extends ComplementaryExam,>( { tableHeaders, re
                                                     <Popover>
                                                         <FilesPopoverBody 
                                                             files={(exam as TExam).examFiles} 
-                                                            onClickAll={() => {}}
+                                                            onClickAll={() => handleDownloadAll(exam)}
                                                             onClickFile={(id, fileName) => getFile({examId: (exam as TExam)?.id, fileId: id}, { onSuccess: (data) => handleFileDownload(data, fileName)})}
                                                         />
                                                     </Popover>
@@ -177,7 +187,7 @@ const FilesPopoverBody = ({files, onClickFile, onClickAll} : FilesPopoverProps) 
                     files.map((file, index) => <ListGroup.Item action onClick={() => onClickFile(file.id, file.name)}>{file.name}</ListGroup.Item>)
                 }
                 {
-                    files.length < 0 ?
+                    files.length > 0 ?
                     <ListGroup.Item action onClick={onClickAll}>Todos</ListGroup.Item>
                     :
                     <ListGroup.Item>Sem arquivos para esse exame.</ListGroup.Item>

@@ -29,9 +29,11 @@ import { EToraxXRayResult } from "Api/Types/enums/EToraxXRayResult";
 import { IgraForm } from "Components/Forms/Exams/IgraForm";
 import { IgraExam } from "Api/Types/IgraExam";
 import { BaarExamTable } from "Components/Exams/BaarExamTable";
+import { OtherExamForm } from "Components/Forms/Exams/OtherExamForm";
+import { OtherExamTable } from "Components/Exams/OtherExamTable";
 
 export const ExamsPage = () => {
-    const examTypeLabels = ["Raio X", "PPD", "PCR", "Biópsia", "Culturas", "BAAR"];
+    const examTypeLabels = ["Raio X", "PPD", "PCR", "Biópsia", "Culturas", "BAAR", "Outros"];
 
     const [ selectedExamType, setSelectedExamType ] = useState<string>(examTypeLabels[0]);
 
@@ -369,6 +371,11 @@ export const ExamsPage = () => {
                                 selectedExamType === 'BAAR' 
                                 &&
                                 <BaarExamTable patient={patient}/>
+                            }
+                            {
+                                selectedExamType === 'Outros'
+                                &&
+                                <OtherExamTable patient={patient}/>
                             }
                         </Col>
                     }

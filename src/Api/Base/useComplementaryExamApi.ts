@@ -30,7 +30,7 @@ export const useComplementaryExamApi= <TComplementaryExam extends ComplementaryE
             const formData = new FormData();
         
             for (const [key, val] of Object.entries(data))
-                if (!(val instanceof File))
+                if (!!val && !(val instanceof File))
                     formData.append(key, val.toString());
 
             for (let i = 0; i < data.files.length; i++) {

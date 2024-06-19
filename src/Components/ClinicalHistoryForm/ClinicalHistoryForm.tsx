@@ -11,7 +11,7 @@ import { useSelectedPatient } from "Hooks/useSelectedPatient"
 import { produce } from "immer";
 import { useEffect, useMemo } from "react";
 import { Button, Col, Container, Form, Row, Spinner } from "react-bootstrap"
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ClinicalHistory } from "Api/Types/ClinicalHistory";
 import { ClinicalHistoryHasDatedImmunizationDTO } from "Api/Types/DTOs/ClinicalHistoryHasDatedImmunizationDTO";
@@ -40,15 +40,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
 
     const isConnectionError = useMemo(() => isPatientError || isDeseasesError || isImmunizationsError || isDatedImmunizationsError, [isPatientError, isDeseasesError, isImmunizationsError, isDatedImmunizationsError]);
 
-    const {
-        handleSubmit,
-        formState: { errors },
-        control,
-        setValue,
-        getValues,
-        register,
-        watch
-    } = useForm<ClinicalHistory>({
+    const formData = useForm<ClinicalHistory>({
         defaultValues: defaultData ?? { 
             previousDeseaseIds: [],
             immunizationIds: [],
@@ -56,23 +48,23 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
         }
     });
 
-    const datedImmunizationIdsWatch = watch('datedImmunizationIds');
-    const isAlergicWatch = watch('isAlergic');
-    const hasPreviousHospitalizationsWatch = watch('hasPreviousHospitalizations');
-    const hasPreviousSurgeryWatch = watch('hasPreviousSurgery');
+    const datedImmunizationIdsWatch = formData.watch('datedImmunizationIds');
+    const isAlergicWatch = formData.watch('isAlergic');
+    const hasPreviousHospitalizationsWatch = formData.watch('hasPreviousHospitalizations');
+    const hasPreviousSurgeryWatch = formData.watch('hasPreviousSurgery');
 
     const handleDeseaseCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const checked = event.target.checked;
         const deseaseId = parseInt(event.target.value);
 
         if (checked) {
-            setValue('previousDeseaseIds', [...(getValues('previousDeseaseIds')), deseaseId ]);
+            formData.setValue('previousDeseaseIds', [...(formData.getValues('previousDeseaseIds')), deseaseId ]);
         }
         else {
-            const previousDeseaseIds = getValues('previousDeseaseIds');
+            const previousDeseaseIds = formData.getValues('previousDeseaseIds');
             const indexToSplice = previousDeseaseIds.findIndex(id => id === deseaseId);
             previousDeseaseIds.splice(indexToSplice, 1);
-            setValue('previousDeseaseIds', previousDeseaseIds);
+            formData.setValue('previousDeseaseIds', previousDeseaseIds);
         }
     }
 
@@ -81,12 +73,12 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
         const immunizationId = parseInt(event.target.value)
 
         if (checked) {
-            setValue('immunizationIds', [...(getValues('immunizationIds')), immunizationId])
+            formData.setValue('immunizationIds', [...(formData.getValues('immunizationIds')), immunizationId])
         } else {
-            const immunizationIds = getValues('immunizationIds');
+            const immunizationIds = formData.getValues('immunizationIds');
             const indexToSplice = immunizationIds.findIndex(id => id === immunizationId);
             immunizationIds.splice(indexToSplice, 1);
-            setValue('immunizationIds', immunizationIds);
+            formData.setValue('immunizationIds', immunizationIds);
         }
     }
 
@@ -95,27 +87,27 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
         const datedImmunizationId = parseInt(event.target.value)
 
         if (checked) {
-            setValue('datedImmunizationIds', [...(getValues('datedImmunizationIds')), { immunizationId: datedImmunizationId, lastDoseDate: '' }])
+            formData.setValue('datedImmunizationIds', [...(formData.getValues('datedImmunizationIds')), { immunizationId: datedImmunizationId, lastDoseDate: '' }])
         } else {
-            const datedImmunizationIds = getValues('datedImmunizationIds');
+            const datedImmunizationIds = formData.getValues('datedImmunizationIds');
             const indexToSplice = datedImmunizationIds.findIndex(datedImmunization => datedImmunization.immunizationId === datedImmunizationId);
             datedImmunizationIds.splice(indexToSplice, 1);
-            setValue('datedImmunizationIds', datedImmunizationIds);
+            formData.setValue('datedImmunizationIds', datedImmunizationIds);
         }
     }
 
     const addDatedImmunizationDate = (datedImmunizationId: number, date: string) => {
-        const clinicalHistoryHasDatedImmunizations = getValues('datedImmunizationIds')
+        const clinicalHistoryHasDatedImmunizations = formData.getValues('datedImmunizationIds')
         const index = clinicalHistoryHasDatedImmunizations.findIndex(datedImmunization => { return (datedImmunization.immunizationId == datedImmunizationId) });
         if (index >= 0) {
-            setValue('datedImmunizationIds', produce(clinicalHistoryHasDatedImmunizations, clinicalHistoryHasDatedImmunizations => {
+            formData.setValue('datedImmunizationIds', produce(clinicalHistoryHasDatedImmunizations, clinicalHistoryHasDatedImmunizations => {
                 clinicalHistoryHasDatedImmunizations[index].lastDoseDate = date;
             }))
         }
     }
 
     const checkIfDatedImmunizationHasValidDate = (datedImmunizationId: number) => {
-        const datedImmunization = getValues('datedImmunizationIds').find(x => x.immunizationId === datedImmunizationId);
+        const datedImmunization = formData.getValues('datedImmunizationIds').find(x => x.immunizationId === datedImmunizationId);
         if (!datedImmunization || !!datedImmunization.lastDoseDate) {
             return true;
         }
@@ -131,14 +123,15 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
 
     useEffect(() => {
         if (patient) {
-            setValue('patientId', patient.id);
+            formData.setValue('patientId', patient.id);
         }  
     }, [patient]);
 
     return (
         <>
             <Container fluid>
-                <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+                <FormProvider {...formData}>
+                <Form noValidate onSubmit={formData.handleSubmit(onSubmit)}>
                     <MazziniFormSection title='Doenças Prévias'>
                         <Row>
                             {
@@ -173,7 +166,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                             <Form.Group as={Col} md='4'>
                                 <Form.Label>Outras</Form.Label>
                                 <Form.Control
-                                    {...register('otherPreviousDeseases')}
+                                    {...formData.register('otherPreviousDeseases')}
                                     defaultValue={defaultData?.otherPreviousDeseases}
                                 />
                             </Form.Group>
@@ -183,7 +176,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                         <Row>
                             <Form.Group as={Col} md='2' className='d-flex align-items-center'>
                                 <Controller
-                                    control={control}
+                                    control={formData.control}
                                     name='isAlergic'
                                     render={({
                                         field: {onChange, onBlur, value}
@@ -203,7 +196,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                                     Caso alérgico(a), especificar:
                                 </Form.Label>
                                 <Form.Control
-                                    {...register('alergyObs')}
+                                    {...formData.register('alergyObs')}
                                     defaultValue={defaultData?.alergyObs}
                                     disabled={!isAlergicWatch}
                                 />
@@ -214,7 +207,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                         <Row>
                             <Form.Group as={Col}>
                                 <Controller
-                                    control={control}
+                                    control={formData.control}
                                     name='hasPreviousSurgery'
                                     render={({
                                         field: {onChange, onBlur, value}
@@ -234,7 +227,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                             <Form.Group as={Col} md='10'>
                                 <Form.Label>Caso possua, especificar motivo(s)</Form.Label>
                                 <Form.Control
-                                    {...register('previousSurgeryObs')}
+                                    {...formData.register('previousSurgeryObs')}
                                     defaultValue={defaultData?.previousSurgeryObs}
                                     disabled={!hasPreviousSurgeryWatch}
                                 />
@@ -245,7 +238,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                          <Row>
                             <Form.Group as={Col}>
                                 <Controller
-                                    control={control}
+                                    control={formData.control}
                                     name='hasPreviousHospitalizations'
                                     render={({
                                         field: {onChange, onBlur, value}
@@ -265,7 +258,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                             <Form.Group as={Col} md='10'>
                                 <Form.Label>Caso possua, especificar motivo(s)</Form.Label>
                                 <Form.Control
-                                    {...register('previousHospitalizationsObs')}
+                                    {...formData.register('previousHospitalizationsObs')}
                                     defaultValue={defaultData?.previousHospitalizationsObs}
                                     disabled={!hasPreviousHospitalizationsWatch}
                                 />
@@ -333,14 +326,14 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                                         <Form.Group>
                                             <Form.Label>Ultima dose em:</Form.Label>
                                             <Form.Control 
-                                                isInvalid={!!errors.datedImmunizationIds && !checkIfDatedImmunizationHasValidDate(datedImmunization.id)} 
+                                                isInvalid={!!formData.formState.errors.datedImmunizationIds && !checkIfDatedImmunizationHasValidDate(datedImmunization.id)} 
                                                 type='date'
                                                 disabled={!datedImmunizationIdsWatch.find(x => x.immunizationId === datedImmunization.id)}
                                                 defaultValue={defaultData?.datedImmunizationIds.find(x => x.immunizationId === datedImmunization.id)?.lastDoseDate}
                                                 onChange={(event) => addDatedImmunizationDate(datedImmunization.id, event.currentTarget.value)}
                                             />
                                             <Form.Control.Feedback type='invalid'>
-                                                {errors.datedImmunizationIds?.message}
+                                                {formData.formState.errors.datedImmunizationIds?.message}
                                             </Form.Control.Feedback>
                                         </Form.Group>
                                     </Form.Group>
@@ -351,14 +344,14 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                             <Form.Group as={Col} md='4'>
                                 <Form.Label>Outros:</Form.Label>
                                 <Form.Control
-                                    {...register('otherImmunizations')}
+                                    {...formData.register('otherImmunizations')}
 
                                 />
                             </Form.Group>
                         </Row>
                     </MazziniFormSection>
                     <Row>
-                        <ResponsabilityCheckbox/>
+                        <ResponsabilityCheckbox fieldName="creatorId"/>
                     </Row>
                     <Row className='form-mazzini-row justify-content-center'>
                         {
@@ -374,6 +367,7 @@ export const ClinicalHistoryForm = ({ onSubmit, onReturn, showReturnButton, defa
                         </Col>
                     </Row>
                 </Form>
+                </FormProvider>
             </Container>
             <SaveLoadingAlert show={isSavingLoading}/>
             <SaveErrorAlert show={isSavingError}/>

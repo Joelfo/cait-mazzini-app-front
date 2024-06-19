@@ -38,6 +38,8 @@ import { PhysicalExamsList } from "Components/PhysicalExamsList";
 import { UserContext } from "Contexts/UserContext";
 import { useUserContext } from "Contexts/useUserContext";
 import { EUserRole } from "Api/Types/enums/EUserRole";
+import { FirstNurseryAppointmentChartPopup } from "Components/FirstNurseryChartPopup";
+import { useFirstMedicalAppointmentChartApi } from "Api/useFirstMedicalAppointmentChartApi";
 
 
 export const PatientDetails = () => {
@@ -48,16 +50,17 @@ export const PatientDetails = () => {
     const [ selectedPharmaceuticalTrackingChartId, setSelectedPharmaceuticalTrackingChartId ] = useState<number>();
     const [ showScannedChartPopup, setShowScannedChartPopup ] = useState<boolean>(false);
     const [ showPhysicalExamsPopup, setShowPhysicalExamsPopup ] = useState<boolean>(false);
+    const [ showFirstNurseryAppointmentPopup, setShowFirstNurseryAppointmentPopup ] = useState(false);
 
     // useRef
     const scannedChartInputRef = useRef<HTMLInputElement | null>(null);
     
-    // Classes
+    //custom hooks
     const trackingAppointmentChartApi = useTrackingAppointmentChartApi();
     const firstNurseryAppointmentAPI = useFirstNurseryAppointmentApi();
+    const firstMedicalAppointmentChartApi = useFirstMedicalAppointmentChartApi();
     const patientAPI = usePatientApi();
 
-    // custom Hooks
     const user = useUserContext();
     const { useCheck: useCheckScannedChart, useShow: useShowScannedChart, useCreate: useCreateScannedChart } = useScannedChartAPI();
 
@@ -66,12 +69,13 @@ export const PatientDetails = () => {
 
     const { patient, isLoading: isPatientLoading } = useSelectedPatient();
     const setSelectedPatientId = usePatientsStore(state => state.setSelectedPatientId);
-    const { data: firstNurseryAppointment, isLoading: isFirstNurseryAppointmentLoading } = firstNurseryAppointmentAPI.useGetByPatient(patient?.id);
+    const { data: firstNurseryAppointmentChart, isLoading: isFirstNurseryAppointmentLoading } = firstNurseryAppointmentAPI.useGetByPatient(patient?.id);
     const { data: trackingAppointmentCharts } = trackingAppointmentChartApi.useAllBasicInfoByPatient(patient?.id);
     const { data: hasScannedChart, refetch: refetchScannedChartChecking } = useCheckScannedChart(patient?.id);
     const { mutate: getScannedChartFile } = useShowScannedChart();
     const { mutate: saveScannedChart, isLoading: isScannedChartSaveLoading, isSuccess: isScannedChartSaveSuccess } = useCreateScannedChart(); 
     const { data: patientRelationshipsInfo } = patientAPI.useShowRelationshipsInfo(patient?.id);
+    const { data: firstMedicalAppointmentChart, isLoading: isFirstMedicalAppointmentChartLoading } = firstMedicalAppointmentChartApi.useGetByPatient(patient?.id);
 
     // useMemo
     const nurseryTrackingCharts = useMemo(() => trackingAppointmentCharts?.filter(x => x.type === ETrackingAppointmentChartType.FromNursery) ?? [], [trackingAppointmentCharts]);
@@ -115,11 +119,6 @@ export const PatientDetails = () => {
     }, [handleNewTrackingChart]);
     const handleNewMedicalChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.Medical), [handleNewTrackingChart]);
     const handleNewFarmaceuthicalChart = useCallback(() => handleNewTrackingChart(ETrackingAppointmentChartType.Farmaceuthical), [handleNewTrackingChart]);
-
-    
-    useEffect(() => {
-        console.log('a');
-    })
 
     return (
         <>
@@ -181,8 +180,41 @@ export const PatientDetails = () => {
                             </div>
                         </div>
                         <Stack gap={2}>
-                            <ChartsBar isLoading={isFirstNurseryAppointmentLoading} title='Enfermagem' canAddNew={user.role === EUserRole.Nurse} charts={nurseryTrackingCharts} onClickNew={handleNewNurseryChart} onClickOnChart={chart => setSelectedNurseryTrackingChartId(chart.id)} /> 
-                            <ChartsBar title='Médico' charts={medicalTrackingCharts} canAddNew={user.role === EUserRole.Physician} onClickNew={handleNewMedicalChart} onClickOnChart={chart => setSelectedMedicalTrackingChartId(chart.id)}/>
+                            <ChartsBar 
+                                isLoading={isFirstNurseryAppointmentLoading} 
+                                title='Enfermagem' 
+                                canAddNew={user.role === EUserRole.Nurse && !!firstNurseryAppointmentChart} 
+                                charts={nurseryTrackingCharts} 
+                                onClickNew={handleNewNurseryChart} 
+                                onClickOnChart={chart => setSelectedNurseryTrackingChartId(chart.id)} 
+                                beforeContent={
+                                    <>
+                                        {
+                                            !!firstNurseryAppointmentChart ?
+                                                <IconButton2 iconClass="bi-file-earmark-text" text="Primeira ficha" onClick={() => setShowFirstNurseryAppointmentPopup(true)}/>
+                                                :
+                                                <IconButton2 iconClass="bi-file-earmark-plus" text="Adicionar primeira ficha" onClick={() => navigate('/firstNurseryChart?patientId=' + patient.id)}/>
+                                        }
+                                    </>
+                                }
+                            />
+                            <ChartsBar 
+                                title='Médico' 
+                                charts={medicalTrackingCharts} 
+                                canAddNew={user.role === EUserRole.Physician && !!firstMedicalAppointmentChart} 
+                                onClickNew={handleNewMedicalChart} 
+                                onClickOnChart={chart => setSelectedMedicalTrackingChartId(chart.id)}
+                                beforeContent={
+                                    <>
+                                        {
+                                            !!firstMedicalAppointmentChart ?
+                                            <IconButton2 iconClass="bi-file-earmark-text" text="Primeira ficha" onClick={() => {}}/>
+                                                :
+                                            <IconButton2 iconClass="bi-file-earmark-plus" text="Adicionar primeira ficha" onClick={() => navigate('/firstMedicalChart?patientId=' + patient.id)}/>
+                                        }
+                                    </>
+                                }
+                            />
                             <ChartsBar title='Farmacêutico' charts={pharmaceuticalTrackingCharts} canAddNew={user.role === EUserRole.Pharmaceutical} onClickNew={handleNewFarmaceuthicalChart} onClickOnChart={chart => setSelectedPharmaceuticalTrackingChartId(chart.id)}/>
                         </Stack>
                     </div>
@@ -199,6 +231,8 @@ export const PatientDetails = () => {
             <TrackingAppointmentChartCarrousel chartIds={medicalTrackingCharts.map(x => x.id)} defaultSelectedId={selectedMedicalTrackingChartId} onClose={() => setSelectedMedicalTrackingChartId(undefined)} />
             <TrackingAppointmentChartCarrousel chartIds={pharmaceuticalTrackingCharts.map(x => x.id)} defaultSelectedId={selectedPharmaceuticalTrackingChartId} onClose={() => setSelectedPharmaceuticalTrackingChartId(undefined)} />
 
+            
+
             <MazziniPopup title="Exames físicos" show={showPhysicalExamsPopup} onClose={() => setShowPhysicalExamsPopup(false)}>
                 <PhysicalExamsList/>
             </MazziniPopup>
@@ -206,6 +240,12 @@ export const PatientDetails = () => {
             <SaveLoadingAlert show={isScannedChartSaveLoading}/>
             <SuccessDismissibleAlert showTrigger={isScannedChartSaveSuccess} text="Ficha escaneada salva com sucesso."/>
             <SuccessDismissibleAlert showTrigger={showSavingSuccessedAlert} text="Dados salvos com sucesso."/>
+            {
+                !!firstNurseryAppointmentChart
+                &&
+                <FirstNurseryAppointmentChartPopup onClose={() => setShowFirstNurseryAppointmentPopup(false)} chart={firstNurseryAppointmentChart} show={showFirstNurseryAppointmentPopup}/>
+            }
+
         </>
     );
 }

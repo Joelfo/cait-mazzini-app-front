@@ -5,7 +5,7 @@ import { ComplementaryExam } from "./ComplementaryExam"
 export type BaarExam = ComplementaryExam & {
     monthNumber: number,
     sampleNumber: number,
-    isSputumMaterial: boolean,
+    isMaterialSputum: boolean,
     otherMaterial: number,
     sputumAspect?: ESputumAspect,
     result: EBaarResult

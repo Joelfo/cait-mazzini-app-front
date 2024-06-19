@@ -3,26 +3,30 @@ import { ChartIconButton } from "Components/IconButton/ChartIconButton";
 import { IconButton2 } from "Components/IconButton/IconButton2";
 import { Spinner, Stack } from "react-bootstrap";
 import { TrackingAppointmentChartBasicInfo } from "Api/Types/BasicInfo/TrackingAppointmentChartBasicInfo";
-import { FirstAppointment } from "Api/Types/FirstAppointment";
+import { FirstAppointmentChart } from "Api/Types/FirstAppointment";
 import { TrackingAppointmentChart } from "Api/Types/TrackingAppointmentChart";
+import { ReactNode } from "react";
 
 export type ChartsBarProps = {
     charts: TrackingAppointmentChartBasicInfo[],
     title: string,
     onClickNew: () => void,
     isLoading?: boolean,
-    firstChart?: FirstAppointment,
+    firstChart?: FirstAppointmentChart,
     onClickOnChart: (chart: TrackingAppointmentChartBasicInfo) => void,
-    canAddNew: boolean
+    canAddNew: boolean,
+    beforeContent?: ReactNode
 };
 
-export const ChartsBar = ({ charts, title, onClickNew, isLoading = false, onClickOnChart, canAddNew } : ChartsBarProps) => {
+export const ChartsBar = ({ charts, title, onClickNew, isLoading = false, onClickOnChart, canAddNew, beforeContent } : ChartsBarProps) => {
 
     return (
         <Stack gap={1}>
             <h5 style={{paddingLeft: '10px'}}>{title}</h5>
             <Stack direction="horizontal" style={{border: '2px solid #3D9AD5', marginBottom: '30px', display:'flex', alignItems: 'start', padding: '20px 0', overflowX: 'auto'}}>
-                
+                    <div style={{padding: '0px 40px'}}>
+                        {beforeContent}
+                    </div>
                 {
                     isLoading ? 
                         <div style={{height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'}}>
@@ -43,8 +47,10 @@ export const ChartsBar = ({ charts, title, onClickNew, isLoading = false, onClic
                 {
                     canAddNew
                     &&
+                    !isLoading
+                    &&
                     <div style={{padding: '0px 40px'}}>
-                        <IconButton2 text="Novo" iconClass="bi-clipboard-plus" onClick={onClickNew}/>
+                        <IconButton2 text={"Novo"} iconClass="bi-file-earmark-plus" onClick={onClickNew}/>
                     </div>
                 }
                 

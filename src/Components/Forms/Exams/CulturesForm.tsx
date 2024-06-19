@@ -3,6 +3,7 @@ import { ExamFormProps } from "./ExamFormProps";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Col, Form, Row, Stack } from "react-bootstrap";
 import { justRequiredRule } from "util/validation";
+import { ComplementaryExamDTO } from "Api/Types/DTOs/ComplementaryExamDTO";
 
 export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesExam>) => {
 
@@ -12,7 +13,7 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
         control,
         setValue,
         register
-    } = useForm<CulturesExam>({
+    } = useForm<ComplementaryExamDTO<CulturesExam>>({
         defaultValues: data ?? {
             patientId: patient.id
         }
@@ -63,6 +64,12 @@ export const CulturesForm = ({patient, onSubmit, data} : ExamFormProps<CulturesE
                 <Form.Group as={Col} md='6'>
                     <Form.Label>Observações</Form.Label>
                     <Form.Control {...register('observations')}/>
+                </Form.Group>
+            </Row>
+            <Row>
+                <Form.Group as={Col} md='12'>
+                    <Form.Label>Arquivos</Form.Label>
+                    <Form.Control {...register('files')} type='file'  multiple/>
                 </Form.Group>
             </Row>
             <Row className="form-mazzini-row">

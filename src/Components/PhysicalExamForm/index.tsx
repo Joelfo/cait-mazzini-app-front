@@ -4,7 +4,7 @@ import { SaveLoadingAlert } from "Components/Utils/Alert/SaveLoadingAlert";
 import { useSelectedPatient } from "Hooks/useSelectedPatient";
 import { useEffect } from "react";
 import { Button, Col, Container, Form, FormLabel, Row } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { PhysicalExam } from "Api/Types/PhysicalExam";
 import { ETrackingAppointmentChartType } from "Api/Types/enums/ETrackingAppointmentChartType";
@@ -14,19 +14,16 @@ import { ResponsabilityCheckbox } from "util/ResponsabilityCheckbox";
 import { HookControlledFormControl } from "util/components/HookControlledFormControl";
 import { HookControlledReactQuill } from "util/components/HookControlledReactQuill";
 import { justRequiredRule } from "util/validation";
+import { useUserContext } from "Contexts/useUserContext";
+import { ControlledReactQuill } from "Components/ControlledReactQuill";
 
 export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButton = false, defaultData, physicalExamType } : PhysicalExamFormProps) => {
 
     const { patient } = useSelectedPatient();
 
-    const {
-        handleSubmit,
-        formState: { errors },
-        control,
-        setValue,
-        getValues,
-        register
-    } = useForm<PhysicalExam>({
+    const user = useUserContext();
+
+    const formData = useForm<PhysicalExam>({
         defaultValues: defaultData ?? {
             date: getActualDate(),
             type: physicalExamType
@@ -38,73 +35,69 @@ export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButt
 
     useEffect(() => {
         if (patient) {
-            setValue('patientId', patient.id)
+            formData.setValue('patientId', patient.id)
         }
     }, [patient])
 
     return (
         <>
             <Container fluid>
-                <Form noValidate onSubmit={handleSubmit(onSubmit)}>
+                <FormProvider {...formData}>
+                <Form noValidate onSubmit={formData.handleSubmit(onSubmit)}>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='2'>
                             <Form.Label>
                                 Data
                             </Form.Label>
-                            <Form.Control {...register('date', justRequiredRule('Data'))} type='date'/>
+                            <Form.Control {...formData.register('date', justRequiredRule('Data'))} type='date'/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Aspecto geral e emocional*</Form.Label>
-                            <HookControlledReactQuill control={control} name='generalAspect' rules={justRequiredRule('Aspecto geral e emocional')} modules={QUILL_DEFAULT_MODULES} />
-                            <Form.Control.Feedback type='invalid'>{errors.generalAspect?.message}</Form.Control.Feedback>
+                            <ControlledReactQuill label='Aspecto geral e emocional*' name='generalAspect' rules={justRequiredRule('Aspecto geral e emocional')} />
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Condições de higiene*</Form.Label>
-                            <HookControlledReactQuill control={control} name='hygieneConditionsObs' rules={justRequiredRule('Condições de higiene')} modules={QUILL_DEFAULT_MODULES}/>
-                            <Form.Control.Feedback type='invalid'>{errors.hygieneConditionsObs?.message}</Form.Control.Feedback>
+                            <ControlledReactQuill label='Condições de higiene*' name='hygieneConditionsObs' rules={justRequiredRule('Condições de higiene')}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Cabeça</Form.Label>
-                            <HookControlledReactQuill control={control} name='headObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='Cabeça' name='headObs' rules={{}}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Pescoço</Form.Label>
-                            <HookControlledReactQuill control={control} name='neckObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='Pescoço' name='neckObs' rules={{}}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Abdome</Form.Label>
-                            <HookControlledReactQuill control={control} name='abdomenObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='Peitoral' name='chestObs' rules={{}}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>MMSS / MMII</Form.Label>
-                            <HookControlledReactQuill control={control} name='mmssMmiiObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='Abdome' name='abdomenObs' rules={{}}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Gênito-Urinário</Form.Label>
-                            <HookControlledReactQuill control={control} name='urinaryTrackObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='MMSS / MMII' name='mmssMmiiObs' rules={{}}/>
                         </Form.Group>
                     </Row>
                     <Row className='form-mazzini-row'>
                         <Form.Group as={Col} md='10'>
-                            <Form.Label>Pele e mucosa</Form.Label>
-                            <HookControlledReactQuill control={control} name='skinAndMucousObs' rules={{}} modules={QUILL_DEFAULT_MODULES}/>
+                            <ControlledReactQuill label='Gênito-Urinário' name='urinaryTrackObs' rules={{}}/>
                         </Form.Group>
                     </Row>
-                    <ResponsabilityCheckbox/>
+                    <Row className='form-mazzini-row'>
+                        <Form.Group as={Col} md='10'>
+                            <ControlledReactQuill label='Pele e mucosa' name='skinAndMucousObs' rules={{}}/>
+                        </Form.Group>
+                    </Row>
+                    <ResponsabilityCheckbox fieldName="creatorId"/>
                     <Row className='form-mazzini-row justify-content-center gx-5'>
                         {
                             showReturnButton
@@ -118,6 +111,7 @@ export const PhysicalExamForm = ({ onSubmit, onReturn = () => {}, showReturnButt
                         </Col>
                     </Row>
                 </Form>
+                </FormProvider>
             </Container>
         </>
     );

@@ -46,7 +46,7 @@ export const usePatientApi = () => {
     const useAllByName = (name: string | undefined) => useQuery(
         ['Patients.AllByName', name],
         async () => {
-            const response = await axios.get<Patient[]>(
+            const response = await axios.get<PatientBasicInfo[]>(
                 resourceUrl + '/ByName',
                 {
                     params: {
