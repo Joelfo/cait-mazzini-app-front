@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 export const LifeHabitsFormPage = () => {
     // useEffect
+    //fmnsjndsn
     const [ showPhysicalActivityPopup, setShowPhysicalActivityPopup ] = useState(false);
     const [ showContraceptiveMethodPopup, setShowContraceptiveMethodPopup ] = useState(false);
 
