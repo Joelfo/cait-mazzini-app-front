@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  front:
+    build: .
+    container_name: front
+    ports:
+      - '3000:80'
+    volumes:
+      - ./
+      - ./node_modules
