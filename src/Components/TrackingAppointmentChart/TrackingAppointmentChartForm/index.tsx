@@ -101,21 +101,14 @@ export const TrackingAppointmentChartForm = () => {
             
             <Form noValidate onSubmit={handleSubmit(onSubmit)}>
                 <Container fluid>
-                    <Row>
+                    <Row className='d-flex justify-content-center'>
                         <Form.Group as={Col} md='3'>
                             <Form.Label>Profissional de saúde</Form.Label>
                             <Form.Control disabled value={user.name}/>
                         </Form.Group>
-                    </Row>
-                    <Row className='mt-5
-                    '>
-                        <Form.Group as={Col} md='6'>
+                        <Form.Group as={Col} md='3'>
                             <Form.Label>Nome do paciente</Form.Label>
                             <Form.Control type='text' disabled value={patient?.name}/>
-                        </Form.Group>
-                        <Form.Group as={Col} md=''>
-                            <Form.Label>Nome do médico</Form.Label>
-                            <Form.Control type='text' disabled value={'Teste'}/>
                         </Form.Group>
                     </Row>
                     <Row className='mt-5 d-flex justify-content-center'>

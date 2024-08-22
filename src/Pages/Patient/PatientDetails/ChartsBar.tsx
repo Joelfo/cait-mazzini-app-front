@@ -24,9 +24,11 @@ export const ChartsBar = ({ charts, title, onClickNew, isLoading = false, onClic
         <Stack gap={1}>
             <h5 style={{paddingLeft: '10px'}}>{title}</h5>
             <Stack direction="horizontal" style={{border: '2px solid #3D9AD5', marginBottom: '30px', display:'flex', alignItems: 'start', padding: '20px 0', overflowX: 'auto'}}>
-                    <div style={{padding: '0px 40px'}}>
+                    { !!beforeContent &&
+                        <div style={{padding: '0px 40px'}}>
                         {beforeContent}
                     </div>
+                    }
                 {
                     isLoading ? 
                         <div style={{height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'}}>

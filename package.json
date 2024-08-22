@@ -44,8 +44,7 @@
     "zustand": "^4.3.9"
   },
   "scripts": {
-    "start": "serve -s build",
-    "dev": "react-scripts start",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -69,7 +68,6 @@
     ]
   },
   "devDependencies": {
-    "style-loader": "^3.3.3",
-    "serve": "^xxxxx"
+    "style-loader": "^3.3.3"
   }
 }

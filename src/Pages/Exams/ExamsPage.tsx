@@ -33,7 +33,7 @@ import { OtherExamForm } from "Components/Forms/Exams/OtherExamForm";
 import { OtherExamTable } from "Components/Exams/OtherExamTable";
 
 export const ExamsPage = () => {
-    const examTypeLabels = ["Raio X", "PPD", "PCR", "Biópsia", "Culturas", "BAAR", "Outros"];
+    const examTypeLabels = ["Raio X", "PPD", "PCR", "Biópsia", "Culturas", "BAAR", "Gerais"];
 
     const [ selectedExamType, setSelectedExamType ] = useState<string>(examTypeLabels[0]);
 
@@ -61,7 +61,7 @@ export const ExamsPage = () => {
             case EToraxXRayResult.Common:
                 return 'Normal';
             case EToraxXRayResult.HasOthers:
-                return 'Outros';
+                return 'Gerais';
             case EToraxXRayResult.HasSequelae:
                 return "Sequela";
             case EToraxXRayResult.HasSug:
@@ -373,7 +373,7 @@ export const ExamsPage = () => {
                                 <BaarExamTable patient={patient}/>
                             }
                             {
-                                selectedExamType === 'Outros'
+                                selectedExamType === 'Gerais'
                                 &&
                                 <OtherExamTable patient={patient}/>
                             }

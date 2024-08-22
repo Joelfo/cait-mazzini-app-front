@@ -19,7 +19,7 @@ export const MazziniNavbar = () => {
                             Cait Mazzini Bueno
                         </Link>
                     </Navbar.Brand>
-                <Nav className='me-auto' color='white'>
+                {/*<Nav className='me-auto' color='white'>
                     <NavDropdown style={{color: 'white'}} title={<span style={{color: 'white'}}>Administrador</span>}>
                         <NavDropdown.Item>
                             <Link to='/userList'>
@@ -27,8 +27,7 @@ export const MazziniNavbar = () => {
                             </Link>
                         </NavDropdown.Item>
                     </NavDropdown>
-                </Nav>
-                <Navbar.Toggle />
+                </Nav>*/}
                 <Navbar.Collapse className="justify-content-end">
                     <Stack direction='horizontal' gap={3}>
                         <Navbar.Text style={{color: 'white'}}>
